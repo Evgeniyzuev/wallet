@@ -59,30 +59,6 @@ export default function Home() {
     return `${tempAddress.slice(0, 4)}...${tempAddress.slice(-4)}`;
   };
 
-  const sendOneToncoin = async () => {
-    if (!tonConnectUI.connected || !tonWalletAddress) {
-      console.log("Wallet not connected");
-      return;
-    }
-
-    try {
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
-        messages: [
-          {
-            address: "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz",
-            amount: "1000000000", // 1 TON in nanotons
-          },
-        ],
-      };
-
-      const result = await tonConnectUI.sendTransaction(transaction);
-      console.log("Transaction sent:", result);
-    } catch (error) {
-      console.error("Error sending transaction:", error);
-    }
-  };
-
   if (isLoading) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center">
@@ -93,6 +69,30 @@ export default function Home() {
     );
   }
 
+  const sendOneToncoin = async () => {
+    if (!tonConnectUI.connected || !tonWalletAddress) {
+      console.log("Wallet not connected");
+      return;
+    }
+  
+    try {
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
+        messages: [
+          {
+            address: "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz",
+            amount: "1000000000", // 1 TON in nanotons
+          },
+        ],
+      };
+  
+      const result = await tonConnectUI.sendTransaction(transaction);
+      console.log("Transaction sent:", result);
+    } catch (error) {
+      console.error("Error sending transaction:", error);
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1>
@@ -101,15 +101,9 @@ export default function Home() {
           <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
           <button
             onClick={handleWalletAction}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-4"
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           >
             Disconnect Wallet
-          </button>
-          <button
-            onClick={sendOneToncoin}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Send 1 Toncoin
           </button>
         </div>
       ) : (
@@ -120,6 +114,14 @@ export default function Home() {
           Connect TON Wallet
         </button>
       )}
+      <div className="flex flex-col items-center">
+        <button
+          onClick={sendOneToncoin}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Send 1 Toncoin
+        </button>
+      </div>
     </main>
   );
 }
