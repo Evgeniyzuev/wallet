@@ -124,8 +124,8 @@ export default function Home() {
       )}
       <div className="w-full bg-gray-800 py-4 fixed bottom-0">
         <div className="flex justify-around max-w-screen-lg mx-auto">
-          <Link href="/assist" className="text-white hover:text-blue-300 font-medium">
-            Assist
+          <Link href="/aissist" className="text-white hover:text-blue-300 font-medium">
+            Aissist
           </Link>
           <Link href="/" className="text-white hover:text-blue-300 font-medium">
             Wallet

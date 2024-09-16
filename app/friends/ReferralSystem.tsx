@@ -17,10 +17,9 @@ interface UserData {
 
 const ReferralSystem: React.FC = () => {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [initData, setInitData] = useState('')
   const [userId, setUserId] = useState('')
   const [startParam, setStartParam] = useState('')
-  const [referrals, setReferrals] = useState<string[]>([])
+  const [referrals] = useState<string[]>([])
   const [referrer, setReferrer] = useState<string | null>(null)
   const [showReferrals, setShowReferrals] = useState(true)
 
@@ -35,13 +34,18 @@ const ReferralSystem: React.FC = () => {
       if (typeof window !== 'undefined') {
         const webApp = (await import('@twa-dev/sdk')).default;
         webApp.ready();
-        setInitData(webApp.initData);
         setUserId(webApp.initDataUnsafe.user?.id.toString() || '');
         setStartParam(webApp.initDataUnsafe.start_param || '');
       }
     }
     initWebApp();
   }, []);
+
+  useEffect(() => {
+    if (startParam) {
+      setReferrer(startParam);
+    }
+  }, [startParam]);
 
   const handleInviteFriend = () => {
     const utils = initUtils()
@@ -55,6 +59,10 @@ const ReferralSystem: React.FC = () => {
     const inviteLink = `${INVITE_URL}?startapp=${userId}`
     navigator.clipboard.writeText(inviteLink)
     alert('Invite link copied to clipboard!')
+  }
+
+  const handleShowReferrals = () => {
+    setShowReferrals(true)
   }
 
   return (
@@ -88,6 +96,12 @@ const ReferralSystem: React.FC = () => {
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
           >
             Copy Invite Link
+          </button>
+          <button
+            onClick={handleShowReferrals}
+            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Show Referrals
           </button>
         </div>
         {showReferrals && (

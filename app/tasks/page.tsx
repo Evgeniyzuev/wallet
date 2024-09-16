@@ -1,11 +1,9 @@
-import ReferralSystem from './ReferralSystem'
 import Link from 'next/link'
 
 export default function FriendsPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-8">Friends</h1>
-      <ReferralSystem />
+      <h1 className="text-4xl font-bold mb-8">Tasks</h1>
       <div className="w-full bg-gray-800 py-4 fixed bottom-0">
         <div className="flex justify-around max-w-screen-lg mx-auto">
           <Link href="/aissist" className="text-white hover:text-blue-300 font-medium">
