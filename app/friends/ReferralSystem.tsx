@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { initUtils } from '@telegram-apps/sdk'
-import WebApp from '@twa-dev/sdk';
 
 const INVITE_URL = 'https://t.me/AissistIncomeBot/AissistIncomeBot/start'
 
@@ -21,21 +20,18 @@ const ReferralSystem: React.FC = () => {
   const [startParam, setStartParam] = useState('')
   const [referrals] = useState<string[]>([])
   const [referrer, setReferrer] = useState<string | null>(null)
-  const [showReferrals, setShowReferrals] = useState(true)
-
-  useEffect(() => {
-    if (WebApp.initDataUnsafe.user) {
-      setUserData(WebApp.initDataUnsafe.user as UserData);
-    }
-  }, []);
+  const [showReferrals, setShowReferrals] = useState(false)
 
   useEffect(() => {
     const initWebApp = async () => {
       if (typeof window !== 'undefined') {
-        const webApp = (await import('@twa-dev/sdk')).default;
-        webApp.ready();
-        setUserId(webApp.initDataUnsafe.user?.id.toString() || '');
-        setStartParam(webApp.initDataUnsafe.start_param || '');
+        const WebApp = (await import('@twa-dev/sdk')).default;
+        WebApp.ready();
+        if (WebApp.initDataUnsafe.user) {
+          setUserData(WebApp.initDataUnsafe.user as UserData);
+        }
+        setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
+        setStartParam(WebApp.initDataUnsafe.start_param || '');
       }
     }
     initWebApp();
@@ -61,8 +57,8 @@ const ReferralSystem: React.FC = () => {
     alert('Invite link copied to clipboard!')
   }
 
-  const handleShowReferrals = () => {
-    setShowReferrals(true)
+  const handleToggleReferrals = () => {
+    setShowReferrals(prev => !prev)
   }
 
   return (
@@ -98,10 +94,12 @@ const ReferralSystem: React.FC = () => {
             Copy Invite Link
           </button>
           <button
-            onClick={handleShowReferrals}
-            className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+            onClick={handleToggleReferrals}
+            className={`${
+              showReferrals ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
+            } text-white font-bold py-2 px-4 rounded`}
           >
-            Show Referrals
+            {showReferrals ? 'Hide Referrals' : 'Show Referrals'}
           </button>
         </div>
         {showReferrals && (
