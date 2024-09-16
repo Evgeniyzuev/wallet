@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address } from "@ton/core";
+import Link from 'next/link';
 
 export default function Home() {
   const [tonConnectUI] = useTonConnectUI();
@@ -99,28 +100,35 @@ export default function Home() {
       {tonWalletAddress ? (
         <div className="flex flex-col items-center">
           <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
+
           <button
             onClick={handleWalletAction}
-            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-red-500 hover:bg-red-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
           >
             Disconnect Wallet
+          </button>
+          <button
+            onClick={sendOneToncoin}
+            className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
+          >
+            Send 1 Toncoin
           </button>
         </div>
       ) : (
         <button
           onClick={handleWalletAction}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-700 mb-4 text-white font-bold py-2 px-4 rounded"
         >
           Connect TON Wallet
         </button>
       )}
-      <div className="flex flex-col items-center">
-        <button
-          onClick={sendOneToncoin}
-          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Send 1 Toncoin
-        </button>
+      <div className="mt-8 flex space-x-4">
+        <Link href="/" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Home
+        </Link>
+        <Link href="/friends" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Friends
+        </Link>
       </div>
     </main>
   );
