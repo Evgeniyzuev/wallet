@@ -8,7 +8,7 @@ export default function FriendsPage() {
     const [initData, setInitData] = useState('')
     const [userId, setUserId] = useState('')
     const [startParam, setStartParam] = useState('')
-  
+    const [userName, setUserName] = useState('')
     useEffect(() => {
       const initWebApp = async () => {
         if (typeof window !== 'undefined') {
@@ -17,6 +17,7 @@ export default function FriendsPage() {
           setInitData(WebApp.initData);
           setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
           setStartParam(WebApp.initDataUnsafe.start_param || '');
+          setUserName(WebApp.initDataUnsafe.user?.first_name || '');
         }
       };
   
@@ -26,6 +27,7 @@ export default function FriendsPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">Friends</h1>
+      <h1 className="text-xl font-bold mb-8">Hello, {userName}!</h1>
       <ReferralSystem initData={initData} userId={userId} startParam={startParam} />
       <div className="w-full bg-gray-800 py-4 fixed bottom-0">
         <div className="flex justify-around max-w-screen-lg mx-auto">
