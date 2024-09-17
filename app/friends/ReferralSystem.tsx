@@ -1,47 +1,50 @@
-'use client'
-
 import { useState, useEffect } from 'react'
 import { initUtils } from '@telegram-apps/sdk'
 
-const INVITE_URL = 'https://t.me/AissistIncomeBot/AissistIncomeBot/start'
-
-interface UserData {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  language_code: string;
-  is_premium?: boolean;
+interface ReferralSystemProps {
+  initData: string
+  userId: string
+  startParam: string
 }
 
-const ReferralSystem: React.FC = () => {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [userId, setUserId] = useState('')
-  const [startParam, setStartParam] = useState('')
-  const [referrals] = useState<string[]>([])
+const ReferralSystem: React.FC<ReferralSystemProps> = ({ initData, userId, startParam }) => {
+  const [referrals, setReferrals] = useState<string[]>([])
   const [referrer, setReferrer] = useState<string | null>(null)
-  const [showReferrals, setShowReferrals] = useState(false)
+  const INVITE_URL = "https://t.me/referral_showcase_bot/start"
 
   useEffect(() => {
-    const initWebApp = async () => {
-      if (typeof window !== 'undefined') {
-        const WebApp = (await import('@twa-dev/sdk')).default;
-        WebApp.ready();
-        if (WebApp.initDataUnsafe.user) {
-          setUserData(WebApp.initDataUnsafe.user as UserData);
+    const checkReferral = async () => {
+      if (startParam && userId) {
+        try {
+          const response = await fetch('/api/referrals', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, referrerId: startParam }),
+          });
+          if (!response.ok) throw new Error('Failed to save referral');
+        } catch (error) {
+          console.error('Error saving referral:', error);
         }
-        setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
-        setStartParam(WebApp.initDataUnsafe.start_param || '');
       }
     }
-    initWebApp();
-  }, []);
 
-  useEffect(() => {
-    if (startParam) {
-      setReferrer(startParam);
+    const fetchReferrals = async () => {
+      if (userId) {
+        try {
+          const response = await fetch(`/api/referrals?userId=${userId}`);
+          if (!response.ok) throw new Error('Failed to fetch referrals');
+          const data = await response.json();
+          setReferrals(data.referrals);
+          setReferrer(data.referrer);
+        } catch (error) {
+          console.error('Error fetching referrals:', error);
+        }
+      }
     }
-  }, [startParam]);
+
+    checkReferral();
+    fetchReferrals();
+  }, [userId, startParam])
 
   const handleInviteFriend = () => {
     const utils = initUtils()
@@ -57,69 +60,41 @@ const ReferralSystem: React.FC = () => {
     alert('Invite link copied to clipboard!')
   }
 
-  const handleToggleReferrals = () => {
-    setShowReferrals(prev => !prev)
-  }
-
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-8">Friends</h1>
+    <div className="w-full max-w-md">
+      {referrer && (
+        <p className="text-green-500 mb-4">You were referred by user {referrer}</p>
+      )}
+      {!referrer && (
+        <p className="text-green-500 mb-4">You were not referred by anyone {initData}</p>
+      )}
       <div className="flex flex-col space-y-4">
-        {(() => {
-          try {
-            return `Welcome, ${userData?.first_name || 'Username'}!`;
-          } catch (error) {
-            return 'Welcome, Username!';
-          }
-        })()}
+        <button
+          onClick={handleInviteFriend}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Invite Friend
+        </button>
+        <button
+          onClick={handleCopyLink}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Copy Invite Link
+        </button>
       </div>
-    
-      <div className="w-full max-w-md">
-        {referrer ? (
-          <p className="text-green-500 mb-4">You were referred by user {referrer}</p>
-        ) : (
-          <p className="text-gray-500 mb-4">No referrer {startParam}</p>
-        )}
-        <div className="flex flex-col space-y-4">
-          <button
-            onClick={handleInviteFriend}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Invite Friend
-          </button>
-          <button
-            onClick={handleCopyLink}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-          >
-            Copy Invite Link
-          </button>
-          <button
-            onClick={handleToggleReferrals}
-            className={`${
-              showReferrals ? 'bg-red-500 hover:bg-red-700' : 'bg-green-500 hover:bg-green-700'
-            } text-white font-bold py-2 px-4 rounded`}
-          >
-            {showReferrals ? 'Hide Referrals' : 'Show Referrals'}
-          </button>
+      {referrals.length > 0 && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Your Referrals</h2>
+          <ul>
+            {referrals.map((referral, index) => (
+              <li key={index} className="bg-gray-100 p-2 mb-2 rounded">
+                User {referral}
+              </li>
+            ))}
+          </ul>
         </div>
-        {showReferrals && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Your Referrals</h2>
-            {referrals.length > 0 ? (
-              <ul>
-                {referrals.map((referral, index) => (
-                  <li key={index} className="bg-gray-100 p-2 mb-2 rounded">
-                    User {referral}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p className="text-gray-500">No referrals</p>
-            )}
-          </div>
-        )}
-      </div>
-    </main>
+      )}
+    </div>
   )
 }
 
