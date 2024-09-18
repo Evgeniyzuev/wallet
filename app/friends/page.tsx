@@ -25,6 +25,10 @@ export default function FriendsPage() {
         const initWebApp = async () => {
           if (typeof window !== 'undefined') {
             const WebApp = (await import('@twa-dev/sdk')).default;
+            WebApp.ready();
+            setInitData(WebApp.initData);
+            setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
+            setStartParam(WebApp.initDataUnsafe.start_param || '');
             if (WebApp.initDataUnsafe.user) {
               setUserData(WebApp.initDataUnsafe.user as UserData);
             }
