@@ -1,9 +1,10 @@
 'use client'
 
-import ReferralSystem from './ReferralSystem'
+import dynamic from 'next/dynamic'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import WebApp from '@twa-dev/sdk';
+
+const ReferralSystem = dynamic(() => import('./ReferralSystem'), { ssr: false })
 
 export default function FriendsPage() {
     const [userData, setUserData] = useState<UserData | null>(null);
@@ -21,26 +22,19 @@ export default function FriendsPage() {
       }
 
       useEffect(() => {
-        if (WebApp.initDataUnsafe.user) {
-          setUserData(WebApp.initDataUnsafe.user as UserData);
-      }
+        const initWebApp = async () => {
+          if (typeof window !== 'undefined') {
+            const WebApp = (await import('@twa-dev/sdk')).default;
+            if (WebApp.initDataUnsafe.user) {
+              setUserData(WebApp.initDataUnsafe.user as UserData);
+            }
+          }
+        };
+
+        initWebApp();
       }, []);
 
 
-    useEffect(() => {
-      const initWebApp = async () => {
-        if (typeof window !== 'undefined') {
-          const WebApp = (await import('@twa-dev/sdk')).default;
-          WebApp.ready();
-          setInitData(WebApp.initData);
-          setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
-          setStartParam(WebApp.initDataUnsafe.start_param || '');
-        }
-      };
-  
-      initWebApp();
-    }, [])
-  
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">Friends</h1>

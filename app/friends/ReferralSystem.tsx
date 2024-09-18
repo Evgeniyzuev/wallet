@@ -60,6 +60,18 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ initData, userId, start
     alert('Invite link copied to clipboard!')
   }
 
+//   const handleSaveReferral = () => {
+//     const userId = (document.querySelector('input[type="text"][placeholder="User ID"]') as HTMLInputElement)?.value;
+//     const referrerId = (document.querySelector('input[type="text"][placeholder="Referrer ID"]') as HTMLInputElement)?.value;
+//     if (userId && referrerId) {
+//       fetch('/api/referrals', {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify({ userId, referrerId }),
+//       });
+//     }
+//   };
+
   return (
     <div className="w-full max-w-md">
       {referrer && (
@@ -81,6 +93,15 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ initData, userId, start
         >
           Copy Invite Link
         </button>
+        {/* сделать 2 поля ввода, в одном вводится userId, в другом referrerId */}
+        {/* <input type="text" placeholder="User ID" />
+        <input type="text" placeholder="Referrer ID" />
+        <button 
+        onClick={handleSaveReferral}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        >
+            Save Referral
+        </button> */}
       </div>
       {referrals.length > 0 && (
         <div className="mt-8">

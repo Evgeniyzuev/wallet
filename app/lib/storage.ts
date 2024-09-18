@@ -1,25 +1,30 @@
 interface ReferralData {
-    referrals: { [userId: string]: string[] };
-    referredBy: { [userId: string]: string };
+    // make a map {userId:  referrerId}
+    referrals: { [userId: string]: string }
   }
   
   const storage: ReferralData = {
-    referrals: {},
-    referredBy: {}
+    referrals: {}
   };
   
   export function saveReferral(userId: string, referrerId: string) {
-    if (!storage.referrals[referrerId]) {
-      storage.referrals[referrerId] = [];
+// если в referrals нет userId, то добавляем его и присваиваем referrerId
+    if (!storage.referrals[userId]) {
+      storage.referrals[userId] = referrerId;
     }
-    storage.referrals[referrerId].push(userId);
-    storage.referredBy[userId] = referrerId;
   }
   
   export function getReferrals(userId: string): string[] {
-    return storage.referrals[userId] || [];
+    // создаем массив referrals 
+    const referrals = [];
+    for (const [key, value] of Object.entries(storage.referrals)) {
+      if (value === userId) {
+        referrals.push(key);
+      }
+    }
+    return referrals;
   }
   
   export function getReferrer(userId: string): string | null {
-    return storage.referredBy[userId] || null;
+    return storage.referrals[userId] || null;
   }
