@@ -14,10 +14,18 @@ export default function FriendsPage() {
         if (typeof window !== 'undefined') {
           const WebApp = (await import('@twa-dev/sdk')).default;
           WebApp.ready();
-          setInitData(WebApp.initData);
-          setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
-          setStartParam(WebApp.initDataUnsafe.start_param || '');
-          setUserName(WebApp.initDataUnsafe.user?.first_name || '');
+          
+          const handleViewportChanged = () => {
+            setInitData(WebApp.initData);
+            setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
+            setStartParam(WebApp.initDataUnsafe.start_param || '');
+            setUserName(WebApp.initDataUnsafe.user?.first_name || '');
+            
+            // Remove the event listener after it's been called
+            WebApp.offEvent('viewportChanged', handleViewportChanged);
+          };
+
+          WebApp.onEvent('viewportChanged', handleViewportChanged);
         }
       };
   
