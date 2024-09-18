@@ -10,7 +10,6 @@ export default function FriendsPage() {
     const [initData, setInitData] = useState('')
     const [userId, setUserId] = useState('')
     const [startParam, setStartParam] = useState('')
-    const [userName, setUserName] = useState('')
 
     interface UserData {
         id: number;
@@ -36,7 +35,6 @@ export default function FriendsPage() {
           setInitData(WebApp.initData);
           setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
           setStartParam(WebApp.initDataUnsafe.start_param || '');
-          setUserName(WebApp.initDataUnsafe.user?.first_name || '');
         }
       };
   
