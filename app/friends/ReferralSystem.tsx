@@ -10,7 +10,7 @@ interface ReferralSystemProps {
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ initData, userId, startParam }) => {
   const [referrals, setReferrals] = useState<string[]>([])
   const [referrer, setReferrer] = useState<string | null>(null)
-  const INVITE_URL = "https://t.me/referral_showcase_bot/start"
+  const INVITE_URL = "https://t.me/flappy_test88_bot/flappy88/start"
 
   useEffect(() => {
     const checkReferral = async () => {
@@ -65,8 +65,8 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ initData, userId, start
       {referrer && (
         <p className="text-green-500 mb-4">You were referred by user {referrer}</p>
       )}
-      {!referrer && (
-        <p className="text-green-500 mb-4">You were not referred by anyone {initData}</p>
+      {!referrer && initData && (
+        <p className="text-green-500 mb-4">You were not referred by anyone</p>
       )}
       <div className="flex flex-col space-y-4">
         <button
