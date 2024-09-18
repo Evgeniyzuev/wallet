@@ -3,29 +3,40 @@
 import ReferralSystem from './ReferralSystem'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import WebApp from '@twa-dev/sdk';
 
 export default function FriendsPage() {
+    const [userData, setUserData] = useState<UserData | null>(null);
     const [initData, setInitData] = useState('')
     const [userId, setUserId] = useState('')
     const [startParam, setStartParam] = useState('')
     const [userName, setUserName] = useState('')
+
+    interface UserData {
+        id: number;
+        first_name: string;
+        last_name?: string;
+        username?: string;
+        language_code: string;
+        is_premium?: boolean;
+      }
+
+      useEffect(() => {
+        if (WebApp.initDataUnsafe.user) {
+          setUserData(WebApp.initDataUnsafe.user as UserData);
+      }
+      }, []);
+
+
     useEffect(() => {
       const initWebApp = async () => {
         if (typeof window !== 'undefined') {
           const WebApp = (await import('@twa-dev/sdk')).default;
           WebApp.ready();
-          
-          const handleViewportChanged = () => {
-            setInitData(WebApp.initData);
-            setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
-            setStartParam(WebApp.initDataUnsafe.start_param || '');
-            setUserName(WebApp.initDataUnsafe.user?.first_name || '');
-            
-            // Remove the event listener after it's been called
-            WebApp.offEvent('viewportChanged', handleViewportChanged);
-          };
-
-          WebApp.onEvent('viewportChanged', handleViewportChanged);
+          setInitData(WebApp.initData);
+          setUserId(WebApp.initDataUnsafe.user?.id.toString() || '');
+          setStartParam(WebApp.initDataUnsafe.start_param || '');
+          setUserName(WebApp.initDataUnsafe.user?.first_name || '');
         }
       };
   
@@ -35,7 +46,7 @@ export default function FriendsPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">Friends</h1>
-      <h1 className="text-xl font-bold mb-8">Hello, {userName}!</h1>
+      <h1 className="text-xl font-bold mb-8">Hello, {userData?.first_name}!</h1>
       <ReferralSystem initData={initData} userId={userId} startParam={startParam} />
       <div className="w-full bg-gray-800 py-4 fixed bottom-0">
         <div className="flex justify-around max-w-screen-lg mx-auto">
