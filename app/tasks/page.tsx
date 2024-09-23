@@ -21,32 +21,16 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
   const [notification, setNotification] = useState('')
-  const [userData, setUserData] = useState<UserData | null>(null);
+  // const [userData, setUserData] = useState<UserData | null>(null);
 
-  interface UserData {
-    id: number;
-    first_name: string;
-    last_name?: string;
-    username?: string;
-    language_code: string;
-    is_premium?: boolean;
-  }
-
-  // useEffect(() => {
-  //   if (WebApp.initDataUnsafe.user) {
-  //     setUserData(WebApp.initDataUnsafe.user as UserData);
+  // interface UserData {
+  //   id: number;
+  //   first_name: string;
+  //   last_name?: string;
+  //   username?: string;
+  //   language_code: string;
+  //   is_premium?: boolean;
   // }
-  // }, []);
-
-//   useEffect(() => {
-//     const initWebApp = async () => {
-//         if (typeof window !== 'undefined') {
-//             const webApp = (await import('@twa-dev/sdk')).default;
-//             // webApp.ready();
-// //         }
-// //     }
-// //     initWebApp();
-// // }, []);
 
 
 
