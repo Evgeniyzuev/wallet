@@ -66,7 +66,7 @@ export default function Home() {
     validUntil: Math.floor(Date.now() / 1000) + 360,
     messages: [
     {
-    address: tonWalletAddress, // sender jetton wallet
+    address: destinationUsdtAddress, // sender jetton wallet
     amount: toNano("2.2").toString(), // for commission fees, excess will be returned
     payload: body.toBoc().toString("base64") // payload with jetton transfer and comment body
     }
