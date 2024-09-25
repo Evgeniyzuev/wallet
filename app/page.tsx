@@ -8,7 +8,7 @@ import Link from 'next/link';
 // const jettonWalletContract = Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
 
 const destinationAddress =   Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
-const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs');
+const usdtContractAddress = Address.parse('EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA'); // USDT contract address on TON EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs
 
 const forwardPayload = beginCell()
     .storeUint(0, 32) // 0 opcode means we have a comment
@@ -18,11 +18,11 @@ const forwardPayload = beginCell()
 const body = beginCell()
     .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
     .storeUint(0, 64) // query id
-    .storeCoins(toNano("0.001")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
+    .storeCoins(2000000) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
     .storeAddress(destinationAddress) // TON wallet destination address
     .storeAddress(usdtContractAddress) // response excess destination
     .storeBit(0) // no custom payload
-    .storeCoins(toNano("0.02")) // forward amount (if >0, will send notification message)
+    .storeCoins(100000) // forward amount (if >0, will send notification message)
     .storeBit(1) // we store forwardPayload as a reference
     .storeRef(forwardPayload)
     .endCell();
@@ -252,7 +252,7 @@ export default function Home() {
           })}
           className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
           >
-            Send transaction
+            Send 2 USDT
           </button>
          </div>
         </div>
