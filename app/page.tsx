@@ -195,7 +195,7 @@ export default function Home() {
         },
         method: "transfer",
         params: {
-          destination: recipientAddress,
+          destination: usdtContractAddress,
           tokens: amount,
           grams: "1000000000", // 0.1 TON for gas
           return_ownership: "0",
