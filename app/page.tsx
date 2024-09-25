@@ -8,7 +8,7 @@ import Link from 'next/link';
 // const jettonWalletContract = Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
 
 const destinationAddress =   Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
-const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs'); // USDT contract address on TON   EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA
+const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs'); // USDT contract address on TON   
 
 const forwardPayload = beginCell()
     .storeUint(0, 32) // 0 opcode means we have a comment
@@ -18,11 +18,11 @@ const forwardPayload = beginCell()
 const body = beginCell()
     .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
     .storeUint(0, 64) // query id
-    .storeCoins(1500000) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
+    .storeCoins(150000000) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
     .storeAddress(destinationAddress) // TON wallet destination address
-    .storeAddress(usdtContractAddress) // response excess destination
+    .storeAddress(destinationAddress) // response excess destination
     .storeBit(0) // no custom payload
-    .storeCoins(100000) // forward amount (if >0, will send notification message)
+    .storeCoins(1000000) // forward amount (if >0, will send notification message)
     .storeBit(1) // we store forwardPayload as a reference
     .storeRef(forwardPayload)
     .endCell();
@@ -66,7 +66,7 @@ export default function Home() {
     messages: [
     {
     address: tonWalletAddress, // sender jetton wallet
-    amount: toNano("0.05").toString(), // for commission fees, excess will be returned
+    amount: toNano("0.2").toString(), // for commission fees, excess will be returned
     payload: body.toBoc().toString("base64") // payload with jetton transfer and comment body
     }
     ]
@@ -158,68 +158,68 @@ export default function Home() {
 
 
 
-  // const sendUSDt = async () => {
-  //   if (!tonConnectUI.connected || !tonWalletAddress) {
-  //     console.log("Wallet not connected");
-  //     return;
-  //   }
+  const sendUSDt = async () => {
+    if (!tonConnectUI.connected || !tonWalletAddress) {
+      console.log("Wallet not connected");
+      return;
+    }
 
-  //   try {
-  //     const usdtContractAddress = "EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA"; // USDT contract address on TON
-  //     const recipientAddress = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz"; // The recipient's address
-  //     const amount = "1000000"; // Amount in minimal units (1 USDT = 1,000,000 units)
+    try {
+      const usdtContractAddress = "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"; // USDT contract address on TON
+      const recipientAddress = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz"; // The recipient's address
+      const amount = "1000000"; // Amount in minimal units (1 USDT = 1,000,000 units)
 
-  //     const payload = {
-  //       abi: {
-  //         type: "Contract",
-  //         value: {
-  //           "ABI version": 2,
-  //           "version": "2.2",
-  //           "header": ["time", "expire"],
-  //           "functions": [
-  //             {
-  //               "name": "transfer",
-  //               "inputs": [
-  //                 {"name": "destination", "type": "address"},
-  //                 {"name": "tokens", "type": "uint128"},
-  //                 {"name": "grams", "type": "uint128"},
-  //                 {"name": "return_ownership", "type": "uint128"},
-  //                 {"name": "notify", "type": "bool"}
-  //               ],
-  //               "outputs": []
-  //             }
-  //           ],
-  //           "data": [],
-  //           "events": []
-  //         }
-  //       },
-  //       method: "transfer",
-  //       params: {
-  //         destination: recipientAddress,
-  //         tokens: amount,
-  //         grams: "1000000000", // 0.1 TON for gas
-  //         return_ownership: "0",
-  //         notify: false
-  //       }
-  //     };
+      const payload = {
+        abi: {
+          type: "Contract",
+          value: {
+            "ABI version": 2,
+            "version": "2.2",
+            "header": ["time", "expire"],
+            "functions": [
+              {
+                "name": "transfer",
+                "inputs": [
+                  {"name": "destination", "type": "address"},
+                  {"name": "tokens", "type": "uint128"},
+                  {"name": "grams", "type": "uint128"},
+                  {"name": "return_ownership", "type": "uint128"},
+                  {"name": "notify", "type": "bool"}
+                ],
+                "outputs": []
+              }
+            ],
+            "data": [],
+            "events": []
+          }
+        },
+        method: "transfer",
+        params: {
+          destination: recipientAddress,
+          tokens: amount,
+          grams: "1000000000", // 0.1 TON for gas
+          return_ownership: "0",
+          notify: false
+        }
+      };
 
-  //     const transaction = {
-  //       validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
-  //       messages: [
-  //         {
-  //           address: usdtContractAddress,
-  //           amount: "1000000000", // 0.1 TON for gas
-  //           payload: btoa(JSON.stringify(payload)), // Serialize and encode the payload
-  //         },
-  //       ],
-  //     };
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
+        messages: [
+          {
+            address: tonWalletAddress,
+            amount: "1000000000", // 0.1 TON for gas
+            payload: btoa(JSON.stringify(payload)), // Serialize and encode the payload
+          },
+        ],
+      };
 
-  //     const result = await tonConnectUI.sendTransaction(transaction);
-  //     console.log("USDT Transaction sent:", result);
-  //   } catch (error) {
-  //     console.error("Error sending USDT transaction:", error);
-  //   }
-  // };
+      const result = await tonConnectUI.sendTransaction(transaction);
+      console.log("USDT Transaction sent:", result);
+    } catch (error) {
+      console.error("Error sending USDT transaction:", error);
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
@@ -242,14 +242,15 @@ export default function Home() {
           </button>
           <div>
           <button 
-          onClick={() => tonConnectUI.sendTransaction({
-            validUntil: myTransaction.validUntil,
-            messages: myTransaction.messages.map(msg => ({
-              address: msg.address?.toString() || '', // Use optional chaining and provide a fallback
-              amount: msg.amount,
-              payload: msg.payload
-            }))
-          })}
+          onClick={sendUSDt}
+          // onClick={() => tonConnectUI.sendTransaction({
+          //   validUntil: myTransaction.validUntil,
+          //   messages: myTransaction.messages.map(msg => ({
+          //     address: msg.address?.toString() || '', // Use optional chaining and provide a fallback
+          //     amount: msg.amount,
+          //     payload: msg.payload
+          //   }))
+          // })}
           className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
           >
             Send 1,5 USDT
