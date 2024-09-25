@@ -20,7 +20,7 @@ const body = beginCell()
     .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
     .storeUint(0, 64) // query id
     .storeCoins(toNano("3.5")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
-    .storeAddress(destinationUsdtAddress) // TON wallet destination address
+    .storeAddress(usdtContractAddress) // TON wallet destination address
     .storeAddress(destinationUsdtAddress) // response excess destination
     .storeBit(0) // no custom payload
     .storeCoins(toNano("1.2")) // forward amount (if >0, will send notification message)
