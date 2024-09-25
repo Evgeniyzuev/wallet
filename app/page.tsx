@@ -94,6 +94,69 @@ export default function Home() {
     }
   };
 
+  const sendUSDt = async () => {
+    if (!tonConnectUI.connected || !tonWalletAddress) {
+      console.log("Wallet not connected");
+      return;
+    }
+
+    try {
+      const usdtContractAddress = "EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA"; // USDT contract address on TON
+      const recipientAddress = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz"; // The recipient's address
+      const amount = "1000000"; // Amount in minimal units (1 USDT = 1,000,000 units)
+
+      const payload = {
+        abi: {
+          type: "Contract",
+          value: {
+            "ABI version": 2,
+            "version": "2.2",
+            "header": ["time", "expire"],
+            "functions": [
+              {
+                "name": "transfer",
+                "inputs": [
+                  {"name": "destination", "type": "address"},
+                  {"name": "tokens", "type": "uint128"},
+                  {"name": "grams", "type": "uint128"},
+                  {"name": "return_ownership", "type": "uint128"},
+                  {"name": "notify", "type": "bool"}
+                ],
+                "outputs": []
+              }
+            ],
+            "data": [],
+            "events": []
+          }
+        },
+        method: "transfer",
+        params: {
+          destination: recipientAddress,
+          tokens: amount,
+          grams: "100000000", // 0.1 TON for gas
+          return_ownership: "0",
+          notify: false
+        }
+      };
+
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
+        messages: [
+          {
+            address: usdtContractAddress,
+            amount: "100000000", // 0.1 TON for gas
+            payload: btoa(JSON.stringify(payload))
+          },
+        ],
+      };
+
+      const result = await tonConnectUI.sendTransaction(transaction);
+      console.log("USDT Transaction sent:", result);
+    } catch (error) {
+      console.error("Error sending USDT transaction:", error);
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1>
@@ -112,6 +175,12 @@ export default function Home() {
             className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
           >
             Send 1 Toncoin
+          </button>
+          <button
+            onClick={sendUSDt}
+            className="bg-blue-500 hover:bg-blue-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
+          >
+            Send 1 USDT
           </button>
         </div>
       ) : (

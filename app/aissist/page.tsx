@@ -23,7 +23,8 @@ export default function AissistPage() {
   const balanceRequiredForNextLevel = [100, 200, 300, 400, 500];
 
   return (
-    <main className="text-base flex flex-col items-center self-start w-full p-4">
+    // <main className="text-base flex flex-col items-center self-start w-full p-4">
+    <main className="bg-black text-white h-screen flex flex-col">
       {/* <Image src={aissistImage} alt="Aissist" className="mb-8" />
       <h1 className="text-4xl font-bold mb-8">Aissist</h1> */}
       <div className="h-1/2 flex items-center justify-center overflow-hidden relative">
@@ -43,7 +44,7 @@ export default function AissistPage() {
           </div>
         </div>
       </div>
-      <div className="mb-1">APY 24,5%: {(aicoreBalance * dailyCoreRate).toFixed(2)} USD/day</div>
+      <div className="mb-1 mt-5">APY 24,5%: {(aicoreBalance * dailyCoreRate).toFixed(2)} USD/day</div>
             <div className="mb-1 flex items-center">
               <span className="mr-2">Reinvest</span>
               <input
@@ -59,7 +60,7 @@ export default function AissistPage() {
                     target.value = '100';
                   }
                 }}
-                className="w-10 h-6 p-1 border border-black text-black rounded"
+                className="w-9 h-6 p-1 border border-black text-black rounded"
                 min="0"
                 max="100"
               />
