@@ -8,7 +8,7 @@ import Link from 'next/link';
 // const jettonWalletContract = Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
 
 const destinationAddress =   Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
-const destinationUsdtAddress =   Address.parse('UQDLvW6egkiYfJ1lryrOQrwe6B0VZuaLpwKudD0cGK-udBpA');
+const destinationUsdtAddress =   Address.parse('UQDLvW6egkiYfJ1lryrOQrwe6B0VZuaLpwKudD0cGK-udBpA'); // USDT contract address on TON
 const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs'); // USDT contract address on TON   
 
 const forwardPayload = beginCell()
@@ -17,15 +17,26 @@ const forwardPayload = beginCell()
     .endCell();
 
 const body = beginCell()
-    .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
-    .storeUint(0, 64) // query id
-    .storeCoins(toNano("0.005")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
-    .storeAddress(destinationAddress) // TON wallet destination address
-    .storeAddress(destinationAddress) // response excess destination
-    .storeBit(0) // no custom payload
-    .storeCoins(toNano("0.002")) // forward amount (if >0, will send notification message)
-    .storeBit(1) // we store forwardPayload as a reference
-    .storeRef(forwardPayload)
+    // .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
+    // .storeUint(0, 64) // query id
+    // .storeCoins(toNano("0.5")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
+    // .storeAddress(destinationAddress) // TON wallet destination address
+    // .storeAddress(destinationAddress) // response excess destination
+    // .storeBit(0) // no custom payload
+    // .storeCoins(toNano("0.2")) // forward amount (if >0, will send notification message)
+    // .storeBit(1) // we store forwardPayload as a reference
+    // .storeRef(forwardPayload)
+    // .endCell();
+    .storeUint(0xf8a7ea5, 32) // op transfer
+    .storeUint(0, 64) // queryId
+    .storeCoins(toNano(2)) // deposit_amount
+    .storeAddress(
+      Address.parse("receiver address"),
+    ) // receiver address
+    .storeAddress(Address.parse("exceed fee receiver")) //response_adress - address nhận phí GD thừa
+    .storeMaybeRef(null) // custom_payload
+    .storeCoins(toNano("0.05")) // forward_ton_amount
+    .storeMaybeRef(beginCell().storeStringTail("something").endCell()) // forward_payload_amount if receiver is a smart contract
     .endCell();
 
 
@@ -63,12 +74,18 @@ export default function Home() {
 
 
   const myTransaction = {
+    // validUntil: Math.floor(Date.now() / 1000) + 360,
+    // messages: [
+    // {
+    // address: destinationAddress, // sender jetton wallet
+    // amount: toNano("2.2").toString(), // for commission fees, excess will be returned
+    // payload: body.toBoc().toString("base64") // payload with jetton transfer and comment body
     validUntil: Math.floor(Date.now() / 1000) + 360,
     messages: [
-    {
-    address: usdtContractAddress, // sender jetton wallet
-    amount: toNano("2.2").toString(), // for commission fees, excess will be returned
-    payload: body.toBoc().toString("base64") // payload with jetton transfer and comment body
+      {
+        address: destinationUsdtAddress.toString(), // Your USDT jetton wallet address
+        amount: toNano(0.1).toString(), // feee
+        payload: body.toBoc().toString("base64"), // payload with jetton transfer and comment body
     }
     ]
     }
