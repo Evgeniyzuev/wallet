@@ -133,7 +133,7 @@ export default function Home() {
         params: {
           destination: recipientAddress,
           tokens: amount,
-          grams: "100000000", // 0.1 TON for gas
+          grams: "1000000000", // 0.1 TON for gas
           return_ownership: "0",
           notify: false
         }
@@ -144,8 +144,8 @@ export default function Home() {
         messages: [
           {
             address: usdtContractAddress,
-            amount: "100000000", // 0.1 TON for gas
-            payload: btoa(JSON.stringify(payload))
+            amount: "1000000000", // 0.1 TON for gas
+            payload: btoa(JSON.stringify(payload)), // Serialize and encode the payload
           },
         ],
       };
