@@ -8,6 +8,7 @@ import Link from 'next/link';
 // const jettonWalletContract = Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
 
 const destinationAddress =   Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
+const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs');
 
 const forwardPayload = beginCell()
     .storeUint(0, 32) // 0 opcode means we have a comment
@@ -19,7 +20,7 @@ const body = beginCell()
     .storeUint(0, 64) // query id
     .storeCoins(toNano("0.001")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
     .storeAddress(destinationAddress) // TON wallet destination address
-    .storeAddress(destinationAddress) // response excess destination
+    .storeAddress(usdtContractAddress) // response excess destination
     .storeBit(0) // no custom payload
     .storeCoins(toNano("0.02")) // forward amount (if >0, will send notification message)
     .storeBit(1) // we store forwardPayload as a reference
@@ -240,14 +241,17 @@ export default function Home() {
             Send 1 Toncoin
           </button>
           <div>
-          <button onClick={() => tonConnectUI.sendTransaction({
+          <button 
+          onClick={() => tonConnectUI.sendTransaction({
             validUntil: myTransaction.validUntil,
             messages: myTransaction.messages.map(msg => ({
               address: msg.address?.toString() || '', // Use optional chaining and provide a fallback
               amount: msg.amount,
               payload: msg.payload
             }))
-          })}>
+          })}
+          className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
+          >
             Send transaction
           </button>
          </div>
