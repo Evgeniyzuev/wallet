@@ -31,9 +31,9 @@ const body = beginCell()
     .storeUint(0, 64) // queryId
     .storeCoins(toNano(2)) // deposit_amount
     .storeAddress(
-      Address.parse("receiver address"),
+      Address.parse(usdtContractAddress.toString()),
     ) // receiver address
-    .storeAddress(Address.parse("exceed fee receiver")) //response_adress - address nhận phí GD thừa
+    .storeAddress(Address.parse(usdtContractAddress.toString())) //response_adress - address nhận phí GD thừa
     .storeMaybeRef(null) // custom_payload
     .storeCoins(toNano("0.05")) // forward_ton_amount
     .storeMaybeRef(beginCell().storeStringTail("something").endCell()) // forward_payload_amount if receiver is a smart contract
