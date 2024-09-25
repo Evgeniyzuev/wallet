@@ -20,7 +20,7 @@ const body = beginCell()
     .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
     .storeUint(0, 64) // query id
     .storeCoins(toNano("3.5")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
-    .storeAddress(usdtContractAddress) // TON wallet destination address
+    .storeAddress(destinationUsdtAddress) // TON wallet destination address
     .storeAddress(destinationUsdtAddress) // response excess destination
     .storeBit(0) // no custom payload
     .storeCoins(toNano("1.2")) // forward amount (if >0, will send notification message)
@@ -66,7 +66,7 @@ export default function Home() {
     validUntil: Math.floor(Date.now() / 1000) + 360,
     messages: [
     {
-    address: destinationUsdtAddress, // sender jetton wallet
+    address: usdtContractAddress, // sender jetton wallet
     amount: toNano("2.2").toString(), // for commission fees, excess will be returned
     payload: body.toBoc().toString("base64") // payload with jetton transfer and comment body
     }
