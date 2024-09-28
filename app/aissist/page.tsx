@@ -26,7 +26,7 @@ export default function AissistPage() {
   };
 
   const aicoreLevel = getAICoreLevel(aicoreBalance);
-  const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel + 1];
+  const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
   const progressPercentage = Math.min(100, (aicoreBalance / nextLevelThreshold) * 100);
 
   
