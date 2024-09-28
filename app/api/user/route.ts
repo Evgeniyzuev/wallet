@@ -17,12 +17,19 @@ export async function POST(req: NextRequest) {
             user = await prisma.user.create({
                 data: {
                     telegramId: userData.id,
-                    referrerId: userData.start_param || '',
+                    referrerId: userData.start_param || null, // Use null instead of empty string
                     username: userData.username || '',
                     firstName: userData.first_name || '',
                     lastName: userData.last_name || '',
                 }
             })
+            console.log('User creation data:', {
+                telegramId: userData.id,
+                referrerId: userData.start_param || null,
+                username: userData.username || '',
+                firstName: userData.first_name || '',
+                lastName: userData.last_name || '',
+            });
         }
 
         return NextResponse.json(user)

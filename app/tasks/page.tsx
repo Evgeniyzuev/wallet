@@ -52,7 +52,10 @@ export default function Home() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(initDataUnsafe.user),
+          body: JSON.stringify({
+            user: initDataUnsafe.user,
+            start_param: initDataUnsafe.start_param
+          }),
         })
           .then((res) => res.json())
           .then((data) => {
