@@ -21,6 +21,8 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
   const [notification, setNotification] = useState('')
+  const [aicoreAmount, setAicoreAmount] = useState('')
+
   // const [userData, setUserData] = useState<UserData | null>(null);
 
   // interface UserData {
@@ -95,6 +97,32 @@ export default function Home() {
     }
   }
 
+  const handleIncreaseAicoreBalance = async () => {
+    if (!user || !aicoreAmount) return
+
+    try {
+      const res = await fetch('/api/increase-aicore-balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegramId: user.telegramId, amount: parseFloat(aicoreAmount) }),
+      })
+      const data = await res.json()
+      if (data.success) {
+        setUser({ ...user, aicoreBalance: data.aicoreBalance })
+        setNotification('Aicore balance increased successfully!')
+        setAicoreAmount('')
+        setTimeout(() => setNotification(''), 3000)
+      } else {
+        setError('Failed to increase Aicore balance')
+      }
+    } catch (err) {
+      console.log(err)
+      setError('An error occurred while increasing Aicore balance')
+    }
+  }
+
   if (error) {
     return <div className="container mx-auto p-4 text-red-500">{error}</div>
   }
@@ -105,12 +133,28 @@ export default function Home() {
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Welcome, {user.firstName}!</h1>
       <p>Your current points: {user.points}</p>
+      <p>Your current Aicore balance: {user.aicoreBalance}</p>
       <button
         onClick={handleIncreasePoints}
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
       >
         Increase Points
       </button>
+      <div className="mt-4">
+        <input
+          type="number"
+          placeholder="Enter amount"
+          className="border border-gray-300 rounded px-2 py-1 mr-2"
+          value={aicoreAmount}
+          onChange={(e) => setAicoreAmount(e.target.value)}
+        />
+        <button
+          onClick={handleIncreaseAicoreBalance}
+          className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Increase Aicore Balance
+        </button>
+      </div>
       {notification && (
         <div className="mt-4 p-2 bg-green-100 text-green-700 rounded">
           {notification}
