@@ -19,9 +19,15 @@ export default function AissistPage() {
   const currentImage = aicoreBalance > 1000 ? aissist2Image : aissistImage;
   // const currentImage = aissistImage;
 
-  const aicoreLevel = 0;
   const balanceRequiredForNextLevel = [1, 2, 4, 8, 16, 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
-  const progressPercentage = Math.min(100, (aicoreBalance / balanceRequiredForNextLevel[aicoreLevel]) * 100);
+  
+  const getAICoreLevel = (balance: number): number => {
+    return balanceRequiredForNextLevel.findIndex(threshold => balance < threshold) - 1;
+  };
+
+  const aicoreLevel = getAICoreLevel(aicoreBalance);
+  const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel + 1];
+  const progressPercentage = Math.min(100, (aicoreBalance / nextLevelThreshold) * 100);
 
   
   return (
