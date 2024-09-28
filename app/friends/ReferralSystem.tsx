@@ -10,7 +10,7 @@ interface ReferralSystemProps {
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ initData, userId, startParam }) => {
   const [referrals, setReferrals] = useState<string[]>([])
   const [referrer, setReferrer] = useState<string | null>(null)
-  const INVITE_URL = "https://t.me/flappy_test88_bot/flappy88/start"
+  const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
 
   useEffect(() => {
     const checkReferral = async () => {

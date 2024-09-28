@@ -68,7 +68,7 @@ export default function AissistPage() {
                     target.value = '100';
                   }
                 }}
-                className="w-9 h-6 p-1 border border-black text-black rounded"
+                className="w-11 h-6 p-1 border border-black text-black rounded"
                 min="0"
                 max="100"
               />
@@ -93,7 +93,7 @@ export default function AissistPage() {
                 type="number"
                 value={coreAfterXyears}
                 onChange={(e) => setCoreAfterXyears(Math.min(99, Math.max(0, parseInt(e.target.value) )))}
-                className="w-7 h-6 p-1 border border-black text-black rounded mx-1"
+                className="w-9 h-6 p-1 border border-black text-black rounded mx-1"
                 min="1"
                 max="99"
               />
