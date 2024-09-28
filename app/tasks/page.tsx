@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import  WebApp  from '@twa-dev/sdk'
 import Link from 'next/link'
-
+import { setAicoreBalance } from '../db'
 // declare global {
 //   interface Window {
 //     Telegram?: {
@@ -111,6 +111,7 @@ export default function Home() {
       const data = await res.json()
       if (data.success) {
         setUser({ ...user, aicoreBalance: data.aicoreBalance })
+        setAicoreBalance(data.aicoreBalance)
         setNotification('Aicore balance increased successfully!')
         setAicoreAmount('')
         setTimeout(() => setNotification(''), 3000)
