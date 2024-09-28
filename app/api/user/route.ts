@@ -24,25 +24,25 @@ export async function POST(req: NextRequest) {
             })
         }
 
-        let coreWallet = await prisma.wallet.findUnique({
-            where: { id: user.id }
-        })
+        // let coreWallet = await prisma..findUnique({
+        //     where: { id: user.id }
+        // })
 
-        if (!coreWallet) {
-            coreWallet = await prisma.wallet.create({
-                data: {
-                    id: user.id,
-                    coreUSD: 0,
-                    walletUSD: 0,
-                    userLevel: 0,
-                    tokens: 0,
-                    reputationPlus: 0,
-                    reputationMinus: 0
-                }
-            })
-        }
+        // if (!coreWallet) {
+        //     coreWallet = await prisma.wallet.create({
+        //         data: {
+        //             id: user.id,
+        //             coreUSD: 0,
+        //             walletUSD: 0,
+        //             userLevel: 0,
+        //             tokens: 0,
+        //             reputationPlus: 0,
+        //             reputationMinus: 0
+        //         }
+        //     })
+        // }
 
-        return NextResponse.json({ user, coreWallet })
+        return NextResponse.json({ user })
     } catch (error) {
         console.error('Error processing user data:', error)
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
