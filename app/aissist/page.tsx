@@ -16,12 +16,14 @@ export default function AissistPage() {
     setReinvestmentPart(value / 100);
   };
 
-  const currentImage = aicoreBalance > 100 ? aissist2Image : aissistImage;
+  const currentImage = aicoreBalance > 1000 ? aissist2Image : aissistImage;
   // const currentImage = aissistImage;
-  const progressPercentage = 50;
-  const aicoreLevel = 1;
-  const balanceRequiredForNextLevel = [100, 200, 300, 400, 500];
 
+  const aicoreLevel = 0;
+  const balanceRequiredForNextLevel = [1, 2, 4, 8, 16, 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
+  const progressPercentage = Math.min(100, (aicoreBalance / balanceRequiredForNextLevel[aicoreLevel]) * 100);
+
+  
   return (
     // <main className="text-base flex flex-col items-center self-start w-full p-4">
     <main className="bg-black text-white h-screen flex flex-col">
