@@ -3,18 +3,53 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { aicoreBalance, addAicoreBalance } from '../db'
+import { useUser } from '../hooks/useUser'
+
 
 export default function TestPage() {
   const [balance, setBalance] = useState(aicoreBalance)
+  const { user, setUser, error: userError } = useUser()
 
-  const handleEarn = (amount: number) => {
+  const handleEarn = async (amount: number) => {
     addAicoreBalance(amount);
-    setBalance(prevBalance => prevBalance + amount);
+    const newBalance = aicoreBalance + amount;
+    setBalance(newBalance);
+
+    // Update the database
+    try {
+      const response = await fetch('/api/update-core-wallet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.id, coreUSD: newBalance }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update core wallet');
+      }
+    } catch (error) {
+      console.error('Error updating core wallet:', error);
+    }
   }
 
   useEffect(() => {
-    setBalance(aicoreBalance);
-  }, []);
+    const fetchInitialBalance = async () => {
+      try {
+        const response = await fetch(`/api/get-core-wallet?userId=${user.id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch core wallet');
+        }
+        const data = await response.json();
+        setBalance(data.coreWallet.coreUSD);
+        addAicoreBalance(data.coreWallet.coreUSD - aicoreBalance); // Update the global aicoreBalance
+      } catch (error) {
+        console.error('Error fetching core wallet:', error);
+      }
+    };
+
+    fetchInitialBalance();
+  }, [user.id]);
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
