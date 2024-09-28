@@ -134,7 +134,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {user.firstName}! Your referrer ID is {startParam}</h1>
+      <h1 className="text-2xl items-center font-bold mb-4">Welcome, {user.firstName}! Your referrer ID is {startParam}</h1>
       <p>Your current points: {user.points}</p>
       <p>Your current Aicore balance: {user.aicoreBalance}</p>
       <button
@@ -147,7 +147,7 @@ export default function Home() {
       <input
         type="number"
         placeholder="Enter amount"
-        className="border border-gray-300 rounded px-2 py-1 mr-2"
+        className="border border-gray-300 rounded px-2 py-1 mt-4 mr-2"
         value={aicoreAmount}
         onChange={(e) => setAicoreAmount(e.target.value)}
       />
