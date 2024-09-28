@@ -22,7 +22,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
   const [notification, setNotification] = useState('')
   const [aicoreAmount, setAicoreAmount] = useState('')
-
+  const [startParam, setStartParam] = useState('')
   // const [userData, setUserData] = useState<UserData | null>(null);
 
   // interface UserData {
@@ -43,6 +43,8 @@ export default function Home() {
 
       // const initData = tg.initData || ''
       const initDataUnsafe = tg.initDataUnsafe || {}
+      // setInitData(WebApp.initData);
+      setStartParam(WebApp.initDataUnsafe.start_param || '');
 
       if (initDataUnsafe.user) {
         fetch('/api/user', {
@@ -141,7 +143,7 @@ export default function Home() {
       >
         Increase Points
       </button>
-      <div className="mt-4">
+      <div className="mt-4 flex min-h-screen flex-col items-center justify-center">
         <input
           type="number"
           placeholder="Enter amount"

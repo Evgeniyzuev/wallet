@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
             user = await prisma.user.create({
                 data: {
                     telegramId: userData.id,
+                    referrerId: userData.start_param || '',
                     username: userData.username || '',
                     firstName: userData.first_name || '',
                     lastName: userData.last_name || '',
