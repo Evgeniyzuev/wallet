@@ -56,6 +56,7 @@ export default function AissistPage() {
             <div className="mb-1 flex items-center">
               <span className="mr-2">Reinvest</span>
               <input
+                autoComplete="off"
                 type="number"
                 value={Math.round(reinvestmentPart * 100)}
                 onChange={handleReinvestmentChange}
@@ -118,9 +119,6 @@ export default function AissistPage() {
           </Link>
           <Link href="/goals" className="text-white hover:text-blue-300 font-medium">
             Goals
-          </Link>
-          <Link href="/test" className="text-white hover:text-blue-300 font-medium">
-            Test
           </Link>
         </div>
       </div>

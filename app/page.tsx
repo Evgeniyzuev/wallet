@@ -299,9 +299,6 @@ export default function Home() {
           <Link href="/goals" className="text-white hover:text-blue-300 font-medium">
             Goals
           </Link>
-          <Link href="/test" className="text-white hover:text-blue-300 font-medium">
-            Test
-          </Link>
         </div>
       </div>
     </main>

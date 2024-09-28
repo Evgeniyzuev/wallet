@@ -131,7 +131,7 @@ export default function Home() {
   if (!user) return <div className="container mx-auto p-4">Loading...</div>
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-2xl font-bold mb-4">Welcome, {user.firstName}!</h1>
       <p>Your current points: {user.points}</p>
       <p>Your current Aicore balance: {user.aicoreBalance}</p>
