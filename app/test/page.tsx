@@ -35,6 +35,8 @@ export default function TestPage() {
 
   useEffect(() => {
     const fetchInitialBalance = async () => {
+      if (!user) return; // Add this check
+
       try {
         const response = await fetch(`/api/get-core-wallet?userId=${user.id}`);
         if (!response.ok) {
@@ -49,7 +51,11 @@ export default function TestPage() {
     };
 
     fetchInitialBalance();
-  }, [user.id]);
+  }, [user]); // Change dependency to just user
+
+  if (!user) {
+    return <div>Loading...</div>; // Add a loading state
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
