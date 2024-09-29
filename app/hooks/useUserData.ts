@@ -73,5 +73,5 @@ export function useUserData() {
     }
   };
 
-  return { user, setUser, error, setError, startParam, handleIncreaseAicoreBalance };
+  return { user, setUser, error, setError, handleIncreaseAicoreBalance };
 }

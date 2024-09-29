@@ -43,7 +43,7 @@ export default function FriendsPage() {
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">Friends</h1>
       <h1 className="text-xl font-bold mb-8">Hello, {userData?.first_name}!</h1>
-      <ReferralSystem initData={initData} userId={userId} startParam={startParam} />
+      <ReferralSystem />
       <Navigation />
     </main>
   );

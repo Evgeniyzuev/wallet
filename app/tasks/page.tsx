@@ -5,7 +5,7 @@ import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
 
 export default function Home() {
-  const { user, setUser, error, setError, startParam, handleIncreaseAicoreBalance } = useUserData();
+  const { user, setUser, error, setError, handleIncreaseAicoreBalance } = useUserData();
   const [notification, setNotification] = useState('')
   const [aicoreAmount, setAicoreAmount] = useState('')
   // const [startParam, setStartParam] = useState('')
@@ -96,7 +96,8 @@ export default function Home() {
         <div className="container mx-auto p-4">Loading...only in tg</div>
       ) : (
         <>
-          <h1 className="text-2xl items-center font-bold mb-4">Welcome, {user.firstName}! Your referrer ID is {startParam}</h1>
+          <h1 className="text-2xl items-center font-bold mb-4">Welcome, {user.firstName}!</h1>
+          <h1 className="text-2xl items-center font-bold mb-4">Your referrer ID is {user.referrerId}</h1>
           <p>Your current points: {user.points}</p>
           <p>Your current Aicore balance: {user.aicoreBalance}</p>
           <button
