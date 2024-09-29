@@ -47,6 +47,7 @@ export default function Home() {
   const [tonConnectUI] = useTonConnectUI();
   const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [tonAmount, setTonAmount] = useState('1');
 
   // const Wallet_DST = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz";
   // const [Wallet_SRC, setWallet_SRC] = useState<string>('');
@@ -140,23 +141,24 @@ export default function Home() {
     );
   }
 
-  const sendOneToncoin = async () => {
+  const sendToncoin = async () => {
     if (!tonConnectUI.connected || !tonWalletAddress) {
       console.log("Wallet not connected");
       return;
     }
-  
+
     try {
+      const amountInNanotons = toNano(tonAmount).toString();
       const transaction = {
         validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
         messages: [
           {
             address: "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz",
-            amount: "1000000000", // 1 TON in nanotons
+            amount: amountInNanotons,
           },
         ],
       };
-  
+
       const result = await tonConnectUI.sendTransaction(transaction);
       console.log("Transaction sent:", result);
     } catch (error) {
@@ -252,14 +254,25 @@ export default function Home() {
           >
             Disconnect Wallet
           </button>
-          <button
-            onClick={sendOneToncoin}
-            className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
-          >
-            Send 1 Toncoin
-          </button>
+          <div className="flex flex-col items-center mb-4">
+            <input
+              type="number"
+              value={tonAmount}
+              onChange={(e) => setTonAmount(e.target.value)}
+              className="w-60 mb-2 p-2 border border-gray-300 rounded"
+              placeholder="Enter TON amount"
+              min="0"
+              step="0.1"
+            />
+            <button
+              onClick={sendToncoin}
+              className="bg-green-500 hover:bg-green-700 w-60 text-white font-bold py-2 px-4 rounded"
+            >
+              Send {tonAmount} TON
+            </button>
+          </div>
           <div>
-          <button 
+          {/* <button 
             onClick={() => tonConnectUI.sendTransaction({
               validUntil: myTransaction.validUntil,
               messages: myTransaction.messages.map(msg => ({
@@ -271,7 +284,7 @@ export default function Home() {
           className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
           >
             Send 1,5 USDT
-          </button>
+          </button> */}
          </div>
         </div>
       ) : (
