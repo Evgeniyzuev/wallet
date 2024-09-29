@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import  WebApp  from '@twa-dev/sdk'
-import Link from 'next/link'
 import { setAicoreBalance } from '../db'
+import Navigation from '../components/Navigation'
 // declare global {
 //   interface Window {
 //     Telegram?: {
@@ -129,15 +129,19 @@ export default function Home() {
     }
   }
 
-  if (error) {
-    return <div className="container mx-auto p-4 text-red-500">{error}</div>
-  }
+  // if (error) {
+  //   return <div className="container mx-auto p-4 text-red-500">{error}</div>
+  // }
 
-  if (!user) return <div className="container mx-auto p-4">Loading...</div>
+  // if (!user) return <div className="container mx-auto p-4">Loading...</div>
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-2xl items-center font-bold mb-4">Welcome, {user.firstName}! Your referrer ID is {startParam}</h1>
+      {error || !user ? (
+        <div className="container mx-auto p-4">Loading...only in tg</div>
+      ) : (
+        <>
+        <h1 className="text-2xl items-center font-bold mb-4">Welcome, {user.firstName}! Your referrer ID is {startParam}</h1>
       <p>Your current points: {user.points}</p>
       <p>Your current Aicore balance: {user.aicoreBalance}</p>
       <button
@@ -166,29 +170,11 @@ export default function Home() {
           {notification}
         </div>
       )}
+        </>
+      )}  
+
     
-    <div className="w-full bg-gray-800 py-4 fixed bottom-0">
-        <div className="flex justify-around max-w-screen-lg mx-auto">
-          <Link href="/aissist" className="text-white hover:text-blue-300 font-medium">
-            Aissist
-          </Link>
-          <Link href="/" className="text-white hover:text-blue-300 font-medium">
-            Wallet
-          </Link>
-          <Link href="/tasks" className="text-white hover:text-blue-300 font-medium">
-            Tasks
-          </Link>
-          <Link href="/friends" className="text-white hover:text-blue-300 font-medium">
-            Frens
-          </Link>
-          <Link href="/goals" className="text-white hover:text-blue-300 font-medium">
-            Goals
-          </Link>
-          <Link href="/test" className="text-white hover:text-blue-300 font-medium">
-            Test
-          </Link>
-        </div>
-      </div>
+      <Navigation />
     </div>
   )
 }

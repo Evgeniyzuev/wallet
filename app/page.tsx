@@ -1,306 +1,108 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react';
-import { useTonConnectUI } from '@tonconnect/ui-react';
-import { Address, beginCell, toNano, } from "@ton/core";
-import Link from 'next/link';
-
-// const jettonWalletContract = Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
-
-const destinationAddress =   Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
-const destinationUsdtAddress =   Address.parse('UQDLvW6egkiYfJ1lryrOQrwe6B0VZuaLpwKudD0cGK-udBpA'); // USDT contract address on TON
-const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs'); // USDT contract address on TON   
-
-const forwardPayload = beginCell()
-    .storeUint(0, 32) // 0 opcode means we have a comment
-    .storeStringTail('Hello, TON!')
-    .endCell();
-
-const body = beginCell()
-    // .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
-    // .storeUint(0, 64) // query id
-    // .storeCoins(toNano("0.5")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
-    // .storeAddress(destinationAddress) // TON wallet destination address
-    // .storeAddress(destinationAddress) // response excess destination
-    // .storeBit(0) // no custom payload
-    // .storeCoins(toNano("0.2")) // forward amount (if >0, will send notification message)
-    // .storeBit(1) // we store forwardPayload as a reference
-    // .storeRef(forwardPayload)
-    // .endCell();
-    .storeUint(0xf8a7ea5, 32) // op transfer
-    .storeUint(0, 64) // queryId
-    .storeCoins(toNano(2)) // deposit_amount
-    .storeAddress(
-      Address.parse(destinationUsdtAddress.toString()),
-    ) // receiver address
-    .storeAddress(Address.parse(destinationUsdtAddress.toString())) //response_adress - address nhận phí GD thừa
-    .storeMaybeRef(null) // custom_payload
-    .storeCoins(toNano("0.05")) // forward_ton_amount
-    .storeMaybeRef(beginCell().storeStringTail("something").endCell()) // forward_payload_amount if receiver is a smart contract
-    .endCell();
-
-
-
-
-
+import { useState } from 'react'
+import Image from 'next/image';
+import aissistImage from './images/aissist.png'
+import aissist2Image from './images/aissist2.png';
+import { aicoreBalance, dailyCoreRate } from './db';
+import Navigation from './components/Navigation'
 export default function Home() {
-  const [tonConnectUI] = useTonConnectUI();
-  const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [coreAfterXyears, setCoreAfterXyears] = useState(30);
+  const [reinvestmentPart, setReinvestmentPart] = useState(0.3);
 
-  // const Wallet_DST = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz";
-  // const [Wallet_SRC, setWallet_SRC] = useState<string>('');
-
-  // transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
-  // response_destination:MsgAddress custom_payload:(Maybe ^Cell)
-  // forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
-  // = InternalMsgBody;
-
-
-
-
-
-  const handleWalletConnection = useCallback((address: string) => {
-    setTonWalletAddress(address);
-    console.log("Wallet connected successfully!");
-    setIsLoading(false);
-  }, []);
-
-  const handleWalletDisconnection = useCallback(() => {
-    setTonWalletAddress(null);
-    console.log("Wallet disconnected successfully!");
-    setIsLoading(false);
-  }, []);
-
-
-  const myTransaction = {
-    // validUntil: Math.floor(Date.now() / 1000) + 360,
-    // messages: [
-    // {
-    // address: destinationAddress, // sender jetton wallet
-    // amount: toNano("2.2").toString(), // for commission fees, excess will be returned
-    // payload: body.toBoc().toString("base64") // payload with jetton transfer and comment body
-    validUntil: Math.floor(Date.now() / 1000) + 360,
-    messages: [
-      {
-        address: destinationUsdtAddress.toString(), // Your USDT jetton wallet address
-        amount: toNano(0.1).toString(), // feee
-        payload: body.toBoc().toString("base64"), // payload with jetton transfer and comment body
-    }
-    ]
-    }
-
-  useEffect(() => {
-    const checkWalletConnection = async () => {
-      if (tonConnectUI.account?.address) {
-        handleWalletConnection(tonConnectUI.account?.address);
-      } else {
-        handleWalletDisconnection();
-      }
-    };
-
-    checkWalletConnection();
-
-
-
-    const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
-      if (wallet) {
-        handleWalletConnection(wallet.account.address);
-      } else {
-        handleWalletDisconnection();
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [tonConnectUI, handleWalletConnection, handleWalletDisconnection]);
-
-  const handleWalletAction = async () => {
-    if (tonConnectUI.connected) {
-      setIsLoading(true);
-      await tonConnectUI.disconnect();
-    } else {
-      await tonConnectUI.openModal();
-    }
+  const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
+    setReinvestmentPart(value / 100);
   };
 
-  const formatAddress = (address: string) => {
-    const tempAddress = Address.parse(address).toString();
-    return `${tempAddress.slice(0, 4)}...${tempAddress.slice(-4)}`;
-  };
+  const currentImage = aicoreBalance > 1000 ? aissist2Image : aissistImage;
+  // const currentImage = aissistImage;
 
-  if (isLoading) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center">
-        <div className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded">
-          Loading...
-        </div>
-      </main>
-    );
-  }
-
-  const sendOneToncoin = async () => {
-    if (!tonConnectUI.connected || !tonWalletAddress) {
-      console.log("Wallet not connected");
-      return;
-    }
+  const balanceRequiredForNextLevel = [1, 2, 4, 8, 16, 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000];
   
-    try {
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
-        messages: [
-          {
-            address: "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz",
-            amount: "1000000000", // 1 TON in nanotons
-          },
-        ],
-      };
-  
-      const result = await tonConnectUI.sendTransaction(transaction);
-      console.log("Transaction sent:", result);
-    } catch (error) {
-      console.error("Error sending transaction:", error);
-    }
+  const getAICoreLevel = (balance: number): number => {
+    return balanceRequiredForNextLevel.findIndex(threshold => balance < threshold);
   };
 
+  const aicoreLevel = getAICoreLevel(aicoreBalance);
+  const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
+  const progressPercentage = Math.min(100, (aicoreBalance / nextLevelThreshold) * 100);
 
-  // transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
-  // response_destination:MsgAddress custom_payload:(Maybe ^Cell)
-  // forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
-  // = InternalMsgBody;
-
-
-
-
-
-
-
-  // const sendUSDt = async () => {
-  //   if (!tonConnectUI.connected || !tonWalletAddress) {
-  //     console.log("Wallet not connected");
-  //     return;
-  //   }
-
-  //   try {
-  //     const usdtContractAddress = "EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs"; // USDT contract address on TON
-  //     const recipientAddress = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz"; // The recipient's address
-  //     const amount = "1000000"; // Amount in minimal units (1 USDT = 1,000,000 units)
-
-  //     const payload = {
-  //       abi: {
-  //         type: "Contract",
-  //         value: {
-  //           "ABI version": 2,
-  //           "version": "2.2",
-  //           "header": ["time", "expire"],
-  //           "functions": [
-  //             {
-  //               "name": "transfer",
-  //               "inputs": [
-  //                 {"name": "destination", "type": "address"},
-  //                 {"name": "tokens", "type": "uint128"},
-  //                 {"name": "grams", "type": "uint128"},
-  //                 {"name": "return_ownership", "type": "uint128"},
-  //                 {"name": "notify", "type": "bool"}
-  //               ],
-  //               "outputs": []
-  //             }
-  //           ],
-  //           "data": [],
-  //           "events": []
-  //         }
-  //       },
-  //       method: "transfer",
-  //       params: {
-  //         destination: usdtContractAddress,
-  //         tokens: amount,
-  //         grams: "1000000000", // 0.1 TON for gas
-  //         return_ownership: "0",
-  //         notify: false
-  //       }
-  //     };
-
-  //     const transaction = {
-  //       validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
-  //       messages: [
-  //         {
-  //           address: tonWalletAddress,
-  //           amount: "1000000000", // 0.1 TON for gas
-  //           payload: btoa(JSON.stringify(payload)), // Serialize and encode the payload
-  //         },
-  //       ],
-  //     };
-
-  //     const result = await tonConnectUI.sendTransaction(transaction);
-  //     console.log("USDT Transaction sent:", result);
-  //   } catch (error) {
-  //     console.error("Error sending USDT transaction:", error);
-  //   }
-  // };
-
+  
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1>
-      {tonWalletAddress ? (
-        <div className="flex flex-col items-center">
-          <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
-
-          <button
-            onClick={handleWalletAction}
-            className="bg-red-500 hover:bg-red-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
-          >
-            Disconnect Wallet
-          </button>
-          <button
-            onClick={sendOneToncoin}
-            className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
-          >
-            Send 1 Toncoin
-          </button>
-          <div>
-          <button 
-            onClick={() => tonConnectUI.sendTransaction({
-              validUntil: myTransaction.validUntil,
-              messages: myTransaction.messages.map(msg => ({
-                address: msg.address?.toString() || '', // Use optional chaining and provide a fallback
-                amount: msg.amount,
-                payload: msg.payload
-              }))
-            })}
-          className="bg-green-500 hover:bg-green-700 w-60 mb-4 text-white font-bold py-2 px-4 rounded"
-          >
-            Send 1,5 USDT
-          </button>
-         </div>
-        </div>
-      ) : (
-        <button
-          onClick={handleWalletAction}
-          className="bg-blue-500 hover:bg-blue-700 mb-4 text-white font-bold py-2 px-4 rounded"
-        >
-          Connect TON Wallet
-        </button>
-      )}
-      <div className="w-full bg-gray-800 py-4 fixed bottom-0">
-        <div className="flex justify-around max-w-screen-lg mx-auto">
-          <Link href="/aissist" className="text-white hover:text-blue-300 font-medium">
-            Aissist
-          </Link>
-          <Link href="/" className="text-white hover:text-blue-300 font-medium">
-            Wallet
-          </Link>
-          <Link href="/tasks" className="text-white hover:text-blue-300 font-medium">
-            Tasks
-          </Link>
-          <Link href="/friends" className="text-white hover:text-blue-300 font-medium">
-            Frens
-          </Link>
-          <Link href="/goals" className="text-white hover:text-blue-300 font-medium">
-            Goals
-          </Link>
+    // <main className="text-base flex flex-col items-center self-start w-full p-4">
+    <main className="bg-black text-white h-screen flex flex-col">
+      {/* <Image src={aissistImage} alt="Aissist" className="mb-8" />
+      <h1 className="text-4xl font-bold mb-8">Aissist</h1> */}
+      <div className="h-1/2 flex items-center justify-center overflow-hidden relative">
+      <Image src={currentImage} alt="AI Assistant" className="w-full h-full object-cover" />
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center">
+          <div className="relative w-80 h-4 bg-gray-700 bg-opacity-50 rounded-full overflow-hidden mr-2">
+            <div
+              className="absolute top-0 left-0 h-full bg-yellow-500 bg-opacity-50"
+              style={{ width: `${progressPercentage}%` }}
+            ></div>
+            <div className="absolute inset-0 flex items-center justify-center text-xs text-white">
+              {aicoreBalance.toFixed(2)} USD / {balanceRequiredForNextLevel[aicoreLevel]} USD
+            </div>
+          </div>
+          <div className="text-yellow-500 border border-yellow-500 rounded-full w-8 h-8 flex items-center justify-center">
+            {aicoreLevel}
+          </div>
         </div>
       </div>
+      <div className="mb-1 mt-5">APY 24,5%: {(aicoreBalance * dailyCoreRate).toFixed(2)} USD/day</div>
+            <div className="mb-1 flex items-center">
+              <span className="mr-2">Reinvest</span>
+              <input
+                autoComplete="off"
+                type="number"
+                value={Math.round(reinvestmentPart * 100)}
+                onChange={handleReinvestmentChange}
+                onInput={(e) => {
+                  const target = e.target as HTMLInputElement;
+                  if (target.value.length > 3) {
+                    target.value = target.value.slice(0, 3);
+                  }
+                  if (parseInt(target.value) > 100) {
+                    target.value = '100';
+                  }
+                }}
+                className="w-11 h-6 p-1 border border-black text-black rounded"
+                min="0"
+                max="100"
+              />
+              <span className="ml-1">% </span>
+              <div 
+                className="w-40 h-4 bg-gray-200 rounded-full overflow-hidden mr-2"
+              >
+                <div
+                  className="h-full bg-green-500"
+                  style={{ width: `${reinvestmentPart * 100}%` }}
+                ></div>
+              </div>
+
+              
+            </div>
+            <div className="mb-1">Core to wallet: {(aicoreBalance * dailyCoreRate * (1 - reinvestmentPart)).toFixed(2)} USD/day</div>
+            {/* <div className="mb-1">Core after {coreAfterXyears} years without replenishment:</div>
+            <div className="mb-1"> {(aicoreBalance *  ((dailyCoreRate * reinvestmentPart + 1) ** 365) ** coreAfterXyears).toFixed(2)} USD</div> */}
+            <div className="mb-1 flex items-center">
+              <span className="mr-0">Core after</span>
+              <input
+                type="number"
+                value={coreAfterXyears}
+                onChange={(e) => setCoreAfterXyears(Math.min(99, Math.max(0, parseInt(e.target.value) )))}
+                className="w-11 h-6 p-1 border border-black text-black rounded mx-1"
+                min="1"
+                max="99"
+              />
+              <span>years without replenishment:</span>
+            </div>
+            <div className="mb-1"> {(aicoreBalance *  ((dailyCoreRate * reinvestmentPart + 1) ** 365) ** coreAfterXyears).toFixed(2)} USD</div>
+
+
+            <Navigation />
     </main>
   );
 }
