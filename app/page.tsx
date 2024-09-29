@@ -28,7 +28,10 @@ export default function Home() {
   const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
   const progressPercentage = Math.min(100, (aicoreBalance / nextLevelThreshold) * 100);
 
-  
+  // hook for aicore balance
+  // const { aicoreBalance, setAicoreBalance } = useUserData();
+
+
   return (
     // <main className="text-base flex flex-col items-center self-start w-full p-4">
     <main className="bg-black text-white h-screen flex flex-col">

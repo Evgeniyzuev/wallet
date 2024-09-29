@@ -1,12 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { setAicoreBalance } from '../db'
 import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
 
 export default function Home() {
-  const { user, setUser, error, setError, startParam } = useUserData();
+  const { user, setUser, error, setError, startParam, handleIncreaseAicoreBalance } = useUserData();
   const [notification, setNotification] = useState('')
   const [aicoreAmount, setAicoreAmount] = useState('')
   // const [startParam, setStartParam] = useState('')
@@ -78,32 +77,18 @@ export default function Home() {
     }
   }
 
-  const handleIncreaseAicoreBalance = async () => {
-    if (!user || !aicoreAmount) return
+  const handleIncreaseAicoreBalanceLocal = async () => {
+    if (!user || !aicoreAmount) return;
 
-    try {
-      const res = await fetch('/api/increase-aicore-balance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ telegramId: user.telegramId, amount: parseFloat(aicoreAmount) }),
-      })
-      const data = await res.json()
-      if (data.success) {
-        setUser({ ...user, aicoreBalance: data.aicoreBalance })
-        setAicoreBalance(data.aicoreBalance)
-        setNotification('Aicore balance increased successfully!')
-        setAicoreAmount('')
-        setTimeout(() => setNotification(''), 3000)
-      } else {
-        setError('Failed to increase Aicore balance')
-      }
-    } catch (err) {
-      console.log(err)
-      setError('An error occurred while increasing Aicore balance')
+    const result = await handleIncreaseAicoreBalance(parseFloat(aicoreAmount));
+    if (result?.success) {
+      setNotification(result.message);
+      setAicoreAmount('');
+      setTimeout(() => setNotification(''), 3000);
+    } else {
+      setError(result?.message || 'An error occurred while increasing Aicore balance');
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center">
@@ -129,7 +114,7 @@ export default function Home() {
             onChange={(e) => setAicoreAmount(e.target.value)}
           />
           <button
-            onClick={handleIncreaseAicoreBalance}
+            onClick={handleIncreaseAicoreBalanceLocal}
             className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
           >
             Increase Aicore Balance

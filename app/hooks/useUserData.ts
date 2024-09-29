@@ -48,5 +48,30 @@ export function useUserData() {
     }
   }, []);
 
-  return { user, setUser, error, setError, startParam };
+  const handleIncreaseAicoreBalance = async (amount: number) => {
+    if (!user) return;
+
+    try {
+      const res = await fetch('/api/increase-aicore-balance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegramId: user.telegramId, amount }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setUser({ ...user, aicoreBalance: data.aicoreBalance });
+        setAicoreBalance(data.aicoreBalance);
+        return { success: true, message: 'Aicore balance increased successfully!' };
+      } else {
+        return { success: false, message: 'Failed to increase Aicore balance' };
+      }
+    } catch (err) {
+      console.error(err);
+      return { success: false, message: 'An error occurred while increasing Aicore balance' };
+    }
+  };
+
+  return { user, setUser, error, setError, startParam, handleIncreaseAicoreBalance };
 }
