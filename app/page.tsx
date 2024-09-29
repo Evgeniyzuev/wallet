@@ -1,12 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import aissistImage from './images/aissist.png'
+import aissistImage from './images/aissist.png';
 import aissist2Image from './images/aissist2.png';
-import { aicoreBalance, dailyCoreRate } from './db';
+import { useUserData } from './hooks/useUserData';
 import Navigation from './components/Navigation'
+
 export default function Home() {
+  const { user, setUser } = useUserData();
+  const [aicoreBalance, setAicoreBalance] = useState(0);
+  const [dailyCoreRate, setDailyCoreRate] = useState(0.0006);
+
+  useEffect(() => {
+    if (user) {
+      setAicoreBalance(user.aicoreBalance);
+    }
+  }, [user]);
+
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
   const [reinvestmentPart, setReinvestmentPart] = useState(0.3);
 

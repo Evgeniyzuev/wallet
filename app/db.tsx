@@ -1,7 +1,7 @@
 import { useState } from 'react';
   
 export let aicoreBalance = 0;
-export const dailyCoreRate = 0.0006;
+// export const dailyCoreRate = 0.0006;
 export let userId = 0;
 // const dailyWalletRate = 0.0003;
 
