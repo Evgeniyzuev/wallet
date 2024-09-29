@@ -13,8 +13,9 @@ const ReferralSystem: React.FC<ReferralSystemProps> = () => {
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
   const { user } = useUserData()
   // try to get user id from user object  
+  let userId = ''
   try {
-    const userId = user.telegramId
+     userId = user.telegramId
   } catch (error) {
     console.error('Error getting user id:', error)
   }
