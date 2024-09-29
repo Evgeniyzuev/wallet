@@ -3,12 +3,15 @@
 import "./globals.css";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { useEffect } from 'react';
+import { useUserData } from './hooks/useUserData';
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { user, error } = useUserData();
+
   useEffect(() => {
     const initWebApp = async () => {
       if (typeof window !== 'undefined') {
