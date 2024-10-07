@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
-
+import Subscription from './subscription'
 export default function Home() {
   const { user, setUser, error, setError, handleIncreaseAicoreBalance } = useUserData();
   const [notification, setNotification] = useState('')
@@ -128,6 +128,7 @@ export default function Home() {
           )}
         </>
       )}  
+      <Subscription />
 
       <Navigation />
     </div>

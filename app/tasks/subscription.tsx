@@ -10,7 +10,7 @@ declare global {
   }
 }
 
-export default function Home() {
+export default function Subscription() {
   const [isChannelMember, setIsChannelMember] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [telegramId, setTelegramId] = useState<string | null>(null)
