@@ -9,7 +9,7 @@ interface ReferralSystemProps {
 const ReferralSystem: React.FC<ReferralSystemProps> = (userId) => {
   const [referrals, setReferrals] = useState<string[]>([])
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
-
+  const { user } = useUserData()
 
 
 
@@ -79,6 +79,11 @@ const ReferralSystem: React.FC<ReferralSystemProps> = (userId) => {
           Copy Invite Link
         </button>
       </div>
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">Your Referrer:</h2>
+          {/* if user.referrerId is not empty, show the referrer id, otherwise show "No referrer" */}
+          {user?.referrerId ?? "No referrer"}
+        </div>
         <div className="mt-8">
           <h2 className="text-2xl font-bold mb-4">Your Referrals:</h2>
           <ul>

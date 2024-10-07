@@ -4,12 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address, beginCell, toNano, } from "@ton/core";
 import Navigation from '../components/Navigation'
+import { useUserData } from '../hooks/useUserData'
 
 // const jettonWalletContract = Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
 
 const destinationAddress =   Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
 const destinationUsdtAddress =   Address.parse('UQDLvW6egkiYfJ1lryrOQrwe6B0VZuaLpwKudD0cGK-udBpA'); // USDT contract address on TON
-const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs'); // USDT contract address on TON   
+const usdtContractAddress = Address.parse('EQCxE6mUtQJKFnGfaROTKOt1lZbDiiX1kCixRv7Nw2Id_sDs'); // USDT contract address on TON  
+ 
 
 const forwardPayload = beginCell()
     .storeUint(0, 32) // 0 opcode means we have a comment
@@ -48,6 +50,7 @@ export default function Home() {
   const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [tonAmount, setTonAmount] = useState('1');
+  const [walletBalance, setWalletBalance] = useState<number>(0);
 
   // const Wallet_DST = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz";
   // const [Wallet_SRC, setWallet_SRC] = useState<string>('');
@@ -56,6 +59,14 @@ export default function Home() {
   // response_destination:MsgAddress custom_payload:(Maybe ^Cell)
   // forward_ton_amount:(VarUInteger 16) forward_payload:(Either Cell ^Cell)
   // = InternalMsgBody;
+
+  const { user } = useUserData();
+
+  useEffect(() => {
+    if (user) {
+      setWalletBalance(user.walletBalance || 0);
+    }
+  }, [user]);
 
 
 
@@ -101,8 +112,6 @@ export default function Home() {
     };
 
     checkWalletConnection();
-
-
 
     const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
       if (wallet) {
@@ -244,6 +253,8 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1>
+                  {/* вывод баланса */}
+                  <p>Wallet Balance: {walletBalance.toFixed(2)} TON</p>
       {tonWalletAddress ? (
         <div className="flex flex-col items-center">
           <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
@@ -270,6 +281,7 @@ export default function Home() {
             >
               Send {tonAmount} TON
             </button>
+
           </div>
           <div>
           {/* <button 

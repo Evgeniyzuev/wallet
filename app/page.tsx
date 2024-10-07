@@ -10,7 +10,7 @@ import Navigation from './components/Navigation'
 export default function Home() {
   const { user, setUser } = useUserData();
   const [aicoreBalance, setAicoreBalance] = useState(0);
-  const [dailyCoreRate, setDailyCoreRate] = useState(0.0006);
+  const [dailyCoreRate] = useState(0.0006);
 
   useEffect(() => {
     if (user) {
