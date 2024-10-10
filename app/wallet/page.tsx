@@ -339,6 +339,14 @@ export default function Home() {
         <div className="mt-4 p-2 bg-gray-100 rounded">
           <p className="text-sm">Transaction Hash:</p>
           <p className="font-mono text-xs break-all">{transactionHash}</p>
+          {/* время транзакции */}
+          <p className="text-sm">Transaction Time: {new Date().toLocaleString()}</p>
+          {/* сумма транзакции */}
+          <p className="text-sm">Transaction Amount: {tonAmount} TON</p>
+          {/* адрес отправителя */}
+          <p className="text-sm">Sender Address: {formatAddress(tonWalletAddress || '')}</p>
+          {/* адрес получателя */}
+          <p className="text-sm">Receiver Address: {formatAddress(destinationUsdtAddress.toString())}</p>
         </div>
       )}
       <Navigation />
