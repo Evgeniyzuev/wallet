@@ -7,6 +7,7 @@ import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
 import { Cell } from '@ton/core';
 import TonWeb from "tonweb";
+import { useTransactionStatus } from '../../hooks/useTransactionStatus';
 
 const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY}));
 
@@ -49,14 +50,14 @@ const body = beginCell()
 
 
 
-export default function Home() {
+export default function WalletPage() {
   const [tonConnectUI] = useTonConnectUI();
   const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [tonAmount, setTonAmount] = useState('1');
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
-  const [transactionStatus, setTransactionStatus] = useState('');
+  const { transactionStatus, startChecking } = useTransactionStatus();
 
   // const Wallet_DST = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz";
   // const [Wallet_SRC, setWallet_SRC] = useState<string>('');
@@ -273,39 +274,6 @@ export default function Home() {
   //   }
   // };
 
-  const checkTransactionStatus = async (hash: string) => {
-    try {
-      const response = await fetch(`https://toncenter.com/api/v3/transactions/${hash}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-Key': process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY || '',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch transaction status');
-      }
-
-      const data = await response.json();
-      if (data && data.status) {
-        if (data.status === 'confirmed') {
-          console.log('Transaction confirmed:', hash);
-          setTransactionStatus('confirmed');
-          clearInterval(intervalId); // Остановить проверку
-        } else if (data.status === 'failed') {
-          console.log('Transaction failed:', hash);
-          setTransactionStatus('failed');
-          clearInterval(intervalId); // Остановить проверку
-        }
-      }
-    } catch (error) {
-      console.error('Error checking transaction status:', error);
-    }
-  };
-
-  let intervalId: NodeJS.Timeout;
-
   const handleSendToncoin = async () => {
     try {
       const hash = await sendToncoin();
@@ -315,8 +283,7 @@ export default function Home() {
       // addTransaction(hash, tonAmount, new Date().toLocaleString(), tonWalletAddress, destinationUsdtAddress.toString());
 
       // Проверка статуса транзакции каждые 5 секунд
-      intervalId = setInterval(() => checkTransactionStatus(hash!), 5000);
-      setTransactionStatus('checking');
+      startChecking(hash!);
     } catch (error) {
       console.error("Error sending transaction:", error);
     }
