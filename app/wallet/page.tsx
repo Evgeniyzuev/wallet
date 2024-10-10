@@ -5,6 +5,7 @@ import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address, beginCell, toNano, } from "@ton/core";
 import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
+import { Cell } from '@ton/core';
 
 // const jettonWalletContract = Address.parse('UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz');
 
@@ -51,6 +52,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const [tonAmount, setTonAmount] = useState('1');
   const [walletBalance, setWalletBalance] = useState<number>(0);
+  const [transactionHash, setTransactionHash] = useState<string | null>(null);
 
   // const Wallet_DST = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz";
   // const [Wallet_SRC, setWallet_SRC] = useState<string>('');
@@ -170,10 +172,27 @@ export default function Home() {
 
       const result = await tonConnectUI.sendTransaction(transaction);
       console.log("Transaction sent:", result);
+      
+      // Get the transaction hash
+      const cell = Cell.fromBase64(result.boc);
+      const buffer = cell.hash();
+      const hashHex = buffer.toString('hex');
+      
+      return hashHex;
     } catch (error) {
       console.error("Error sending transaction:", error);
+      throw error;
     }
   };
+
+  
+// хэш транзакции
+// const transactionRes = await walletConnect.sendTransaction()
+// const cell = Cell.fromBase64(transactionRes.boc)
+// const buffer = cell.hash();
+// const hashHex = buffer.toString('hex');
+// hashHex: 57123dffb9029bdaa9187b5d035737eea94a1b8c018e2ab1885f245eb95c6e30
+// const hashBase64 = buffer.toString('base64');
 
 
   // transfer#0f8a7ea5 query_id:uint64 amount:(VarUInteger 16) destination:MsgAddress
@@ -250,6 +269,16 @@ export default function Home() {
   //   }
   // };
 
+  const handleSendToncoin = async () => {
+    try {
+      const hash = await sendToncoin();
+      setTransactionHash(hash || '');
+    } catch (error) {
+      console.error("Error sending transaction:", error);
+      // You might want to set an error state here to display to the user
+    }
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1>
@@ -276,12 +305,11 @@ export default function Home() {
               step="0.1"
             />
             <button
-              onClick={sendToncoin}
+              onClick={handleSendToncoin}
               className="bg-green-500 hover:bg-green-700 w-60 text-white font-bold py-2 px-4 rounded"
             >
               Send {tonAmount} TON
             </button>
-
           </div>
           <div>
           {/* <button 
@@ -306,6 +334,12 @@ export default function Home() {
         >
           Connect TON Wallet
         </button>
+      )}
+      {transactionHash && (
+        <div className="mt-4 p-2 bg-gray-100 rounded">
+          <p className="text-sm">Transaction Hash:</p>
+          <p className="font-mono text-xs break-all">{transactionHash}</p>
+        </div>
       )}
       <Navigation />
     </main>
