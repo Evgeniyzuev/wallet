@@ -51,9 +51,16 @@ export const useTransactionStatus = () => {
             // const incomingAmount = transaction.in_msg.value; // in nano
             try {
                 // to number
-              setTransactionAmount(transaction.out_msgs.value);
+                if (transaction.out_msgs.value) {
+                  setTransactionAmount(transaction.out_msgs.value);
+                } else {
+                  if (transaction.in_msg.value) {
+                    setTransactionAmount(transaction.in_msg.value);
+                  } else {
+                    setTransactionAmount('no amount');
+                  }
+                }
             } catch (error) {
-              setTransactionAmount('no amount');
               console.error('Error setting transaction amount:', error);
             }
 
