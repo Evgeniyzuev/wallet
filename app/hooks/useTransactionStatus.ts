@@ -8,6 +8,7 @@ export const useTransactionStatus = () => {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const { handleIncreaseWalletBalance } = useUserData();
   const { user } = useUserData();
+  const [transactionAmount, setTransactionAmount] = useState<number>(0);
 
   useEffect(() => {
     if (user) {
@@ -39,7 +40,7 @@ export const useTransactionStatus = () => {
             setTransactionStatus('confirmed');
             // TODO: добавить баланс кошелька
             // const incomingAmount = transaction.in_msg.value; // in nano
-            handleIncreaseWalletBalance(Number(toNano(transaction.in_msg.value)));
+            setTransactionAmount(transaction.in_msg.value);
 
             // setWalletBalance(walletBalance + Number(toNano(incomingAmount)));
 
@@ -80,5 +81,5 @@ export const useTransactionStatus = () => {
     setTransactionStatus('checking');
   }, []);
 
-  return { transactionStatus, startChecking };
+  return { transactionStatus, startChecking, transactionAmount };
 };
