@@ -1,8 +1,18 @@
 import { useState, useCallback, useEffect } from 'react';
+import { useUserData } from './useUserData';
 
 export const useTransactionStatus = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
+  const [walletBalance, setWalletBalance] = useState<number>(0);
+
+  const { user } = useUserData();
+
+  useEffect(() => {
+    if (user) {
+      setWalletBalance(user.walletBalance || 0);
+    }
+  }, [user]);
 
   async function checkTransactionStatus(hash: string) {
     try {
@@ -26,6 +36,9 @@ export const useTransactionStatus = () => {
           if (transaction.description.compute_ph.success) {
             console.log('Transaction confirmed:', hash);
             setTransactionStatus('confirmed');
+            // TODO: добавить баланс кошелька
+            setWalletBalance(walletBalance + transaction.value)
+
           } else {
             console.log('Transaction failed:', hash);
             setTransactionStatus('failed');
