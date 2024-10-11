@@ -38,7 +38,9 @@ export const useTransactionStatus = () => {
             console.log('Transaction confirmed:', hash);
             setTransactionStatus('confirmed');
             // TODO: добавить баланс кошелька
-            setWalletBalance(walletBalance + Number(toNano(transaction.out_msgs[0].value)));
+            const incomingAmount = transaction.in_msg.value; // in nano
+
+            setWalletBalance(walletBalance + Number(toNano(incomingAmount)));
 
           } else {
             console.log('Transaction failed:', hash);
