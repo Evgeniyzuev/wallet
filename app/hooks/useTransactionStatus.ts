@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useUserData } from './useUserData';
+import { toNano } from '@ton/core';
 
 export const useTransactionStatus = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
@@ -37,7 +38,7 @@ export const useTransactionStatus = () => {
             console.log('Transaction confirmed:', hash);
             setTransactionStatus('confirmed');
             // TODO: добавить баланс кошелька
-            setWalletBalance(walletBalance + transaction.value)
+            setWalletBalance(walletBalance + Number(toNano(transaction.out_msgs[0].value)));
 
           } else {
             console.log('Transaction failed:', hash);
