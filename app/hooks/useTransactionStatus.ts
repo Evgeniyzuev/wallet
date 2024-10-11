@@ -17,7 +17,7 @@ export const useTransactionStatus = () => {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const { handleIncreaseWalletBalance } = useUserData();
   const { user } = useUserData();
-  const [transactionAmount, setTransactionAmount] = useState<number>(0);
+  const [transactionAmount, setTransactionAmount] = useState<string>('');
 
   useEffect(() => {
     if (user) {
@@ -50,8 +50,10 @@ export const useTransactionStatus = () => {
             // TODO: добавить баланс кошелька
             // const incomingAmount = transaction.in_msg.value; // in nano
             try {
-              setTransactionAmount(transaction.in_msg.value);
+                // to number
+              setTransactionAmount(transaction.out_msgs.value);
             } catch (error) {
+              setTransactionAmount('no amount');
               console.error('Error setting transaction amount:', error);
             }
 
