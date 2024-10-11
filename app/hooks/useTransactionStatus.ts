@@ -2,13 +2,15 @@ import { useState, useCallback, useEffect } from 'react';
 import { useUserData } from './useUserData';
 import { toNano } from '@ton/core';
 
+export const [transactionAmount, setTransactionAmount] = useState<number>(0);
+
 export const useTransactionStatus = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const { handleIncreaseWalletBalance } = useUserData();
   const { user } = useUserData();
-  const [transactionAmount, setTransactionAmount] = useState<number>(0);
+
 
   useEffect(() => {
     if (user) {
