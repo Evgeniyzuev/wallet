@@ -58,8 +58,8 @@ export default function WalletPage() {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const { transactionStatus, startChecking } = useTransactionStatus();
-  const [amountToWalletBalance, setAmountToWalletBalance] = useState<number>(0);
-  const { user, handleIncreaseWalletBalance } = useUserData();
+  // const [amountToWalletBalance, setAmountToWalletBalance] = useState<number>(0);
+  const { user } = useUserData();
 
   // const Wallet_DST = "UQB7cFPcnMxBh5VjuRxtxwXXG8UuqxR3xbQtsuhw0Ezy7Jfz";
   // const [Wallet_SRC, setWallet_SRC] = useState<string>('');
@@ -75,12 +75,12 @@ export default function WalletPage() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (transactionStatus === 'confirmed' && amountToWalletBalance > 0) {
-      handleIncreaseWalletBalance(amountToWalletBalance / 1e9);
-      setAmountToWalletBalance(0); // Reset the amount
-    }
-  }, [transactionStatus, amountToWalletBalance, walletBalance, handleIncreaseWalletBalance]);
+  // useEffect(() => {
+  //   if (transactionStatus === 'confirmed' && amountToWalletBalance > 0) {
+  //     handleIncreaseWalletBalance(amountToWalletBalance / 1e9);
+  //     setAmountToWalletBalance(0); // Reset the amount
+  //   }
+  // }, [transactionStatus, amountToWalletBalance, walletBalance, handleIncreaseWalletBalance]);
 
 
 
@@ -182,7 +182,7 @@ export default function WalletPage() {
         ],
       };
 
-      setAmountToWalletBalance(Number(amountInNanotons));
+      // setAmountToWalletBalance(Number(amountInNanotons));
 
       const result = await tonConnectUI.sendTransaction(transaction);
       console.log("Transaction sent:", result);
