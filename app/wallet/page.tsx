@@ -7,7 +7,7 @@ import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
 import { Cell } from '@ton/core';
 import TonWeb from "tonweb";
-import { useTransactionStatus, transactionAmount } from '../hooks/useTransactionStatus';
+import { useTransactionStatus } from '../hooks/useTransactionStatus';
 
 const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY}));
 
@@ -58,6 +58,7 @@ export default function WalletPage() {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
   const { transactionStatus, startChecking } = useTransactionStatus();
+  const { transactionAmount } = useTransactionStatus();
   // const [amountToWalletBalance, setAmountToWalletBalance] = useState<number>(0);
   const { user } = useUserData();
 

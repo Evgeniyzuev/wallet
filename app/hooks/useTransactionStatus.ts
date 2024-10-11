@@ -2,7 +2,14 @@ import { useState, useCallback, useEffect } from 'react';
 import { useUserData } from './useUserData';
 import { toNano } from '@ton/core';
 
-export const [transactionAmount, setTransactionAmount] = useState<number>(0);
+
+
+// export function useTransactionAmount() {
+//   // ... hook logic
+// }
+
+// // Then in your component:
+// const amount = useTransactionAmount();
 
 export const useTransactionStatus = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
@@ -10,7 +17,7 @@ export const useTransactionStatus = () => {
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const { handleIncreaseWalletBalance } = useUserData();
   const { user } = useUserData();
-
+  const [transactionAmount, setTransactionAmount] = useState<number>(0);
 
   useEffect(() => {
     if (user) {
@@ -42,7 +49,11 @@ export const useTransactionStatus = () => {
             setTransactionStatus('confirmed');
             // TODO: добавить баланс кошелька
             // const incomingAmount = transaction.in_msg.value; // in nano
-            setTransactionAmount(transaction.in_msg.value);
+            try {
+              setTransactionAmount(transaction.in_msg.value);
+            } catch (error) {
+              console.error('Error setting transaction amount:', error);
+            }
 
             // setWalletBalance(walletBalance + Number(toNano(incomingAmount)));
 
