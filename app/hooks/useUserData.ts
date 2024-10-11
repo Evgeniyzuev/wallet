@@ -74,7 +74,7 @@ export function useUserData() {
     }
   };
 
-  const increaseWalletBalance = async (amount: number) => {
+  const handleIncreaseWalletBalance = async (amount: number) => {
     if (!user) return;
 
     try {
@@ -100,5 +100,5 @@ export function useUserData() {
   };
 
 
-  return { user, setUser, error, setError, handleIncreaseAicoreBalance };
+  return { user, setUser, error, setError, handleIncreaseAicoreBalance, handleIncreaseWalletBalance };
 }
