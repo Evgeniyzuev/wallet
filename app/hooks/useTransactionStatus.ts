@@ -15,7 +15,7 @@ export const useTransactionStatus = () => {
   const [transactionStatus, setTransactionStatus] = useState('');
   const [transactionHash, setTransactionHash] = useState('');
   const [walletBalance, setWalletBalance] = useState<number>(0);
-  const { handleIncreaseWalletBalance } = useUserData();
+  // const { handleIncreaseWalletBalance } = useUserData();
   const { user } = useUserData();
   const [transactionAmount, setTransactionAmount] = useState<string>('');
 
@@ -49,17 +49,12 @@ export const useTransactionStatus = () => {
             setTransactionStatus('confirmed');
             // TODO: добавить баланс кошелька
             // const incomingAmount = transaction.in_msg.value; // in nano
+            setTransactionAmount('...');
             try {
                 // to number
-                if (transaction.out_msgs.value) {
-                  setTransactionAmount(transaction.out_msgs.value);
-                } else {
-                  if (transaction.in_msg.value) {
-                    setTransactionAmount(transaction.in_msg.value);
-                  } else {
-                    setTransactionAmount('no amount');
-                  }
-                }
+                if (transaction.out_msgs.value || transaction.in_msg.value) {
+                  setTransactionAmount('received');
+                } else setTransactionAmount('no amount');
             } catch (error) {
               console.error('Error setting transaction amount:', error);
             }
