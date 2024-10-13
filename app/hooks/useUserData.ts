@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
-// import { setUserId, setAicoreBalance } from '../db';
 
 export function useUserData() {
   const [user, setUser] = useState<any>(null);
@@ -99,6 +98,22 @@ export function useUserData() {
     }
   };
 
+  const getWalletBalance = (): number => {
+    return user ? user.walletBalance : 0;
+  };
 
-  return { user, setUser, error, setError, handleIncreaseAicoreBalance, handleIncreaseWalletBalance };
+  const getAiCoreBalance = (): number => {
+    return user ? user.aicoreBalance : 0;
+  };
+
+  return {
+    user,
+    setUser,
+    error,
+    setError,
+    handleIncreaseAicoreBalance,
+    handleIncreaseWalletBalance,
+    getWalletBalance,
+    getAiCoreBalance
+  };
 }

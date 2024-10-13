@@ -25,4 +25,20 @@ model User {
   walletBalance     Float     @default(0)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  contacts   Contact[] @relation("UserContacts")
+  referrals  Contact[] @relation("UserReferrals")
+}
+
+model Contact {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  contactId String   @db.ObjectId
+  isReferral Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User     @relation("UserContacts", fields: [userId], references: [id])
+  contact   User     @relation("UserReferrals", fields: [contactId], references: [id])
+
+  @@unique([userId, contactId])
 }

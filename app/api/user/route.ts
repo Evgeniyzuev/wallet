@@ -23,6 +23,23 @@ export async function POST(req: NextRequest) {
                     lastName: user.last_name || '',
                 }
             })
+
+            // Save contact as referral if start_param exists
+            if (start_param) {
+                const referrer = await prisma.user.findUnique({
+                    where: { telegramId: parseInt(start_param) }
+                })
+
+                if (referrer) {
+                    await prisma.contact.create({
+                        data: {
+                            userId: referrer.id,
+                            contactId: dbUser.id,
+                            isReferral: true
+                        }
+                    })
+                }
+            }
         }
 
         return NextResponse.json(dbUser)
