@@ -30,6 +30,7 @@ export async function GET(request: NextRequest) {
             contact: {
               select: {
                 telegramId: true,
+                firstName: true,
                 username: true
               }
             }
@@ -44,6 +45,7 @@ export async function GET(request: NextRequest) {
 
     const referrals = user.contacts.map(contact => ({
       telegramId: contact.contact.telegramId,
+      firstName: contact.contact.firstName,
       username: contact.contact.username
     }));
 

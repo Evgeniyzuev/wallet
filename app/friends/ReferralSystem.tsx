@@ -9,6 +9,7 @@ interface ReferralSystemProps {
 interface Referral {
   telegramId: number;
   username: string | null;
+  firstName: string | null;
 }
 
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
@@ -72,7 +73,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
         <ul>
           {referrals.map((referral, index) => (
             <li key={index} className="bg-gray-100 p-2 mb-2 rounded">
-              User {referral.telegramId} {referral.username ? `(@${referral.username})` : ''}
+              ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`}
             </li>
           ))}
         </ul>

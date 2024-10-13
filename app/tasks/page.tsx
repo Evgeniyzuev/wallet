@@ -4,6 +4,14 @@ import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
 import Subscription from './subscription'
+import TaskPopup from '../components/TaskPopup'
+
+interface Task {
+  title: string;
+  description: string;
+  reward: string;
+  actionText: string;
+}
 
 export default function Home() {
   const { user, setUser, error, setError, handleIncreaseAicoreBalance } = useUserData();
@@ -11,6 +19,14 @@ export default function Home() {
   const [aicoreAmount, setAicoreAmount] = useState('')
   // const [startParam, setStartParam] = useState('')
   const [subscriptionCompleted, setSubscriptionCompleted] = useState(false)
+  const [isPopupOpen, setIsPopupOpen] = useState(false)
+  const [currentTask, setCurrentTask] = useState({
+    title: '',
+    description: '',
+    reward: '',
+    actionText: '',
+    secondActionText: ''
+  })
 
   // useEffect(() => {
   //   if (typeof window !== 'undefined' /*&& window.Telegram?.WebApp*/) {
@@ -92,43 +108,52 @@ export default function Home() {
   // };
 
   const handleSubscribe = async () => {
-    // Open the Telegram channel link
     window.open('https://t.me/WeAi_ch', '_blank');
+  };
 
-    // Wait for the user to return to the app
-    const checkMembership = async () => {
-      const response = await fetch('/api/check-membership', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          telegramId: user?.telegramId,
-          channelUsername: 'WeAi_ch'
-        }),
-      });
+  const checkMembership = async () => {
+    if (!user?.telegramId) {
+      setError('User not found');
+      return;
+    }
 
-      if (response.ok) {
-        const { isMember } = await response.json();
-        if (isMember) {
-          // Increase aicoreBalance
-          const result = await handleIncreaseAicoreBalance(0.5);
-          if (result?.success) {
-            setNotification('Subscription successful! 0.5 Aicore added to your balance.');
-            setSubscriptionCompleted(true);
-          } else {
-            setError('Failed to increase Aicore balance');
-          }
+    const response = await fetch('/api/check-membership', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        telegramId: user.telegramId,
+        channelUsername: 'WeAi_ch'
+      }),
+    });
+
+    if (response.ok) {
+      const { isMember } = await response.json();
+      if (isMember) {
+        const result = await handleIncreaseAicoreBalance(0.5);
+        if (result?.success) {
+          setNotification('Subscription successful! 0.5 Aicore added to your balance.');
+          setSubscriptionCompleted(true);
+          setIsPopupOpen(false);
         } else {
-          setError('Please subscribe to the channel to receive the bonus');
+          setError('Failed to increase Aicore balance');
         }
       } else {
-        setError('Failed to check membership');
+        setError('Please subscribe to the channel to receive the bonus');
       }
-    };
+    } else {
+      setError('Failed to check membership');
+    }
+  };
 
-    // Check membership after a short delay
-    setTimeout(checkMembership, 3000);
+  const handleOpenPopup = (task: Task) => {
+    setCurrentTask({
+      ...task,
+      actionText: 'Subscribe',
+      secondActionText: 'Check Membership'
+    });
+    setIsPopupOpen(true);
   };
 
   return (
@@ -145,23 +170,50 @@ export default function Home() {
       {/* task subscription channel WeAi_ch */}
 
       {subscriptionCompleted ? (
-        <div className="bg-green-500 text-white font-bold py-2 px-4 rounded mt-4">
+        <div className="bg-green-500 text-white font-bold py-2 px-4 rounded mt-4 text-center">
           ✅ Completed: Core +0.5$
         </div>
       ) : (
         <button 
-          onClick={handleSubscribe}
+          onClick={() => handleOpenPopup({
+            title: 'Subscribe to the channel',
+            description: 'Subscribe to the WeAi channel',
+            reward: '+0,500 $',
+            actionText: 'Subscribe'
+          })}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
         >
           Subscribe t.me/WeAi_ch
         </button>
       )}
 
+      {/* task popup */}
+      {<button onClick={() => handleOpenPopup({
+        title: 'Boost Major channel',
+        description: 'Boost official Major channel to help it get additional features. Keep your boost to collect free rating every day.',
+        reward: '+1,500 ⭐',
+        actionText: 'Boost Channel'
+      })}
+      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+      >Open Popup</button>
+      }
+
       </div>
       <Subscription />
       <Navigation />
       {notification && <p className="text-green-500 mt-2">{notification}</p>}
       {error && <p className="text-red-500 mt-2">{error}</p>}
+      <TaskPopup
+        isOpen={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        title={currentTask.title}
+        description={currentTask.description}
+        reward={currentTask.reward}
+        onAction={handleSubscribe}
+        actionText={currentTask.actionText}
+        onSecondAction={checkMembership}
+        secondActionText={currentTask.secondActionText}
+      />
     </main>
   )
 }
