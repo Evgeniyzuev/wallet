@@ -6,7 +6,7 @@ interface ReferralSystemProps {
   userId: string
 }
 
-const ReferralSystem: React.FC<ReferralSystemProps> = (userId) => {
+const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const [referrals, setReferrals] = useState<string[]>([])
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
   const { user } = useUserData()
@@ -49,7 +49,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = (userId) => {
 
   const handleInviteFriend = () => {
     const utils = initUtils()
-    const inviteLink = `${INVITE_URL}?startapp=${userId}`
+    const inviteLink = `${INVITE_URL}?startapp=${userId}` //userId to string
     const shareText = `Join me on this awesome Telegram mini app!`
     const fullUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(shareText)}`
     utils.openTelegramLink(fullUrl)
