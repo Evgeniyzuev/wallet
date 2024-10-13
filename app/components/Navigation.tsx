@@ -7,7 +7,8 @@ export default function Navigation() {
   const pathname = usePathname()
 
   const navItems = [
-    { href: '/', label: 'Aissist' },
+    { href: '/', label: 'Core' },
+    { href: '/ai', label: 'Ai' },
     { href: '/wallet', label: 'Wallet' },
     { href: '/tasks', label: 'Tasks' },
     { href: '/friends', label: 'Frens' },

@@ -48,15 +48,17 @@ export const useTransactionStatus = () => {
             console.log('Transaction confirmed:', hash);
             setTransactionStatus('confirmed');
             // TODO: добавить баланс кошелька
-            // const incomingAmount = transaction.in_msg.value; // in nano
-            setTransactionAmount('...');
-            try {
-                // to number
-                if (transaction.out_msgs.value || transaction.in_msg.value) {
-                  setTransactionAmount('received');
-                } else setTransactionAmount('no amount');
-            } catch (error) {
-              console.error('Error setting transaction amount:', error);
+           // Extract the actual transaction amount
+           let amount: string | null = null;
+          // amount = hole transaction to string
+           amount = JSON.stringify(transaction);
+
+           if (amount) {
+             // Convert from nanoTON to TON
+            //  const amountInTON = parseFloat(amount) / 1e9;
+             setTransactionAmount(amount);
+           } else {
+              setTransactionAmount('Amount not available');
             }
 
             // setWalletBalance(walletBalance + Number(toNano(incomingAmount)));
@@ -96,6 +98,7 @@ export const useTransactionStatus = () => {
   const startChecking = useCallback((hash: string) => {
     setTransactionHash(hash);
     setTransactionStatus('checking');
+    setTransactionAmount('...');
   }, []);
 
   return { transactionStatus, startChecking, transactionAmount };
