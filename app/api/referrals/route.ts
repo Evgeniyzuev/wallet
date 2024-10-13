@@ -24,7 +24,8 @@ export async function GET(request: NextRequest) {
     const user = await prisma.user.findUnique({
       where: { telegramId: parseInt(userId) },
       include: {
-        referrals: {
+        contacts: {
+          where: { isReferral: true },
           include: {
             contact: {
               select: {
@@ -41,9 +42,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const referrals = user.referrals.map(referral => ({
-      telegramId: referral.contact.telegramId,
-      username: referral.contact.username
+    const referrals = user.contacts.map(contact => ({
+      telegramId: contact.contact.telegramId,
+      username: contact.contact.username
     }));
 
     return NextResponse.json({ referrals });

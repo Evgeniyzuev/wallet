@@ -6,8 +6,8 @@ import aissistImage from '../images/aissist.png';
 import Navigation from '../components/Navigation';
 
 interface Message {
-  text: string;
-  isUser: boolean;
+  role: 'user' | 'assistant';
+  content: string;
 }
 
 export default function AiPage() {
@@ -16,17 +16,36 @@ export default function AiPage() {
   const [isAiTyping, setIsAiTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim()) {
-      setMessages(prevMessages => [...prevMessages, { text: input, isUser: true }]);
+      const userMessage: Message = { role: 'user', content: input };
+      setMessages(prevMessages => [...prevMessages, userMessage]);
       setInput('');
       setIsAiTyping(true);
 
-      // Имитация ответа ИИ
-      setTimeout(() => {
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ messages: [...messages, userMessage] }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to get response from AI');
+        }
+
+        const data = await response.json();
+        const aiMessage: Message = { role: 'assistant', content: data.content };
+        setMessages(prevMessages => [...prevMessages, aiMessage]);
+      } catch (error) {
+        console.error('Error getting AI response:', error);
+        const errorMessage: Message = { role: 'assistant', content: "I'm sorry, I encountered an error. Please try again later." };
+        setMessages(prevMessages => [...prevMessages, errorMessage]);
+      } finally {
         setIsAiTyping(false);
-        setMessages(prevMessages => [...prevMessages, { text: "Ai not available yet", isUser: false }]);
-      }, 2000); // Задержка в 2 секунды для имитации обработки
+      }
     }
   };
 
@@ -41,13 +60,13 @@ export default function AiPage() {
       </div>
       <div className="flex-grow overflow-y-auto p-4 pb-20">
         {messages.map((msg, index) => (
-          <div key={index} className={`mb-2 ${msg.isUser ? 'text-right' : 'text-left'}`}>
+          <div key={index} className={`mb-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
             <div
               className={`inline-block p-2 rounded-lg ${
-                msg.isUser ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'
+                msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'
               }`}
             >
-              {msg.text}
+              {msg.content}
             </div>
           </div>
         ))}

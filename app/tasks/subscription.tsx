@@ -78,7 +78,7 @@ export default function Subscription() {
   if (!telegramId) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-4">
-        <h1 className="text-4xl font-bold mb-8">Telegram Channel Membership Check</h1>
+        <h1 className="text-base font-bold mb-1">Telegram Channel Membership Check</h1>
         <p className="text-xl">This app can only be used within Telegram as a Mini App.</p>
       </main>
     )
@@ -86,13 +86,13 @@ export default function Subscription() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
-      <h1 className="text-4xl font-bold mb-8">Telegram Channel Membership Check</h1>
+      <h1 className="text-base font-bold mb-1">Telegram Channel Membership Check</h1>
       <input
         type="text"
         value={channelUsername}
         onChange={(e) => setChannelUsername(e.target.value)}
         placeholder="Enter channel username (e.g., @example)"
-        className="mb-4 p-2 border border-gray-300 rounded w-full max-w-xs"
+        className="mb-2 p-2 border border-gray-300 rounded w-full max-w-xs"
       />
       <button
         onClick={checkChannelMembership}
