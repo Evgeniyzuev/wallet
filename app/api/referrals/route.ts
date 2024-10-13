@@ -1,5 +1,6 @@
 import { getReferrals, getReferrer, saveReferral } from '@/app/lib/storage';
 import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   const { userId, referrerId } = await request.json();
@@ -19,8 +20,35 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
   }
 
-  const referrals = getReferrals(userId);
-  const referrer = getReferrer(userId);
+  try {
+    const user = await prisma.user.findUnique({
+      where: { telegramId: parseInt(userId) },
+      include: {
+        referrals: {
+          include: {
+            contact: {
+              select: {
+                telegramId: true,
+                username: true
+              }
+            }
+          }
+        }
+      }
+    });
 
-  return NextResponse.json({ referrals, referrer });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const referrals = user.referrals.map(referral => ({
+      telegramId: referral.contact.telegramId,
+      username: referral.contact.username
+    }));
+
+    return NextResponse.json({ referrals });
+  } catch (error) {
+    console.error('Error fetching referrals:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
