@@ -2,15 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import BackButton from './BackButton'
-import Image from 'next/image'
-import frensImage from '../images/frens.jpg'
-import TelegramBackButton from './TelegramBackButton';
 
 export default function Navigation() {
   const pathname = usePathname()
 
   const navItems = [
+    { href: '/', label: 'Core' },
     { href: '/ai', label: 'Ai' },
     { href: '/wallet', label: 'Wallet' },
     { href: '/tasks', label: 'Tasks' },
@@ -50,7 +47,6 @@ export default function Navigation() {
                 className="mb-0"
               />
             )} */}
-            {pathname !== '/' && <TelegramBackButton />}
             {item.label}
           </Link>
           // telegram back button
