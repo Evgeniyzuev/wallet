@@ -72,7 +72,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
         <h2 className="text-2xl font-bold mb-4">Your Referrals:</h2>
         <ul>
           {referrals.map((referral, index) => (
-            <li key={index} className="bg-gray-100 p-2 mb-2 rounded">
+            <li key={index} className="bg-dark-blue p-2 mb-2 rounded">
               ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`}
             </li>
           ))}

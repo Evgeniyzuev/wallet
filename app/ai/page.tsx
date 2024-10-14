@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import aissistImage from '../images/aissist.png';
+import aissistImage from '../images/aissist0.png';
 import Navigation from '../components/Navigation';
 
 interface Message {
@@ -54,11 +54,11 @@ export default function AiPage() {
   }, [messages, isAiTyping]);
 
   return (
-    <main className="bg-black text-white h-screen flex flex-col">
+    <main className="bg-dark-blue text-white h-screen flex flex-col">
       <div className="h-1/3 overflow-hidden">
         <Image src={aissistImage} alt="AI Assistant" layout="responsive" objectFit="cover" />
       </div>
-      <div className="flex-grow overflow-y-auto p-4 pb-20">
+      <div className="flex-grow overflow-y-auto p-4 pb-20 mb-12">
         {messages.map((msg, index) => (
           <div key={index} className={`mb-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
             <div
@@ -79,7 +79,7 @@ export default function AiPage() {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="fixed bottom-0 left-6 right-0 p-4">
+      <div className="fixed bottom-8 left-0 right-0 p-4">
         <div className="flex max-w-screen-lg mx-auto">
           <input
             type="text"

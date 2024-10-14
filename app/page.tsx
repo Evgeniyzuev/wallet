@@ -102,7 +102,7 @@ export default function Home() {
 
   return (
     // <main className="text-base flex flex-col items-center self-start w-full p-4">
-    <main className="bg-black text-white h-screen flex flex-col">
+    <main className="bg-[#1c2033] text-white min-h-screen flex flex-col">
       {/* <Image src={aissistImage} alt="Aissist" className="mb-8" />
       <h1 className="text-4xl font-bold mb-8">Aissist</h1> */}
       <div className="h-1/2 flex items-center justify-center overflow-hidden relative">

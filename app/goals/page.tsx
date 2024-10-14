@@ -2,7 +2,7 @@ import Navigation from '../components/Navigation'
 
 export default function FriendsPage() {
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl font-bold text-center mb-8">Goals</h1>
       <div className="flex flex-col">
       <span>🏋️ здоровье</span>

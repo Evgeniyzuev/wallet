@@ -157,7 +157,7 @@ export default function Home() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl font-bold text-center mb-8">Tasks</h1>
       <div className="flex flex-col">
       <span>🔵приветствие</span>
@@ -199,7 +199,7 @@ export default function Home() {
       }
 
       </div>
-      <Subscription />
+      {/* <Subscription /> // for subscription check*/} 
       <Navigation />
       {notification && <p className="text-green-500 mt-2">{notification}</p>}
       {error && <p className="text-red-500 mt-2">{error}</p>}

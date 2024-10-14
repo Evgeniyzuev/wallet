@@ -40,7 +40,7 @@ export default function FriendsPage() {
 
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
+    <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl font-bold mb-8">Friends</h1>
       <h1 className="text-xl font-bold mb-8">Hello, {userData?.first_name}!</h1>
       <ReferralSystem userId={userId} />

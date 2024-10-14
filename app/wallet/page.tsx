@@ -73,7 +73,7 @@ export default function Wallet() {
   };
 
   return (
-    <main className="bg-black text-white h-screen flex flex-col flex flex-col items-center min-h-screen">
+    <main className="bg-dark-blue text-white h-screen flex flex-col flex flex-col items-center min-h-screen">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Wallet</h1>
         <p className="text-2xl mb-8">Wallet Balance: {walletBalance.toFixed(2)} USD</p>

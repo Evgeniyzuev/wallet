@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import BackButton from './BackButton'
 import Image from 'next/image'
 import frensImage from '../images/frens.jpg'
+import TelegramBackButton from './TelegramBackButton';
 
 export default function Navigation() {
   const pathname = usePathname()
@@ -17,11 +18,17 @@ export default function Navigation() {
     { href: '/goals', label: 'Goals' },
   ]
 
-  if (pathname !== '/') {
-    return <BackButton />
-  }
+  // if (pathname !== '/') {
+  //   return (
+  //     <>
+  //       {/* <BackButton /> */}
+  //       <TelegramBackButton />
+  //     </>
+  //   );
+  // }
 
   return (
+    
     <div className="w-full bg-gray-800 py-3 fixed bottom-0">
       <div className="flex justify-around max-w-screen-lg mx-auto">
         {navItems.map((item) => (
@@ -43,8 +50,12 @@ export default function Navigation() {
                 className="mb-0"
               />
             )} */}
+            {pathname !== '/' && <TelegramBackButton />}
             {item.label}
           </Link>
+          // telegram back button
+          
+          
         ))}
       </div>
     </div>
