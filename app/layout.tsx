@@ -3,6 +3,8 @@
 import "./globals.css";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { useEffect } from 'react';
+import BackButton from './components/BackButton'
+import { usePathname } from 'next/navigation';
 
 export default function RootLayout({
   children,
@@ -29,7 +31,9 @@ export default function RootLayout({
       </head>
       <body>
         <TonConnectUIProvider manifestUrl="https://blush-keen-constrictor-906.mypinata.cloud/ipfs/QmdbgPxFiAvgYVCrcMnwRVxtBCqgCtSM6A4Sy27nonHSnr">
-            {children}
+          {usePathname() !== '/' && <BackButton />}
+          
+          {children}
         </TonConnectUIProvider>
       </body>
     </html>

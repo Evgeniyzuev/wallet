@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import aissistImage from './images/aissist.png';
-import aissist2Image from './images/aissist2.png';
 import { useUserData } from './hooks/useUserData';
 import Navigation from './components/Navigation'
 

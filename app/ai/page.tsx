@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import aissistImage from '../images/aissist0.png';
+import aissistImage from '../images/aissist.png';
+import coreImage from '../images/core.jpg';
 import Navigation from '../components/Navigation';
 
 interface Message {
@@ -55,12 +56,17 @@ export default function AiPage() {
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
-      <div className="h-1/3 overflow-hidden">
-        <Image src={aissistImage} alt="AI Assistant" layout="responsive" objectFit="cover" />
+      <div className="h-1/4 overflow-hidden flex">
+        <div className="w-1/2">
+          <Image src={coreImage} alt="AI Core" layout="responsive" objectFit="cover" />
+        </div>
+        <div className="w-1/2">
+          <Image src={aissistImage} alt="AI Assistant" layout="responsive" objectFit="cover" />
+        </div>
       </div>
-      <div className="flex-grow overflow-y-auto p-4 pb-20 mb-12">
+      <div className="flex-grow overflow-y-auto p-4 pb-20 mb-10">
         {messages.map((msg, index) => (
-          <div key={index} className={`mb-2 ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
+          <div key={index} className={`mb-2 ${msg.role === 'user' ? 'ml-1' : 'mr-1'}`}>
             <div
               className={`inline-block p-2 rounded-lg ${
                 msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-700 text-white'
@@ -79,7 +85,7 @@ export default function AiPage() {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="fixed bottom-8 left-0 right-0 p-4">
+      <div className="fixed bottom-8 left-0 right-0 p-4 mb-2">
         <div className="flex max-w-screen-lg mx-auto">
           <input
             type="text"
