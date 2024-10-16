@@ -1,4 +1,4 @@
-import Navigation from '../components/Navigation'
+
 
 export default function FriendsPage() {
   return (
@@ -17,7 +17,6 @@ export default function FriendsPage() {
       <span>👪 семья</span>
       </div>
 
-      <Navigation />
     </main>
   );
 }

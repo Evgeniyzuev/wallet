@@ -6,9 +6,11 @@ import { useUserData } from '../hooks/useUserData'
 import TaskPopup from '../components/TaskPopup'
 import { tasks as initialTasks, Task } from './taskData'
 import Image from 'next/image'
+import { useUser } from '../UserContext';
 
 export default function Home() {
-  const { user, setUser, error, setError, handleIncreaseAicoreBalance } = useUserData();
+  const { user, setUser, handleIncreaseAicoreBalance } = useUser();
+  const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState('')
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [localTasks, setLocalTasks] = useState<Task[]>([])
@@ -39,7 +41,7 @@ export default function Home() {
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
-      <h1 className="text-4xl font-bold text-center mb-8">Tasks</h1>
+      <h1 className="text-4xl text-center mb-8">Tasks</h1> 
       <div className="flex flex-col items-center w-full px-4">
         {localTasks.map((task, index) => (
           <button 
@@ -63,7 +65,7 @@ export default function Home() {
           </button>
         ))}
       </div>
-      <Navigation />
+
       {notification && <p className="text-green-500 mt-2">{notification}</p>}
       {error && <p className="text-red-500 mt-2">{error}</p>}
       <TaskPopup
@@ -79,6 +81,7 @@ export default function Home() {
         }}
         secondActionText={currentTask.secondActionText}
       />
+      {/* <Navigation /> */}
     </main>
   )
 }

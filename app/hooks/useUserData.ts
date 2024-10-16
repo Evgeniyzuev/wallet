@@ -3,7 +3,6 @@ import WebApp from '@twa-dev/sdk';
 
 export function useUserData() {
   const [user, setUser] = useState<any>(null);
-  // const [walletBalance, setWalletBalance] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [startParam, setStartParam] = useState('');
 
@@ -32,8 +31,6 @@ export function useUserData() {
               setError(data.error);
             } else {
               setUser(data);
-              // setUserId(data.telegramId);
-              // setAicoreBalance(data.aicoreBalance);
             }
           })
           .catch((err) => {
@@ -62,7 +59,6 @@ export function useUserData() {
       const data = await res.json();
       if (data.success) {
         setUser({ ...user, aicoreBalance: data.aicoreBalance });
-        // setAicoreBalance(data.aicoreBalance);
         return { success: true, message: 'Aicore balance increased successfully!' };
       } else {
         return { success: false, message: 'Failed to increase Aicore balance' };
@@ -87,7 +83,6 @@ export function useUserData() {
       const data = await res.json();
       if (data.success) {
         setUser({ ...user, walletBalance: data.walletBalance });
-        // setWalletBalance(data.walletBalance);
         return { success: true, message: 'Wallet balance increased successfully!' };
       } else {
         return { success: false, message: 'Failed to increase wallet balance' };
@@ -98,14 +93,6 @@ export function useUserData() {
     }
   };
 
-  const getWalletBalance = (): number => {
-    return user ? user.walletBalance : 0;
-  };
-
-  const getAiCoreBalance = (): number => {
-    return user ? user.aicoreBalance : 0;
-  };
-
   return {
     user,
     setUser,
@@ -113,7 +100,5 @@ export function useUserData() {
     setError,
     handleIncreaseAicoreBalance,
     handleIncreaseWalletBalance,
-    getWalletBalance,
-    getAiCoreBalance
   };
 }

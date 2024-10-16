@@ -94,13 +94,7 @@ export const checkMembership = async (user: any, channelUsername: string, handle
   if (response.ok) {
     const { isMember } = await response.json();
     if (isMember) {
-      const result = await handleIncreaseAicoreBalance(0.5);
-      if (result?.success) {
-        return true
-      } else {
-        setError('Failed to increase Aicore balance');
-        return false
-      }
+      return true
     } else {
       setError('Please subscribe to the channel to receive the bonus');
       return false

@@ -4,19 +4,20 @@
 import Navigation from '../components/Navigation'  
 import { useUserData } from '../hooks/useUserData'
 import { useEffect, useState } from 'react'
+import { useUser } from '../UserContext';
+import { User } from '../UserContext';
 
 export default function Wallet() {
-  const { user, handleIncreaseWalletBalance } = useUserData();
-  const [walletBalance, setWalletBalance] = useState<number>(0);
+  const { user, setUser, handleIncreaseWalletBalance, handleIncreaseAicoreBalance } = useUser();
+  // const [walletBalance, setWalletBalance] = useState<number>(0);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [amount, setAmount] = useState<string>('');
-  const { handleIncreaseAicoreBalance } = useUserData();
 
-  useEffect(() => {
-    if (user?.walletBalance !== undefined) {
-      setWalletBalance(user.walletBalance);
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (user?.walletBalance !== undefined) {
+  //     setWalletBalance(user.walletBalance);
+  //   }
+  // }, [user]);
 
   const handleButtonClick = (action: string) => {
     setSelectedAction(action);
@@ -34,25 +35,52 @@ export default function Wallet() {
 
     switch (selectedAction) {
       case 'topUpWallet':
+        setUser((prevUser: User | null) => {
+          if (prevUser) {
+            return {
+              ...prevUser,
+              walletBalance: prevUser.walletBalance + amountNumber
+            };
+          }
+          return prevUser;
+        });
         result = await handleIncreaseWalletBalance(amountNumber);
         break;
       case 'withdraw':
-        if (amountNumber > walletBalance) {
+        if (amountNumber > (user?.walletBalance || 0)) {
           console.error('Insufficient balance');
           return;
         }
-        amountNumber = -amountNumber;
-        result = await handleIncreaseWalletBalance(amountNumber);
+        // amountNumber = -amountNumber;
+        // setUser((prevUser: User | null) => {
+        //   if (prevUser) {
+        //     return {
+        //       ...prevUser,
+        //       walletBalance: prevUser.walletBalance + amountNumber
+        //     };
+        //   }
+        //   return prevUser;
+        // });
+        result = await handleIncreaseWalletBalance(-amountNumber);
         break;
       case 'topUpCore':
         // Handle topUpCore action handleIncreaseAicoreBalance
-        if (amountNumber > walletBalance) {
+        if (amountNumber > (user?.walletBalance || 0)) {
           console.error('Insufficient balance');
           return;
         }
         result = await handleIncreaseAicoreBalance(amountNumber);
-        amountNumber = -amountNumber;
-        result = await handleIncreaseWalletBalance(amountNumber);
+        result = await handleIncreaseWalletBalance(-amountNumber);
+        setUser((prevUser: User | null) => {
+          if (prevUser) {
+            return {
+              ...prevUser,
+              // walletBalance: prevUser.walletBalance - amountNumber,
+              aicoreBalance: prevUser.aicoreBalance + amountNumber
+            };
+          }
+          return prevUser;
+        });
         console.log('Top Up Core action not implemented yet');
         break;
       default:
@@ -63,7 +91,7 @@ export default function Wallet() {
     if (result?.success) {
       console.log(result.message);
       // Update the local wallet balance immediately
-      setWalletBalance(walletBalance + amountNumber);
+      // setWalletBalance((user?.walletBalance || 0) + amountNumber);
     } else {
       console.error(result?.message || 'Action failed');
     }
@@ -76,7 +104,7 @@ export default function Wallet() {
     <main className="bg-dark-blue text-white h-screen flex flex-col flex flex-col items-center min-h-screen">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Wallet</h1>
-        <p className="text-2xl mb-8">Wallet Balance: {walletBalance.toFixed(2)} USD</p>
+        <p className="text-2xl mb-8">Wallet Balance: {Math.floor((user?.walletBalance || 0) * 100) / 100} USD</p>
         <div className="flex justify-center mb-4">
           <div className="flex items-center space-x-4 w-72">
             <button 
@@ -122,7 +150,7 @@ export default function Wallet() {
           </div>
         )}
       </div>
-      <Navigation />
+      {/* <Navigation /> */}
     </main>
   );
 }

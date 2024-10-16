@@ -14,9 +14,9 @@ export async function POST(req: NextRequest) {
             data: { walletBalance: { increment: amount } }
         })
 
-        return NextResponse.json({ success: true, aicoreBalance: updatedUser.aicoreBalance })
+        return NextResponse.json({ success: true, walletBalance: updatedUser.walletBalance })
     } catch (error) {
-        console.error('Error increasing Aicore balance:', error)
+        console.error('Error increasing wallet balance:', error)
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

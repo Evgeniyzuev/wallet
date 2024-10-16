@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address, beginCell, toNano, } from "@ton/core";
-import Navigation from '../components/Navigation'
 import { useUserData } from '../hooks/useUserData'
 import { Cell } from '@ton/core';
 import TonWeb from "tonweb";
@@ -265,7 +264,6 @@ export default function WalletPage() {
           <p className="text-sm">Receiver Address: {formatAddress(destinationAddress.toString())}</p>
         </div>
       )}
-      <Navigation />
       {transactionStatus && <h2>Transaction Status: {transactionStatus}</h2>}
       {transactionAmount && <h2>Transaction Amount: {transactionAmount}</h2>}
     </main>

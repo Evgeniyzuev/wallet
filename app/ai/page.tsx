@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import aissistImage from '../images/aissist.png'; 
 import coreImage from '../images/core.jpg';
-import Navigation from '../components/Navigation';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -102,7 +101,7 @@ export default function AiPage() {
           </button>
         </div>
       </div>
-      <Navigation />
+      {/* <Navigation /> */}
     </main>
   );
 }

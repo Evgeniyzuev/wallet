@@ -6,7 +6,9 @@ export default function BackButton() {
       const tg = window.Telegram.WebApp;
       tg.BackButton.show();
       tg.BackButton.onClick(() => {
-        window.history.back();
+        // window.history.back();
+        // go to home page
+        window.location.href = '/';
       });
 
       return () => {
