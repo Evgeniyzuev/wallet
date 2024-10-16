@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { initUtils } from '@telegram-apps/sdk'
 import { useUserData } from '../hooks/useUserData'
 
@@ -14,25 +14,31 @@ interface Referral {
 
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const [referrals, setReferrals] = useState<Referral[]>([])
+  const [showReferrals, setShowReferrals] = useState(false);
+  const [referralsLoaded, setReferralsLoaded] = useState(false);
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
   const { user } = useUserData()
 
-  useEffect(() => {
-    const fetchReferrals = async () => {
-      if (userId) {
-        try {
-          const response = await fetch(`/api/referrals?userId=${userId}`);
-          if (!response.ok) throw new Error('Failed to fetch referrals');
-          const data = await response.json();
-          setReferrals(data.referrals);
-        } catch (error) {
-          console.error('Error fetching referrals:', error);
-        }
+  const fetchReferrals = async () => {
+    if (userId && !referralsLoaded) {
+      try {
+        const response = await fetch(`/api/referrals?userId=${userId}`);
+        if (!response.ok) throw new Error('Failed to fetch referrals');
+        const data = await response.json();
+        setReferrals(data.referrals);
+        setReferralsLoaded(true);
+      } catch (error) {
+        console.error('Error fetching referrals:', error);
       }
     }
+  }
 
-    fetchReferrals();
-  }, [userId])
+  const handleShowReferrals = () => {
+    setShowReferrals(!showReferrals);
+    if (!referralsLoaded) {
+      fetchReferrals();
+    }
+  }
 
   const handleInviteFriend = () => {
     const utils = initUtils()
@@ -47,6 +53,8 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
     navigator.clipboard.writeText(inviteLink)
     alert('Invite link copied to clipboard!')
   }
+
+
 
   return (
     <div className="w-full max-w-md">
@@ -69,14 +77,24 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
         {user?.referrerId ? `User ${user.referrerId}` : "No referrer"}
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Your Referrals:</h2>
-        <ul>
-          {referrals.map((referral, index) => (
-            <li key={index} className="bg-dark-blue p-2 mb-2 rounded">
-              ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`}
-            </li>
-          ))}
-        </ul>
+        <button
+          onClick={handleShowReferrals}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
+        >
+          {showReferrals ? 'Hide Referrals' : 'Show Referrals'}
+        </button>
+        {showReferrals && (
+          <>
+            <h2 className="text-2xl font-bold mb-4">Your Referrals:</h2>
+            <ul>
+              {referrals.map((referral, index) => (
+                <li key={index} className="bg-dark-blue p-2 mb-2 rounded">
+                  ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
     </div>
   )

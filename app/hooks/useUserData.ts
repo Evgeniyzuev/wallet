@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
 
+let cachedUser: any = null;
+
 export function useUserData() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState(cachedUser);
   const [error, setError] = useState<string | null>(null);
   const [startParam, setStartParam] = useState('');
 
   useEffect(() => {
+    if (cachedUser) return;
+
     if (typeof window !== 'undefined') {
       const tg = WebApp;
       tg.ready();
@@ -30,6 +34,7 @@ export function useUserData() {
             if (data.error) {
               setError(data.error);
             } else {
+              cachedUser = data;
               setUser(data);
             }
           })
@@ -95,7 +100,10 @@ export function useUserData() {
 
   return {
     user,
-    setUser,
+    setUser: (newUser: any) => {
+      cachedUser = newUser;
+      setUser(newUser);
+    },
     error,
     setError,
     handleIncreaseAicoreBalance,

@@ -103,7 +103,7 @@ export default function Core() {
           if (prevUser) {
             return {
               ...prevUser,
-              aicoreBalance: prevUser.aicoreBalance + aicoreIncrease,
+              // aicoreBalance: prevUser.aicoreBalance + aicoreIncrease,
               walletBalance: prevUser.walletBalance + walletIncrease
             };
           }
@@ -128,7 +128,6 @@ export default function Core() {
             ></div>
             <div className="absolute inset-0 flex items-center justify-center text-xs text-white">
             {Math.floor((user?.aicoreBalance || 0) * 100) / 100} USD / {balanceRequiredForNextLevel[aicoreLevel]} USD 
-              {/* {Math.floor((user?.aicoreBalance || 0) * 100) / 100} */}
             </div>
           </div>
           <div className="text-yellow-500 border border-yellow-500 rounded-full w-8 h-8 flex items-center justify-center">
@@ -170,7 +169,7 @@ export default function Core() {
               
             </div>
             <div className="mb-1">Core to wallet: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(2)} USD/day</div>
-            <div className="mb-1">Wallet: {(user?.walletBalance || 0).toFixed(2)} USD</div>
+            <div className="mb-1">Wallet: {Math.floor((user?.walletBalance || 0) * 100) / 100} USD</div>
             {/* <div className="mb-1">Core after {coreAfterXyears} years without replenishment:</div>
             <div className="mb-1"> {(aicoreBalance *  ((dailyCoreRate * reinvestmentPart + 1) ** 365) ** coreAfterXyears).toFixed(2)} USD</div> */}
             <div className="mb-1 flex items-center">
