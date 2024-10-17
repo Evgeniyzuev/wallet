@@ -9,22 +9,24 @@ export interface User {
   lastName?: string;
   aicoreBalance: number;
   walletBalance: number;
+  level: number;
 }
 
 interface UserContextType {
   user: User | null;
   setUser: Dispatch<SetStateAction<User | null>>;
-  handleIncreaseAicoreBalance: (amount: number) => Promise<{ success: boolean; message: string } | undefined>;
-  handleIncreaseWalletBalance: (amount: number) => Promise<{ success: boolean; message: string } | undefined>;
+//   handleIncreaseAicoreBalance: (amount: number) => Promise<{ success: boolean; message: string } | undefined>;
+//   handleIncreaseWalletBalance: (amount: number) => Promise<{ success: boolean; message: string } | undefined>;
+  handleUpdateUser: (updates: Partial<User>) => Promise<{ success: boolean; message: string } | undefined>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const { user, setUser, handleIncreaseAicoreBalance, handleIncreaseWalletBalance } = useUserData();
+  const { user, setUser, handleUpdateUser } = useUserData();
 
   return (
-    <UserContext.Provider value={{ user, setUser, handleIncreaseAicoreBalance, handleIncreaseWalletBalance }}>
+    <UserContext.Provider value={{ user, setUser, handleUpdateUser }}>
       {children}
     </UserContext.Provider>
   );

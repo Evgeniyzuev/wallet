@@ -8,7 +8,7 @@ import { User } from '../UserContext';
 
 
 export default function Core() {
-  const { user, setUser, handleIncreaseAicoreBalance, handleIncreaseWalletBalance } = useUser();
+  const { user, setUser, handleUpdateUser } = useUser();
   // const [aicoreBalance, setAicoreBalance] = useState(0);
   // const [walletBalance, setWalletBalance] = useState(0);
   const [dailyCoreRate] = useState(0.000633);
@@ -46,7 +46,7 @@ export default function Core() {
 
   const aicoreLevel = getAICoreLevel(user?.aicoreBalance || 0);
   const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
-  const progressPercentage = Math.min(100, (user?.aicoreBalance || 0 / nextLevelThreshold) * 100);
+  const progressPercentage = Math.min(100, ((user?.aicoreBalance || 0) / nextLevelThreshold) * 100);
 
   // hook for aicore balance
   // const { aicoreBalance, setAicoreBalance } = useUserData();
@@ -91,25 +91,20 @@ export default function Core() {
       const walletIncrease = user.aicoreBalance * (dailyCoreRate * (1 - reinvestmentPart));
       
       // Implement these functions in your UserContext or as API calls
-      const walletResult = await handleIncreaseWalletBalance(walletIncrease);
-      const aicoreResult = await handleIncreaseAicoreBalance(aicoreIncrease);
+      // const walletResult = await handleIncreaseWalletBalance(walletIncrease);
+      // const aicoreResult = await handleIncreaseAicoreBalance(aicoreIncrease);
+      await handleUpdateUser({
+        walletBalance: walletIncrease,  // Increase wallet balance by 10
+        aicoreBalance: aicoreIncrease,   // Increase aicore balance by 5
+        level: 0            // Increase level by 1
+      });
 
 
-      if (aicoreResult?.success && walletResult?.success) {
-        // setWalletBalance(prevBalance => prevBalance + walletIncrease);
-        // setAicoreBalance(prevBalance => prevBalance + aicoreIncrease);
-
-        setUser((prevUser: User | null) => {
-          if (prevUser) {
-            return {
-              ...prevUser,
-              // aicoreBalance: prevUser.aicoreBalance + aicoreIncrease,
-              walletBalance: prevUser.walletBalance + walletIncrease
-            };
-          }
-          return prevUser;
-        });
-      }
+      // if (result?.success) {
+      //   console.log('Successfully skipped 1 day. Aicore balance increased by', aicoreIncrease.toFixed(2), 'and Wallet balance increased by', walletIncrease.toFixed(2));
+      // } else {
+      //   console.log('Failed to update balances');
+      // }
     } catch (error) {
       console.error('Error updating balances:', error);
       alert('An error occurred while updating balances');
@@ -125,7 +120,11 @@ export default function Core() {
             <div
               className="absolute top-0 left-0 h-full bg-yellow-500 bg-opacity-50"
               style={{ width: `${progressPercentage}%` }}
-            ></div>
+            >
+              {/* <div className="absolute inset-0 flex items-center justify-center text-xs text-black font-bold">
+                {Math.floor(progressPercentage)}%
+              </div> */}
+            </div>
             <div className="absolute inset-0 flex items-center justify-center text-xs text-white">
             {Math.floor((user?.aicoreBalance || 0) * 100) / 100} USD / {balanceRequiredForNextLevel[aicoreLevel]} USD 
             </div>

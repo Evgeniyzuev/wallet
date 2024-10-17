@@ -8,7 +8,7 @@ import { useUser } from '../UserContext';
 import { User } from '../UserContext';
 
 export default function Wallet() {
-  const { user, setUser, handleIncreaseWalletBalance, handleIncreaseAicoreBalance } = useUser();
+  const { user, setUser, handleUpdateUser } = useUser();
   // const [walletBalance, setWalletBalance] = useState<number>(0);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [amount, setAmount] = useState<string>('');
@@ -35,16 +35,18 @@ export default function Wallet() {
 
     switch (selectedAction) {
       case 'topUpWallet':
-        setUser((prevUser: User | null) => {
-          if (prevUser) {
-            return {
-              ...prevUser,
-              walletBalance: prevUser.walletBalance + amountNumber
-            };
-          }
-          return prevUser;
+        // setUser((prevUser: User | null) => {
+        //   if (prevUser) {
+        //     return {
+        //       ...prevUser,
+        //       walletBalance: prevUser.walletBalance + amountNumber
+        //     };
+        //   }
+        //   return prevUser;
+        // });
+        result = await handleUpdateUser({
+          walletBalance: amountNumber
         });
-        result = await handleIncreaseWalletBalance(amountNumber);
         break;
       case 'withdraw':
         if (amountNumber > (user?.walletBalance || 0)) {
@@ -61,7 +63,9 @@ export default function Wallet() {
         //   }
         //   return prevUser;
         // });
-        result = await handleIncreaseWalletBalance(-amountNumber);
+        result = await handleUpdateUser({
+          walletBalance: -amountNumber
+        });
         break;
       case 'topUpCore':
         // Handle topUpCore action handleIncreaseAicoreBalance
@@ -69,18 +73,20 @@ export default function Wallet() {
           console.error('Insufficient balance');
           return;
         }
-        result = await handleIncreaseAicoreBalance(amountNumber);
-        result = await handleIncreaseWalletBalance(-amountNumber);
-        setUser((prevUser: User | null) => {
-          if (prevUser) {
-            return {
-              ...prevUser,
-              // walletBalance: prevUser.walletBalance - amountNumber,
-              aicoreBalance: prevUser.aicoreBalance + amountNumber
-            };
-          }
-          return prevUser;
+        result = await handleUpdateUser({
+          walletBalance: -amountNumber,
+          aicoreBalance: amountNumber
         });
+        // setUser((prevUser: User | null) => {
+        //   if (prevUser) {
+        //     return {
+        //       ...prevUser,
+        //       // walletBalance: prevUser.walletBalance - amountNumber,
+        //       aicoreBalance: prevUser.aicoreBalance + amountNumber
+        //     };
+        //   }
+        //   return prevUser;
+        // });
         console.log('Top Up Core action not implemented yet');
         break;
       default:

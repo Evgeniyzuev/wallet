@@ -2,8 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
-import aissistImage from '../images/aissist.png'; 
-import coreImage from '../images/core.jpg';
+import aissistImage from '../images/aissist0.png'; 
+import coreImage from '../images/brain.jpg';
+import { INITIAL_SYSTEM_PROMPT } from '../constants/prompts';
+import { useUser } from '../UserContext';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -11,10 +13,62 @@ interface Message {
 }
 
 export default function AiPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { user } = useUser();
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedMessages = localStorage.getItem('chatMessages');
+      if (savedMessages) {
+        return JSON.parse(savedMessages);
+      }
+    }
+    return [];
+  });
   const [input, setInput] = useState('');
   const [isAiTyping, setIsAiTyping] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const initializeChat = async () => {
+      if (typeof window !== 'undefined') {
+        const savedMessages = localStorage.getItem('chatMessages');
+        if (savedMessages) {
+          setMessages(JSON.parse(savedMessages));
+        } else {
+          setIsAiTyping(true);
+          try {
+            const userPrompt = user?.firstName 
+              ? `${INITIAL_SYSTEM_PROMPT} Обращайтесь к пользователю по имени: ${user.firstName}.` 
+              : INITIAL_SYSTEM_PROMPT;
+            const response = await fetch('/api/chat', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ messages: [{ role: 'system', content: userPrompt }] }),
+            });
+
+            if (!response.ok) {
+              throw new Error('Failed to get response from AI');
+            }
+
+            const data = await response.json();
+            const aiMessage: Message = { role: 'assistant', content: data.content };
+            setMessages([aiMessage]);
+            localStorage.setItem('chatMessages', JSON.stringify([aiMessage]));
+          } catch (error) {
+            console.error('Error getting initial AI response:', error);
+            const errorMessage: Message = { role: 'assistant', content: "Извините, произошла ошибка при инициализации чата. Пожалуйста, попробуйте обновить страницу." };
+            setMessages([errorMessage]);
+          } finally {
+            setIsAiTyping(false);
+          }
+        }
+      }
+    };
+
+    initializeChat();
+  }, [user]);
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -50,20 +104,76 @@ export default function AiPage() {
   };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isAiTyping]);
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+  }, [messages]);
+
+  const clearChat = async () => {
+    setIsAiTyping(true);
+    setMessages([]);
+    localStorage.removeItem('chatMessages');
+    setIsSettingsOpen(false);
+
+    try {
+      const userPrompt = user?.firstName 
+        ? `${INITIAL_SYSTEM_PROMPT} Обращайтесь к пользователю по имени: ${user.firstName}.` 
+        : INITIAL_SYSTEM_PROMPT;
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ messages: [{ role: 'system', content: userPrompt }] }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response from AI');
+      }
+
+      const data = await response.json();
+      const aiMessage: Message = { role: 'assistant', content: data.content };
+      setMessages([aiMessage]);
+      localStorage.setItem('chatMessages', JSON.stringify([aiMessage]));
+    } catch (error) {
+      console.error('Error getting initial AI response:', error);
+      const errorMessage: Message = { role: 'assistant', content: "Извините, произошла ошибка при очистке чата. Пожалуйста, попробуйте еще раз." };
+      setMessages([errorMessage]);
+    } finally {
+      setIsAiTyping(false);
+    }
+  };
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
-      <div className="h-1/4 overflow-hidden flex">
+      <div className="h-30 flex relative">
         <div className="w-1/2">
           <Image src={coreImage} alt="AI Core" layout="responsive" objectFit="cover" />
         </div>
         <div className="w-1/2">
           <Image src={aissistImage} alt="AI Assistant" layout="responsive" objectFit="cover" />
         </div>
+        <div className="absolute top-2 right-2">
+          <button
+            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+            className="text-2xl bg-blue-700 bg-opacity-50 hover:bg-opacity-70 text-white rounded-full w-8 h-8 flex items-center justify-center transition-all duration-300"
+          >
+            ⚙️
+          </button>
+          {isSettingsOpen && (
+            <div className="absolute top-10 right-0 bg-gray-800 p-4 rounded shadow-lg">
+              <button
+                onClick={() => {
+                  clearChat();
+                  setIsSettingsOpen(false);
+                }}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Clear Chat
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-      <div className="flex-grow overflow-y-auto p-4 pb-20 mb-10">
+      <div className="overflow-y-auto p-4 pb-20 mb-10">
         {messages.map((msg, index) => (
           <div key={index} className={`mb-2 ${msg.role === 'user' ? 'ml-1' : 'mr-1'}`}>
             <div
@@ -102,6 +212,12 @@ export default function AiPage() {
         </div>
       </div>
       {/* <Navigation /> */}
+      {/* <button
+        onClick={clearChat}
+        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-4"
+      >
+        Clear Chat
+      </button> */}
     </main>
   );
 }

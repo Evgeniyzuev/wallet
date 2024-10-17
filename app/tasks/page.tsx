@@ -9,7 +9,7 @@ import Image from 'next/image'
 import { useUser } from '../UserContext';
 
 export default function Home() {
-  const { user, setUser, handleIncreaseAicoreBalance } = useUser();
+  const { user, setUser, handleUpdateUser } = useUser();
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState('')
   const [isPopupOpen, setIsPopupOpen] = useState(false)
@@ -77,7 +77,7 @@ export default function Home() {
         onAction={currentTask.action}
         actionText={currentTask.actionText}
         onSecondAction={() => {
-          currentTask.secondAction(user, handleIncreaseAicoreBalance, setNotification, () => handleTaskCompletion(currentTask), setIsPopupOpen, setError);
+          currentTask.secondAction(user, handleUpdateUser, setNotification, () => handleTaskCompletion(currentTask), setIsPopupOpen, setError);
         }}
         secondActionText={currentTask.secondActionText}
       />

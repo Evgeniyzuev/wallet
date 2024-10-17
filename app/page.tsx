@@ -14,7 +14,7 @@ type Page = 'core' | 'ai' | 'wallet' | 'tasks' | 'friends' | 'goals';
 
 export default function MainPage() {
   const [currentPage, setCurrentPage] = useState<Page>('core');
-  const { user, setUser } = useUser();
+  // const { user, setUser } = useUser();
 
 
   const renderContent = () => {

@@ -73,8 +73,8 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
         </button>
       </div>
       <div className="mt-8">
-        <h2 className="text-2xl font-bold mb-4">Your Referrer:</h2>
-        {user?.referrerId ? `User ${user.referrerId}` : "No referrer"}
+        <h2 className="text-xl font-bold mb-4">Your Referrer: {user?.referrerId ? `User ${user.referrerId}` : "No referrer"}</h2>
+        
       </div>
       <div className="mt-8">
         <button

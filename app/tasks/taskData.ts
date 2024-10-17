@@ -8,7 +8,7 @@ export interface Task {
   actionText: string;
   action: () => void;
   secondActionText: string;
-  secondAction: (user: any, handleIncreaseAicoreBalance: any, setNotification: any, setTaskCompleted: any, setIsPopupOpen: any, setError: any) => void;
+  secondAction: (user: any, handleUpdateUser: any, setNotification: any, setTaskCompleted: any, setIsPopupOpen: any, setError: any) => void;
 }
 
 export const tasks: Task[] = [
@@ -22,12 +22,14 @@ export const tasks: Task[] = [
             window.open('https://t.me/WeAi_ch', '_blank');
         },
         secondActionText: 'Done',   
-        secondAction: async (user, handleIncreaseAicoreBalance, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
+        secondAction: async (user, handleUpdateUser, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
             if (!user?.telegramId) {
                 setError('User not found');
                 return;
               }
-            const result = await handleIncreaseAicoreBalance(1);
+            const result = await handleUpdateUser({
+              aicoreBalance: 1
+            });
             if (result?.success) {
               setNotification('Subscription successful! 1 Aicore added to your balance.');
               setTaskCompleted(true);
@@ -47,14 +49,16 @@ export const tasks: Task[] = [
       window.open('https://t.me/WeAi_ch', '_blank');
     },
     secondActionText: 'Check Membership',
-    secondAction: async (user, handleIncreaseAicoreBalance, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
+    secondAction: async (user, handleUpdateUser, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
       if (!user?.telegramId) {
         setError('User not found');
         return;
       }
-      const isMember = await checkMembership(user, 'WeAi_ch', handleIncreaseAicoreBalance, setError)
+      const isMember = await checkMembership(user, 'WeAi_ch', handleUpdateUser, setError)
         if (isMember) {
-          const result = await handleIncreaseAicoreBalance(0.5);
+          const result = await handleUpdateUser({
+            aicoreBalance: 0.5
+          });
           if (result?.success) {
             setNotification('Subscription successful! 0.5 Aicore added to your balance.');
             setTaskCompleted(true);

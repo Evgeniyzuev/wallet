@@ -29,6 +29,7 @@ export default function RootLayout({
       <head>
         <title>TON Connect Demo</title>
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        {/* <link rel="icon" href="data:,"></link> */}
       </head>
       <body>
         <TonConnectUIProvider manifestUrl="https://blush-keen-constrictor-906.mypinata.cloud/ipfs/QmdbgPxFiAvgYVCrcMnwRVxtBCqgCtSM6A4Sy27nonHSnr">

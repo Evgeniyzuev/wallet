@@ -50,51 +50,39 @@ export function useUserData() {
     }
   }, []);
 
-  const handleIncreaseAicoreBalance = async (amount: number) => {
+
+  const handleUpdateUser = async (updates: {
+    walletBalance?: number;
+    level?: number;
+    aicoreBalance?: number;
+  }) => {
     if (!user) return;
 
     try {
-      const res = await fetch('/api/increase-aicore-balance', {
+      const updatedFields = Object.entries(updates).reduce((acc, [key, value]) => {
+        if (value !== undefined) {
+          acc[key] = { increment: value };
+        }
+        return acc;
+      }, {} as Record<string, { increment: number }>);
+
+      const res = await fetch('/api/user-update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ telegramId: user.telegramId, amount }),
+        body: JSON.stringify({ telegramId: user.telegramId, updates: updatedFields }),
       });
       const data = await res.json();
       if (data.success) {
-        setUser({ ...user, aicoreBalance: data.aicoreBalance });
-        return { success: true, message: 'Aicore balance increased successfully!' };
+        setUser(data.user);
+        return { success: true, message: 'User updated successfully!' };
       } else {
-        return { success: false, message: 'Failed to increase Aicore balance' };
+        return { success: false, message: 'Failed to update user' };
       }
     } catch (err) {
       console.error(err);
-      return { success: false, message: 'An error occurred while increasing Aicore balance' };
-    }
-  };
-
-  const handleIncreaseWalletBalance = async (amount: number) => {
-    if (!user) return;
-
-    try {
-      const res = await fetch('/api/increase-wallet-balance', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ telegramId: user.telegramId, amount }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        setUser({ ...user, walletBalance: data.walletBalance });
-        return { success: true, message: 'Wallet balance increased successfully!' };
-      } else {
-        return { success: false, message: 'Failed to increase wallet balance' };
-      }
-    } catch (err) {
-      console.error(err);
-      return { success: false, message: 'An error occurred while increasing wallet balance' };
+      return { success: false, message: 'An error occurred while updating user' };
     }
   };
 
@@ -106,7 +94,6 @@ export function useUserData() {
     },
     error,
     setError,
-    handleIncreaseAicoreBalance,
-    handleIncreaseWalletBalance,
+    handleUpdateUser,
   };
 }
