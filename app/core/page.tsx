@@ -318,11 +318,9 @@ export default function Core() {
                 (() => {
                   const years = Math.floor(daysToTarget / 365);
                   const remainingDays = Math.floor(daysToTarget % 365);
-                  if (years > 0 && remainingDays > 0) {
+
                     return `${years} ${years === 1 ? 'year' : 'years'} ${remainingDays} ${remainingDays === 1 ? 'day' : 'days'}`;
-                  } else if (years === 0) {
-                    return `${remainingDays} ${remainingDays === 1 ? 'day' : 'days'}`;
-                  } 
+
                 })()
               }
             </div>
