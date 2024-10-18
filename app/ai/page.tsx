@@ -8,7 +8,7 @@ import { INITIAL_SYSTEM_PROMPT } from '../constants/prompts';
 import { useUser } from '../UserContext';
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
@@ -26,6 +26,12 @@ export default function AiPage() {
   const [input, setInput] = useState('');
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [language, setLanguage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('chatLanguage') || 'ru';
+    }
+    return 'ru';
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,9 +43,7 @@ export default function AiPage() {
         } else {
           setIsAiTyping(true);
           try {
-            const userPrompt = user?.firstName 
-              ? `${INITIAL_SYSTEM_PROMPT} Обращайтесь к пользователю по имени: ${user.firstName}.` 
-              : INITIAL_SYSTEM_PROMPT;
+            const userPrompt = `${INITIAL_SYSTEM_PROMPT} Обращайтесь к пользователю по имени: ${user?.firstName || 'пользователь'}. Уровень пользователя: ${user?.level || 0}. Используйте язык: ${language}.`;
             const response = await fetch('/api/chat', {
               method: 'POST',
               headers: {
@@ -68,7 +72,15 @@ export default function AiPage() {
     };
 
     initializeChat();
-  }, [user]);
+  }, [user, language]);
+
+  useEffect(() => {
+    localStorage.setItem('chatMessages', JSON.stringify(messages));
+  }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem('chatLanguage', language);
+  }, [language]);
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -77,13 +89,18 @@ export default function AiPage() {
       setInput('');
       setIsAiTyping(true);
 
+      const systemMessage: Message = { 
+        role: 'system', 
+        content: `Уровень пользователя: ${user?.level || 0}. Используйте язык: ${language}. Адаптируйте свой ответ соответственно.`
+      };
+
       try {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ messages: [...messages, userMessage] }),
+          body: JSON.stringify({ messages: [...messages, systemMessage, userMessage] }),
         });
 
         if (!response.ok) {
@@ -103,10 +120,6 @@ export default function AiPage() {
     }
   };
 
-  useEffect(() => {
-    localStorage.setItem('chatMessages', JSON.stringify(messages));
-  }, [messages]);
-
   const clearChat = async () => {
     setIsAiTyping(true);
     setMessages([]);
@@ -114,9 +127,7 @@ export default function AiPage() {
     setIsSettingsOpen(false);
 
     try {
-      const userPrompt = user?.firstName 
-        ? `${INITIAL_SYSTEM_PROMPT} Обращайтесь к пользователю по имени: ${user.firstName}.` 
-        : INITIAL_SYSTEM_PROMPT;
+      const userPrompt = `${INITIAL_SYSTEM_PROMPT} Обращайтесь к пользователю по имени: ${user?.firstName || 'пользователь'}. Уровень пользователя: ${user?.level || 0}. Используйте язык: ${language}.`;
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -142,6 +153,10 @@ export default function AiPage() {
     }
   };
 
+  const toggleLanguage = () => {
+    setLanguage(prevLang => prevLang === 'ru' ? 'en' : 'ru');
+  };
+
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
       <div className="h-30 flex relative">
@@ -159,22 +174,31 @@ export default function AiPage() {
             ⚙️
           </button>
           {isSettingsOpen && (
-            <div className="absolute top-10 right-0 bg-gray-800 p-4 rounded shadow-lg">
+            <div className="absolute w-48 top-10 right-0 bg-gray-800 p-4 rounded shadow-lg">
+              <div className="flex items-center justify-between mb-4">
+                <span>{language === 'ru' ? 'Язык:' : 'Language:'}</span>
+                <button
+                  onClick={toggleLanguage}
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                >
+                  {language === 'ru' ? 'EN' : 'RU'}
+                </button>
+              </div>
               <button
                 onClick={() => {
                   clearChat();
                   setIsSettingsOpen(false);
                 }}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full"
               >
-                Clear Chat
+                {language === 'ru' ? 'Очистить чат' : 'Clear Chat'}
               </button>
             </div>
           )}
         </div>
       </div>
       <div className="overflow-y-auto p-4 pb-20 mb-10">
-        {messages.map((msg, index) => (
+        {messages.filter(msg => msg.role !== 'system').map((msg, index) => (
           <div key={index} className={`mb-2 ${msg.role === 'user' ? 'ml-1' : 'mr-1'}`}>
             <div
               className={`inline-block p-2 rounded-lg ${
