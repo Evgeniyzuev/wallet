@@ -159,30 +159,41 @@ export default function Core() {
     }
   };
 
-  const [targetAmount, setTargetAmount] = useState('1000000');
-  const [daysToTarget, setdaysToTarget] = useState(0);
+  // const [targetAmount, setTargetAmount] = useState('1000000');
+  // const [daysToTarget, setdaysToTarget] = useState(0);
 
-  useEffect(() => {
-    const calculatedaysToTarget = () => {
-      const target = parseFloat(targetAmount);
-      if (isNaN(target) || target <= (user?.aicoreBalance || 0)) {
-        setdaysToTarget(0);
-        return;
-      }
+  // const calculateDaysToTarget = () => {
+  //   const target = parseFloat(targetAmount.replace(/\s/g, ''));
+  //   const initialBalance = user?.aicoreBalance || 0;
+    
+  //   if (isNaN(target) || target <= initialBalance) {
+  //     return 0;
+  //   }
 
-      let days = 0;
-      let currentBalance = user?.aicoreBalance || 0;
+  //   const dailyGrowthRate = dailyCoreRate * reinvestmentPart + 1;
+  //   const dailyAddition = dailyReward * reinvestmentPart;
 
-      while (currentBalance < target && days < 30*365.25) {
-        currentBalance = (((user?.aicoreBalance || 0) + dailyReward * days) * ((dailyCoreRate * reinvestmentPart + 1)) ** days)
-        days++;
-      }
+  //   // Если нет ежедневного пополнения, используем простую формулу
+  //   if (dailyAddition === 0) {
+  //     return Math.log(target / initialBalance) / Math.log(dailyGrowthRate);
+  //   }
 
-      setdaysToTarget(days);
-    };
+  //   // Если есть ежедневное пополнение, используем более сложную формулу
+  //   const a = Math.log(dailyGrowthRate);
+  //   const b = dailyAddition * (dailyGrowthRate - 1) / a;
+  //   const c = initialBalance - b;
 
-    calculatedaysToTarget();
-  }, [user?.aicoreBalance, targetAmount, dailyReward, reinvestmentPart, dailyCoreRate]);
+  //   const days = Math.log((target - b) / c) / a;
+
+  //   return Math.ceil(days);
+  // };
+
+  // Используйте эту функцию в useEffect или там, где вам нужно
+
+  // useEffect(() => {
+  //   const daysToTarget = calculateDaysToTarget();
+  //   setdaysToTarget(daysToTarget);
+  // }, [targetAmount, user?.aicoreBalance, dailyReward, reinvestmentPart, dailyCoreRate]);
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen flex flex-col">
@@ -299,7 +310,7 @@ export default function Core() {
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
               } $
             </div> */}
-            <div className="mb-0 flex items-center">
+            {/* <div className="mb-0 flex items-center">
               <span className="mr-2">Target amount:</span>
               <input
                 type="text"
@@ -319,11 +330,11 @@ export default function Core() {
                   const years = Math.floor(daysToTarget / 365);
                   const remainingDays = Math.floor(daysToTarget % 365);
 
-                    return `${years} ${years === 1 ? 'year' : 'years'} ${remainingDays} ${remainingDays === 1 ? 'day' : 'days'}`;
+                    return `${years} years ${remainingDays} days`;
 
                 })()
               }
-            </div>
+            </div> */}
             <button onClick={handleSkipDay} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Skip 1 day</button>
             <button 
               onClick={() => handleButtonClick('upCore')}
