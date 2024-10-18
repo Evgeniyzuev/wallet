@@ -9,24 +9,13 @@ import { User } from '../UserContext';
 
 export default function Core() {
   const { user, handleUpdateUser } = useUser();
-  // const [aicoreBalance, setAicoreBalance] = useState(0);
-  // const [walletBalance, setWalletBalance] = useState(0);
   const [dailyCoreRate] = useState(0.000633);
-
-  // const [shouldUpdateBalance, setShouldUpdateBalance] = useState(true);
-
-  // useEffect(() => {
-  //   if (user) {
-  //     setAicoreBalance(user.aicoreBalance || 0);
-  //     setWalletBalance(user.walletBalance || 0);
-  //     // setShouldUpdateBalance(false);
-  //   }
-  // }, [user]);
-
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
   const [reinvestmentPart, setReinvestmentPart] = useState(1);
   const [dailyReward, setDailyReward] = useState(1);
   const [dailyRewardInput, setDailyRewardInput] = useState('1');
+  const [targetAmount, setTargetAmount] = useState('');
+  // const [daysToTarget, setDaysToTarget] = useState(0);
 
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
@@ -58,40 +47,6 @@ export default function Core() {
   const progressPercentage = Math.min(100, ((user?.aicoreBalance || 0) / nextLevelThreshold) * 100);
   
 
-  // hook for aicore balance
-  // const { aicoreBalance, setAicoreBalance } = useUserData();
-
-
-  // const handleSkipYears = async () => {
-  //   if (skipYears <= 0 || !user) return;
-
-  //   // (aicoreBalance *  ((dailyCoreRate * reinvestmentPart + 1) ** 365) ** skipYears).toFixed(2)
-
-  //   const aicoreIncrease = aicoreBalance * (((dailyCoreRate * reinvestmentPart + 1) ** 365) ** skipYears -1);
-  //   const walletIncrease = aicoreBalance * (((dailyCoreRate * (1 - reinvestmentPart) + 1) ** 365) ** skipYears -1);
-
-  //   try {
-  //     const aicoreResult = await handleIncreaseAicoreBalance(aicoreIncrease);
-  //     const walletResult = await handleIncreaseWalletBalance(walletIncrease);
-
-  //     if (aicoreResult?.success && walletResult?.success) {
-  //       setAicoreBalance(prevBalance => prevBalance + aicoreIncrease);
-  //       setWalletBalance(prevBalance => prevBalance + walletIncrease);
-  //       // setUser(prevUser => ({
-  //       //   ...prevUser,
-  //       //   aicoreBalance: prevUser.aicoreBalance + aicoreIncrease,
-  //       //   walletBalance: prevUser.walletBalance + walletIncrease
-  //       // }));
-  //       alert(`Successfully skipped ${skipYears} years. Aicore balance increased by ${aicoreIncrease.toFixed(2)} and Wallet balance increased by ${walletIncrease.toFixed(2)}`);
-  //     } else {
-  //       alert('Failed to update balances');
-  //     }
-  //   } catch (error) {
-  //     console.error('Error updating balances:', error);
-  //     alert('An error occurred while updating balances');
-  //   }
-  //   setskipYears(0);
-  // };
 
   const handleSkipDay = async () => {
     if (!user) return;
@@ -188,6 +143,16 @@ export default function Core() {
   //   return Math.ceil(days);
   // };
 
+  // const calculateDaysToTarget = () => {
+  //   const target = parseFloat(targetAmount.replace(/\s/g, ''));
+  //   const initialBalance = user?.aicoreBalance || 0;
+    
+  //   if (isNaN(target) || target <= initialBalance) {
+  //     setDaysToTarget(0);
+  //   }
+  // }
+
+  
   // Используйте эту функцию в useEffect или там, где вам нужно
 
   // useEffect(() => {
@@ -248,12 +213,7 @@ export default function Core() {
                   style={{ width: `${reinvestmentPart * 100}%` }}
                 ></div>
               </div>
-
-              
             </div>
-
-            {/* <div className="mb-1">Core to wallet: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(2)} $/day</div> */}
-
             <div>
             <span className="mr-2">Task rewards</span>
               <input
@@ -283,8 +243,6 @@ export default function Core() {
               />
               <span className="ml-1">$/d</span>
             </div>
-            {/* <div className="mb-1">Core after {coreAfterXyears} years without replenishment:</div>
-            <div className="mb-1"> {(aicoreBalance *  ((dailyCoreRate * reinvestmentPart + 1) ** 365) ** coreAfterXyears).toFixed(2)} $</div> */}
             <div className="mb-1 flex items-center">
               <span className="mr-2">Core in years</span>
               <input
@@ -303,15 +261,9 @@ export default function Core() {
               } $
             </span>
             </div>
-            {/* <div className="mb-1">
-              {(((user?.aicoreBalance || 0) + dailyReward * 365.25 * coreAfterXyears) * 
-                ((dailyCoreRate * reinvestmentPart + 1) ** 365.25) ** coreAfterXyears)
-                .toFixed(0)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-              } $
-            </div> */}
-            {/* <div className="mb-0 flex items-center">
-              <span className="mr-2">Target amount:</span>
+
+            {/* {<div className="mb-0 flex items-center">
+              <span className="mr-2">Target</span>
               <input
                 type="text"
                 value={targetAmount}
@@ -323,15 +275,15 @@ export default function Core() {
                 className="w-32 h-6 p-1 border border-black text-black rounded"
               />
               <span className="ml-1">$</span>
-            </div>
+            </div> } */}
+            {/* <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Calculate</button>
             <div className="mb-4">
               Time to target: {
                 (() => {
                   const years = Math.floor(daysToTarget / 365);
                   const remainingDays = Math.floor(daysToTarget % 365);
 
-                    return `${years} years ${remainingDays} days`;
-
+                  return `${years} years ${remainingDays} days`;
                 })()
               }
             </div> */}
