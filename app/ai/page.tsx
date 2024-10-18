@@ -153,9 +153,6 @@ export default function AiPage() {
     }
   };
 
-  const toggleLanguage = () => {
-    setLanguage(prevLang => prevLang === 'ru' ? 'en' : 'ru');
-  };
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
@@ -176,13 +173,25 @@ export default function AiPage() {
           {isSettingsOpen && (
             <div className="absolute w-48 top-10 right-0 bg-gray-800 p-4 rounded shadow-lg">
               <div className="flex items-center justify-between mb-4">
-                <span>{language === 'ru' ? 'Язык:' : 'Language:'}</span>
-                <button
-                  onClick={toggleLanguage}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              <button
+                  onClick={() => setLanguage('en')}
+                  className={`
+                    ${language === 'en' ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-500 hover:bg-gray-700'}
+                    w-20 text-white font-bold py-2 px-4 rounded
+                  `}
                 >
-                  {language === 'ru' ? 'EN' : 'RU'}
+                  EN
                 </button>
+                <button
+                  onClick={() => setLanguage('ru')}
+                  className={`
+                    ${language === 'ru' ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-500 hover:bg-gray-700'}
+                    w-20 text-white font-bold py-2 px-4 rounded
+                  `}
+                >
+                  RU
+                </button>
+
               </div>
               <button
                 onClick={() => {

@@ -1,14 +1,11 @@
 'use client'
 // TODO: add walletBalance
 
-import Navigation from '../components/Navigation'  
-import { useUserData } from '../hooks/useUserData'
 import { useEffect, useState } from 'react'
 import { useUser } from '../UserContext';
-import { User } from '../UserContext';
 
 export default function Wallet() {
-  const { user, setUser, handleUpdateUser } = useUser();
+  const { user, handleUpdateUser } = useUser();
   // const [walletBalance, setWalletBalance] = useState<number>(0);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [amount, setAmount] = useState<string>('');
@@ -34,7 +31,7 @@ export default function Wallet() {
     let result;
 
     switch (selectedAction) {
-      case 'topUpWallet':
+      case 'receive':
         // setUser((prevUser: User | null) => {
         //   if (prevUser) {
         //     return {
@@ -48,7 +45,7 @@ export default function Wallet() {
           walletBalance: amountNumber
         });
         break;
-      case 'withdraw':
+      case 'send':
         if (amountNumber > (user?.walletBalance || 0)) {
           console.error('Insufficient balance');
           return;
@@ -67,7 +64,7 @@ export default function Wallet() {
           walletBalance: -amountNumber
         });
         break;
-      case 'topUpCore':
+      case 'upCore':
         // Handle topUpCore action handleIncreaseAicoreBalance
         if (amountNumber > (user?.walletBalance || 0)) {
           console.error('Insufficient balance');
@@ -114,31 +111,31 @@ export default function Wallet() {
         <div className="flex justify-center mb-4">
           <div className="flex items-center space-x-4 w-72">
             <button 
-              onClick={() => handleButtonClick('topUpWallet')}
+              onClick={() => handleButtonClick('receive')}
               className="w-32 bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-2 px-4 rounded mr-4"
             >
-              Top Up Wallet
+              Receive
             </button>
             <button 
-              onClick={() => handleButtonClick('withdraw')}
+              onClick={() => handleButtonClick('send')}
               className="w-32 bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded"
             >
-              Withdraw
+              Send
             </button>
           </div>
         </div>
         <button 
-          onClick={() => handleButtonClick('topUpCore')}
+          onClick={() => handleButtonClick('upCore')}
           className="w-72 bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded"
         >
-          Top Up Core
+          Up Core
         </button>
         
         {selectedAction && (
           <div className="mt-8 p-4 border border-gray-300 rounded">
             <h2 className="text-xl font-bold mb-4">
-              {selectedAction === 'topUpWallet' ? 'Top Up Wallet' :
-               selectedAction === 'withdraw' ? 'Withdraw' : 'Top Up Core'}
+              {selectedAction === 'receive' ? 'Receive' :
+               selectedAction === 'send' ? 'Send' : 'Up Core'}
             </h2>
             <input
               type="number"
