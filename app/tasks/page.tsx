@@ -30,9 +30,7 @@ export default function Home() {
       try {
         await fetchCompletedTasks();
         // Now we use the latest completedTasks state
-        setLocalTasks(prevTasks => 
-          initialTasks.filter(task => !completedTasks.includes(task.taskId))
-        );
+        setLocalTasks(initialTasks);
       } catch (error) {
         console.error('Error initializing tasks:', error);
         setError('Failed to load tasks');
@@ -40,7 +38,11 @@ export default function Home() {
     };
 
     initializeTasks();
-  }, [completedTasks]);
+  }, []);
+
+  useEffect(() => {
+    setLocalTasks(initialTasks.filter(task => !completedTasks.includes(task.taskId)))
+  }, [completedTasks])
 
   const handleOpenPopup = (task: Task) => {
     setCurrentTask(task);
