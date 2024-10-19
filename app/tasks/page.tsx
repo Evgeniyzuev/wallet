@@ -39,14 +39,14 @@ export default function Home() {
     initializeTasks();
   }, []);
 
-  useEffect(() => {
-    if (completedTasks.length > 0) {
-      const tasksToLoad = initialTasks
-        .filter(task => completedTasks.includes(task.taskId))
-        .slice(0, 10);
-      setLocalTasks(tasksToLoad);
-    }
-  }, [completedTasks]);
+  // useEffect(() => {
+  //   if (completedTasks.length > 0) {
+  //     const tasksToLoad = initialTasks
+  //       .filter(task => completedTasks.includes(task.taskId))
+  //       .slice(0, 10);
+  //     setLocalTasks(tasksToLoad);
+  //   }
+  // }, [completedTasks]);
 
   // useEffect(() => {
   //   let tasks = initialTasks
@@ -94,7 +94,7 @@ export default function Home() {
       <div className="text-sm text-center text-yellow-300 flex-shrink-0">Completed tasks: {completedTasks.join(', ')}</div>
       {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {taskIds.join(', ')}</div> */}
       {/* display local tasks ids */}
-      <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {localTasks.map(task => task.taskId).join(', ')}</div>
+      {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {localTasks.map(task => task.taskId).join(', ')}</div> */}
       <div className="flex flex-col items-center w-full px-4">
         {localTasks.map((task, index) => (
           <button 
