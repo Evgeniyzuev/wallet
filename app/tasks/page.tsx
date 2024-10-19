@@ -27,7 +27,9 @@ export default function Home() {
 
   useEffect(() => {
     fetchCompletedTasks();
-    setLocalTasks(initialTasks.filter(task => !completedTasks.includes(task.taskId)))
+    if (completedTasks.length > 0) {
+      setLocalTasks(initialTasks.filter(task => !completedTasks.includes(task.taskId)))
+    }
 
   }, [])
 
