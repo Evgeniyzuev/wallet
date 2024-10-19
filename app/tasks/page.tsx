@@ -29,8 +29,6 @@ export default function Home() {
     const initializeTasks = async () => {
       try {
         await fetchCompletedTasks();
-        // Now we use the latest completedTasks state
-        setLocalTasks(initialTasks);
       } catch (error) {
         console.error('Error initializing tasks:', error);
         setError('Failed to load tasks');
