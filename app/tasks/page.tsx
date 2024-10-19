@@ -68,17 +68,18 @@ export default function Home() {
     try {
       const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
       const completedTaskIds = await response.json();
+      setNewTasks(completedTaskIds);
       
       // Получаем ID всех заданий
-      const allTaskIds = initialTasks.map(task => task.taskId);
+      // const allTaskIds = initialTasks.map(task => task.taskId);
       
-      // Фильтруем, чтобы получить ID незавершенных заданий
-      const uncompletedTaskIds = allTaskIds.filter(id => !completedTaskIds.includes(id));
+      // // Фильтруем, чтобы получить ID незавершенных заданий
+      // const uncompletedTaskIds = allTaskIds.filter(id => !completedTaskIds.includes(id));
       
       // Устанавливаем состояние для незавершенных заданий
       // setNewTasks(uncompletedTaskIds);
       
-      return uncompletedTaskIds;
+      // return uncompletedTaskIds;
     } catch (error) {
       console.error('Error fetching completed tasks:', error);
       setError('Failed to fetch completed tasks');
