@@ -13,6 +13,7 @@ export default function Home() {
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [localTasks, setLocalTasks] = useState<Task[]>([])
   const [completedTasks, setCompletedTasks] = useState<number[]>([]);
+  const [newTasks, setNewTasks] = useState<number[]>([]);
   const [currentTask, setCurrentTask] = useState<Task>({
     taskId: 0,
     title: '',
@@ -57,24 +58,37 @@ export default function Home() {
   const fetchCompletedTasks = async () => {
     try {
       const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
-      const data = await response.json();
-      if (data){
-        let tasks = initialTasks
-        tasks = tasks.filter(task => !completedTasks.includes(task.taskId))
-        setLocalTasks(tasks)
-      }
-
-      setCompletedTasks(data.completedTaskIds);
+      const completedTaskIds = await response.json();
+      
+      // Получаем ID всех заданий
+      const allTaskIds = initialTasks.map(task => task.taskId);
+      
+      // Фильтруем, чтобы получить ID незавершенных заданий
+      const uncompletedTaskIds = allTaskIds.filter(id => !completedTaskIds.includes(id));
+      
+      // Устанавливаем состояние для незавершенных заданий
+      setNewTasks(uncompletedTaskIds);
+      
+      // Загружаем до 10 заданий из newTasks
+      const tasksToLoad = initialTasks
+        .filter(task => uncompletedTaskIds.includes(task.taskId))
+        .slice(0, 10);
+      
+      setLocalTasks(tasksToLoad);
+      
+      return uncompletedTaskIds;
     } catch (error) {
       console.error('Error fetching completed tasks:', error);
       setError('Failed to fetch completed tasks');
+      return [];
     }
   };
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl text-center mb-8">Tasks</h1> 
-      <div className="text-sm text-center text-yellow-300 flex-shrink-0">Completed tasks: {completedTasks.join(', ')}</div>
+      <div className="text-sm text-center text-yellow-300 flex-shrink-0">new tasks: {newTasks.join(', ')}</div>
+      {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {taskIds.join(', ')}</div> */}
       {/* display local tasks ids */}
       <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {localTasks.map(task => task.taskId).join(', ')}</div>
       <div className="flex flex-col items-center w-full px-4">
