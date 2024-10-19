@@ -76,7 +76,7 @@ export default function Home() {
       const uncompletedTaskIds = allTaskIds.filter(id => !completedTaskIds.includes(id));
       
       // Устанавливаем состояние для незавершенных заданий
-      setNewTasks(uncompletedTaskIds);
+      // setNewTasks(uncompletedTaskIds);
       
       return uncompletedTaskIds;
     } catch (error) {
