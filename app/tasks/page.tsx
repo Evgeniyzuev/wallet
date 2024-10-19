@@ -40,13 +40,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (newTasks.length > 0) {
+    if (completedTasks.length > 0) {
       const tasksToLoad = initialTasks
-        .filter(task => newTasks.includes(task.taskId))
+        .filter(task => completedTasks.includes(task.taskId))
         .slice(0, 10);
       setLocalTasks(tasksToLoad);
     }
-  }, [newTasks]);
+  }, [completedTasks]);
 
   // useEffect(() => {
   //   let tasks = initialTasks
@@ -68,7 +68,7 @@ export default function Home() {
     try {
       const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
       const completedTaskIds = await response.json();
-      setNewTasks(completedTaskIds);
+      setCompletedTasks(completedTaskIds);
       
       // Получаем ID всех заданий
       // const allTaskIds = initialTasks.map(task => task.taskId);
@@ -90,7 +90,8 @@ export default function Home() {
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl text-center mb-8">Tasks</h1> 
-      <div className="text-sm text-center text-yellow-300 flex-shrink-0">new tasks: {newTasks.join(', ')}</div>
+      {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">new tasks: {newTasks.join(', ')}</div> */}
+      <div className="text-sm text-center text-yellow-300 flex-shrink-0">Completed tasks: {completedTasks.join(', ')}</div>
       {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {taskIds.join(', ')}</div> */}
       {/* display local tasks ids */}
       <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {localTasks.map(task => task.taskId).join(', ')}</div>
