@@ -28,7 +28,7 @@ export default function Home() {
   useEffect(() => {
     fetchCompletedTasks();
     if (completedTasks.length > 0) {
-      setLocalTasks(initialTasks.filter(task => !completedTasks.includes(task.taskId)))
+      setLocalTasks(initialTasks)
     }
 
   }, [])
@@ -53,6 +53,8 @@ export default function Home() {
     <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl text-center mb-8">Tasks</h1> 
       <div className="text-sm text-center text-yellow-300 flex-shrink-0">Completed tasks: {completedTasks.join(', ')}</div>
+      {/* display local tasks ids */}
+      <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {localTasks.map(task => task.taskId).join(', ')}</div>
       <div className="flex flex-col items-center w-full px-4">
         {localTasks.map((task, index) => (
           <button 
