@@ -4,6 +4,7 @@ import { useUserData } from './hooks/useUserData';
 export interface User {
   id: string;
   telegramId: number;
+  referrerId?: number;
   username?: string;
   firstName?: string;
   lastName?: string;
@@ -15,8 +16,6 @@ export interface User {
 interface UserContextType {
   user: User | null;
   setUser: Dispatch<SetStateAction<User | null>>;
-//   handleIncreaseAicoreBalance: (amount: number) => Promise<{ success: boolean; message: string } | undefined>;
-//   handleIncreaseWalletBalance: (amount: number) => Promise<{ success: boolean; message: string } | undefined>;
   handleUpdateUser: (updates: Partial<User>) => Promise<{ success: boolean; message: string } | undefined>;
 }
 

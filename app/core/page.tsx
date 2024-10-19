@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import aissistImage from '../images/aissist0.png';
 import { useUser } from '../UserContext'; 
-import { User } from '../UserContext';
 
 
 export default function Core() {
@@ -33,7 +32,7 @@ export default function Core() {
   const currentImage = aissistImage;
 
   const balanceRequiredForNextLevel = [
-    1, 2, 4, 8, 16, 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 
+    2, 4, 8, 16, 32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 
     1000000, 2000000, 4000000, 8000000, 16000000, 32000000, 64000000, 125000000, 250000000, 500000000, 
     1000000000, 2000000000, 4000000000, 8000000000, 16000000000, 32000000000, 64000000000, 125000000000, 250000000000, 500000000000
   ];

@@ -3,12 +3,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address, beginCell, toNano, } from "@ton/core";
-import { useUserData } from '../hooks/useUserData'
 import { Cell } from '@ton/core';
 import TonWeb from "tonweb";
 import { useTransactionStatus } from '../hooks/useTransactionStatus';
+import { useUser } from '../UserContext';
 
-const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY}));
+
 
 
  
@@ -44,8 +44,8 @@ const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/
 
 
 
-
-export default function WalletPage() {
+export default function TonConnect() {
+  const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY}));
   const [tonConnectUI] = useTonConnectUI();
   const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -55,8 +55,9 @@ export default function WalletPage() {
   const { transactionStatus, startChecking } = useTransactionStatus();
   const { transactionAmount } = useTransactionStatus();
   // const [amountToWalletBalance, setAmountToWalletBalance] = useState<number>(0);
-  const { user } = useUserData();
+  const { user, handleUpdateUser } = useUser();
   const [destinationAddress, setDestinationAddress] = useState('');
+  const [dollarAmount, setDollarAmount] = useState<number>(0);
 
   useEffect(() => {
     setDestinationAddress(process.env.NEXT_PUBLIC_DESTINATION_ADDRESS || '');
@@ -68,12 +69,39 @@ export default function WalletPage() {
     }
   }, [user]);
 
-  // useEffect(() => {
-  //   if (transactionStatus === 'confirmed' && amountToWalletBalance > 0) {
-  //     handleIncreaseWalletBalance(amountToWalletBalance / 1e9);
-  //     setAmountToWalletBalance(0); // Reset the amount
-  //   }
-  // }, [transactionStatus, amountToWalletBalance, walletBalance, handleIncreaseWalletBalance]);
+  useEffect(() => {
+    const updateUserBalance = async () => {
+      if (transactionStatus === 'confirmed' && dollarAmount > 0) {
+        const result = await handleUpdateUser({
+          walletBalance: dollarAmount
+        });
+        setDollarAmount(0); // Reset the amount
+      }
+    };
+
+    updateUserBalance();
+  }, [transactionStatus, dollarAmount, handleUpdateUser]);
+
+  const [tonPrice, setTonPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchTonPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
+        const data = await response.json();
+        setTonPrice(data['the-open-network'].usd);
+      } catch (error) {
+        console.error('Error fetching TON price:', error);
+      }
+    };
+
+    fetchTonPrice();
+    // Optionally, you can set up an interval to update the price periodically
+    const interval = setInterval(fetchTonPrice, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
 
 
 
@@ -199,21 +227,35 @@ export default function WalletPage() {
       const hash = await sendToncoin();
       setTransactionHash(hash || '');
 
-      // Добавляем транзакцию в очередь и проверяем ее через API Toncenter
-      // addTransaction(hash, tonAmount, new Date().toLocaleString(), tonWalletAddress, destinationUsdtAddress.toString());
+      // Calculate dollar amount
+      if (tonPrice !== null) {
+        const dollarValue = parseFloat(tonAmount) * tonPrice;
+        setDollarAmount(dollarValue);
+      }
 
-      // Проверка статуса транзакции каждые 5 секунд
       startChecking(hash!);
     } catch (error) {
       console.error("Error sending transaction:", error);
     }
   };
 
+  // const handleIncreaseWalletBalance = useCallback((amount: number) => {
+  //   if (user) {
+  //     const newBalance = (user.walletBalance || 0) + amount;
+  //     handleUpdateUser({ ...user, walletBalance: newBalance });
+  //     setWalletBalance(newBalance);
+  //   }
+  // }, [user, handleUpdateUser]);
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1>
-                  {/* вывод баланса */}
-                  <p>Wallet Balance: {walletBalance.toFixed(2)} TON</p>
+    <main className="flex min-h-screen flex-col">
+      {/* <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1> */}
+      {/* вывод курса тона в долларах */}
+      {tonPrice !== null ? (
+        <p className="mb-1">TON Price: ${tonPrice.toFixed(2)}</p>
+      ) : (
+        <p className="mb-1">Loading TON Price...</p>
+      )}
       {tonWalletAddress ? (
         <div className="flex flex-col items-center">
           <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
@@ -229,7 +271,7 @@ export default function WalletPage() {
               type="number"
               value={tonAmount}
               onChange={(e) => setTonAmount(e.target.value)}
-              className="w-60 mb-2 p-2 border border-gray-300 rounded"
+              className="w-60 text-black mb-2 p-2 border border-gray-300 rounded"
               placeholder="Enter TON amount"
               min="0"
               step="0.1"
@@ -251,7 +293,7 @@ export default function WalletPage() {
         </button>
       )}
       {transactionHash && (
-        <div className="mt-4 p-2 bg-gray-100 rounded">
+        <div className="mt-4 text-white p-2 rounded">
           <p className="text-sm">Transaction Message Hash:</p>
           <p className="font-mono text-xs break-all">{transactionHash}</p>
           {/* время транзакции */}

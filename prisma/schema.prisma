@@ -27,6 +27,7 @@ model User {
   updatedAt  DateTime @updatedAt
   contacts   Contact[] @relation("UserContacts")
   referrals  Contact[] @relation("UserReferrals")
+  completedTasks CompletedTask[]
 }
 
 model Contact {
@@ -41,4 +42,13 @@ model Contact {
   contact   User     @relation("UserReferrals", fields: [contactId], references: [id])
 
   @@unique([userId, contactId])
+}
+
+model CompletedTask {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId Int
+  taskId    Int
+  user      User     @relation(fields: [telegramId], references: [telegramId])
+
+  @@unique([telegramId, taskId])
 }

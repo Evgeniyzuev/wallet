@@ -1,10 +1,22 @@
 import { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
-
+import { User } from '../UserContext';
 let cachedUser: any = null;
 
+const initialUser: User = {
+  id: '',
+  telegramId: 0,
+  referrerId: 0,
+  username: '',
+  firstName: '',
+  lastName: '',
+  aicoreBalance: 0,
+  walletBalance: 0,
+  level: 0
+};
+
 export function useUserData() {
-  const [user, setUser] = useState(cachedUser);
+  const [user, setUser] = useState<User | null>(initialUser);
   const [error, setError] = useState<string | null>(null);
   const [startParam, setStartParam] = useState('');
 
@@ -49,7 +61,6 @@ export function useUserData() {
       setError('This app should be opened in Telegram');
     }
   }, []);
-
 
   const handleUpdateUser = async (updates: {
     walletBalance?: number;

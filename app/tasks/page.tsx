@@ -1,8 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Navigation from '../components/Navigation'
-import { useUserData } from '../hooks/useUserData'
 import TaskPopup from '../components/TaskPopup'
 import { tasks as initialTasks, Task } from './taskData'
 import Image from 'next/image'
@@ -15,6 +13,7 @@ export default function Home() {
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [localTasks, setLocalTasks] = useState<Task[]>([])
   const [currentTask, setCurrentTask] = useState<Task>({
+    taskId: 0,
     title: '',
     image: '',
     description: '',
@@ -47,7 +46,7 @@ export default function Home() {
           <button 
             key={index}
             onClick={() => handleOpenPopup(task)}
-            className="bg-blue-500 bg-opacity-50 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-1 w-full"
+            className="bg-gray-500 bg-opacity-50 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-xl mt-1 w-full"
           >
             <div className="flex items-center">
               <div className="w-10 h-10 mr-2 flex-shrink-0">
@@ -59,8 +58,12 @@ export default function Home() {
                   className="rounded-md"
                 />
               </div>
-              <div className="flex-grow text-left">{task.title}</div>
+              <div className="flex-grow text-left">{task.title}
               <div className="text-sm text-yellow-300 flex-shrink-0">{task.reward}</div>
+
+              </div>
+              <div className="text-sm text-right text-yellow-300 flex-shrink-0">▶️</div>
+              
             </div>
           </button>
         ))}

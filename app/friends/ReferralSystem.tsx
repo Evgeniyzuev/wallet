@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { initUtils } from '@telegram-apps/sdk'
-import { useUserData } from '../hooks/useUserData'
+import { useUser } from '../UserContext'; 
 
 interface ReferralSystemProps {
   userId: string
@@ -17,7 +17,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const [showReferrals, setShowReferrals] = useState(false);
   const [referralsLoaded, setReferralsLoaded] = useState(false);
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
-  const { user } = useUserData()
+  const { user } = useUser()
 
   const fetchReferrals = async () => {
     if (userId && !referralsLoaded) {

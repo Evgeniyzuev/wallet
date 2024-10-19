@@ -1,20 +1,15 @@
 'use client'
-// TODO: add walletBalance
 
 import { useEffect, useState } from 'react'
 import { useUser } from '../UserContext';
+// import ReceivePopup from '../components/ReceivePopup';
+import TonConnect from './tonconnect';
 
 export default function Wallet() {
   const { user, handleUpdateUser } = useUser();
-  // const [walletBalance, setWalletBalance] = useState<number>(0);
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [amount, setAmount] = useState<string>('');
-
-  // useEffect(() => {
-  //   if (user?.walletBalance !== undefined) {
-  //     setWalletBalance(user.walletBalance);
-  //   }
-  // }, [user]);
+  // const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
 
   const handleButtonClick = (action: string) => {
     setSelectedAction(action);
@@ -31,35 +26,18 @@ export default function Wallet() {
     let result;
 
     switch (selectedAction) {
-      case 'receive':
-        // setUser((prevUser: User | null) => {
-        //   if (prevUser) {
-        //     return {
-        //       ...prevUser,
-        //       walletBalance: prevUser.walletBalance + amountNumber
-        //     };
-        //   }
-        //   return prevUser;
-        // });
-        result = await handleUpdateUser({
-          walletBalance: amountNumber
-        });
-        break;
+      // case 'receive':
+
+      //   result = await handleUpdateUser({
+      //     walletBalance: amountNumber
+      //   });
+      //   break;
       case 'send':
         if (amountNumber > (user?.walletBalance || 0)) {
           console.error('Insufficient balance');
           return;
         }
-        // amountNumber = -amountNumber;
-        // setUser((prevUser: User | null) => {
-        //   if (prevUser) {
-        //     return {
-        //       ...prevUser,
-        //       walletBalance: prevUser.walletBalance + amountNumber
-        //     };
-        //   }
-        //   return prevUser;
-        // });
+
         result = await handleUpdateUser({
           walletBalance: -amountNumber
         });
@@ -74,16 +52,7 @@ export default function Wallet() {
           walletBalance: -amountNumber,
           aicoreBalance: amountNumber
         });
-        // setUser((prevUser: User | null) => {
-        //   if (prevUser) {
-        //     return {
-        //       ...prevUser,
-        //       // walletBalance: prevUser.walletBalance - amountNumber,
-        //       aicoreBalance: prevUser.aicoreBalance + amountNumber
-        //     };
-        //   }
-        //   return prevUser;
-        // });
+
         console.log('Top Up Core action not implemented yet');
         break;
       default:
@@ -104,20 +73,20 @@ export default function Wallet() {
   };
 
   return (
-    <main className="bg-dark-blue text-white h-screen flex flex-col flex flex-col items-center min-h-screen">
+    <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">Wallet</h1>
         <p className="text-2xl mb-8">Wallet Balance: {Math.floor((user?.walletBalance || 0) * 100) / 100} USD</p>
         <div className="flex justify-center mb-4">
           <div className="flex items-center space-x-4 w-72">
             <button 
-              onClick={() => handleButtonClick('receive')}
+              onClick={() => handleButtonClick('Receive')}
               className="w-32 bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-2 px-4 rounded mr-4"
             >
               Receive
             </button>
             <button 
-              onClick={() => handleButtonClick('send')}
+              onClick={() => handleButtonClick('Send')}
               className="w-32 bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded"
             >
               Send
@@ -125,17 +94,16 @@ export default function Wallet() {
           </div>
         </div>
         <button 
-          onClick={() => handleButtonClick('upCore')}
+          onClick={() => handleButtonClick('Up Core')}
           className="w-72 bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded"
         >
           Up Core
         </button>
         
-        {selectedAction && (
+        {(selectedAction === 'Send' || selectedAction === 'Up Core' )&& (
           <div className="mt-8 p-4 border border-gray-300 rounded">
             <h2 className="text-xl font-bold mb-4">
-              {selectedAction === 'receive' ? 'Receive' :
-               selectedAction === 'send' ? 'Send' : 'Up Core'}
+              {selectedAction}
             </h2>
             <input
               type="number"
@@ -150,10 +118,16 @@ export default function Wallet() {
             >
               Confirm
             </button>
+
           </div>
+          
+          
         )}
-      </div>
-      {/* <Navigation /> */}
+        {selectedAction === 'Receive' && <TonConnect />}
+
+      </div>                                          
+
+      {/* <ReceivePopup isOpen={isReceivePopupOpen} onClose={() => setIsReceivePopupOpen(false)} /> */}
     </main>
   );
 }
