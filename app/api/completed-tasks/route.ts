@@ -14,10 +14,11 @@ export async function GET(req: NextRequest) {
       select: { taskId: true },
     });
 
-    return NextResponse.json({ completedTasks: completedTasks.map(task => task.taskId) });
+    const completedTaskIds = completedTasks.map(task => task.taskId);
+
+    return NextResponse.json({ completedTaskIds });
   } catch (error) {
     console.error('Error fetching completed tasks:', error);
     return NextResponse.json({ error: 'Failed to fetch completed tasks' }, { status: 500 });
   }
 }
-

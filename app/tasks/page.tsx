@@ -12,6 +12,7 @@ export default function Home() {
   const [notification, setNotification] = useState('')
   const [isPopupOpen, setIsPopupOpen] = useState(false)
   const [localTasks, setLocalTasks] = useState<Task[]>([])
+  const [completedTasks, setCompletedTasks] = useState<number[]>([]);
   const [currentTask, setCurrentTask] = useState<Task>({
     taskId: 0,
     title: '',
@@ -25,7 +26,15 @@ export default function Home() {
   })
 
   useEffect(() => {
-    setLocalTasks(initialTasks)
+    fetchCompletedTasks();
+    if (completedTasks.length > 0) {
+      let tasks = initialTasks
+      for (let i = 0; i < completedTasks.length; i++) {
+        tasks = tasks.filter(task => task.taskId !== completedTasks[i])
+      }
+      setLocalTasks(tasks)
+    }
+
   }, [])
 
   const handleOpenPopup = (task: Task) => {
@@ -34,13 +43,20 @@ export default function Home() {
   };
 
   const handleTaskCompletion = (completedTask: Task) => {
-    setLocalTasks(prevTasks => prevTasks.filter(task => task.title !== completedTask.title));
+    setLocalTasks(prevTasks => prevTasks.filter(task => task.taskId !== completedTask.taskId));
     setIsPopupOpen(false);
+  };
+
+  const fetchCompletedTasks = async () => {
+    const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
+    const data = await response.json();
+    setCompletedTasks(data.completedTaskIds);
   };
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl text-center mb-8">Tasks</h1> 
+      <div className="text-sm text-center text-yellow-300 flex-shrink-0">Completed tasks: {completedTasks.join(', ')}</div>
       <div className="flex flex-col items-center w-full px-4">
         {localTasks.map((task, index) => (
           <button 
@@ -85,6 +101,8 @@ export default function Home() {
         secondActionText={currentTask.secondActionText}
       />
       {/* <Navigation /> */}
+      {/* display completed tasks ids */}
+
     </main>
   )
 }
