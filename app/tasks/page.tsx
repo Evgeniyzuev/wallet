@@ -39,6 +39,15 @@ export default function Home() {
     initializeTasks();
   }, []);
 
+  useEffect(() => {
+    if (newTasks.length > 0) {
+      const tasksToLoad = initialTasks
+        .filter(task => newTasks.includes(task.taskId))
+        .slice(0, 10);
+      setLocalTasks(tasksToLoad);
+    }
+  }, [newTasks]);
+
   // useEffect(() => {
   //   let tasks = initialTasks
   //   tasks = tasks.filter(task => !completedTasks.includes(task.taskId))
