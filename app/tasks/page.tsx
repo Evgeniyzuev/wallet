@@ -26,13 +26,21 @@ export default function Home() {
   })
 
   useEffect(() => {
-    fetchCompletedTasks();
-    setLocalTasks(initialTasks)
-    if (completedTasks.length > 0) {
-      setLocalTasks(initialTasks.filter(task => !completedTasks.includes(task.taskId)))
-    }
+    const initializeTasks = async () => {
+      try {
+        await fetchCompletedTasks();
+        // Now we use the latest completedTasks state
+        setLocalTasks(prevTasks => 
+          initialTasks.filter(task => !completedTasks.includes(task.taskId))
+        );
+      } catch (error) {
+        console.error('Error initializing tasks:', error);
+        setError('Failed to load tasks');
+      }
+    };
 
-  }, [])
+    initializeTasks();
+  }, []);
 
   const handleOpenPopup = (task: Task) => {
     setCurrentTask(task);
@@ -45,9 +53,14 @@ export default function Home() {
   };
 
   const fetchCompletedTasks = async () => {
-    const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
-    const data = await response.json();
-    setCompletedTasks(data.completedTaskIds);
+    try {
+      const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
+      const data = await response.json();
+      setCompletedTasks(data.completedTaskIds);
+    } catch (error) {
+      console.error('Error fetching completed tasks:', error);
+      setError('Failed to fetch completed tasks');
+    }
   };
 
   return (
