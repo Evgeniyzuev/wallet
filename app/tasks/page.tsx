@@ -39,7 +39,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    setLocalTasks(initialTasks.filter(task => !completedTasks.includes(task.taskId)))
+    let tasks = initialTasks
+    tasks = tasks.filter(task => !completedTasks.includes(task.taskId))
+    setLocalTasks(tasks)
   }, [completedTasks])
 
   const handleOpenPopup = (task: Task) => {
