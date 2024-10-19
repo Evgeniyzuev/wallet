@@ -38,11 +38,11 @@ export default function Home() {
     initializeTasks();
   }, []);
 
-  useEffect(() => {
-    let tasks = initialTasks
-    tasks = tasks.filter(task => !completedTasks.includes(task.taskId))
-    setLocalTasks(tasks)
-  }, [completedTasks])
+  // useEffect(() => {
+  //   let tasks = initialTasks
+  //   tasks = tasks.filter(task => !completedTasks.includes(task.taskId))
+  //   setLocalTasks(tasks)
+  // }, [completedTasks])
 
   const handleOpenPopup = (task: Task) => {
     setCurrentTask(task);
@@ -58,7 +58,8 @@ export default function Home() {
     try {
       const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
       const data = await response.json();
-      setCompletedTasks(data.completedTaskIds);
+      setLocalTasks(initialTasks.filter(task => !data.completedTaskIds.includes(task.taskId)))
+      // setCompletedTasks(data.completedTaskIds);
     } catch (error) {
       console.error('Error fetching completed tasks:', error);
       setError('Failed to fetch completed tasks');
