@@ -27,13 +27,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchCompletedTasks();
-    if (completedTasks.length > 0) {
-      let tasks = initialTasks
-      for (let i = 0; i < completedTasks.length; i++) {
-        tasks = tasks.filter(task => task.taskId !== completedTasks[i])
-      }
-      setLocalTasks(tasks)
-    }
+    setLocalTasks(initialTasks.filter(task => !completedTasks.includes(task.taskId)))
 
   }, [])
 
