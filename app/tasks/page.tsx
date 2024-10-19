@@ -59,7 +59,7 @@ export default function Home() {
       const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
       const data = await response.json();
       setLocalTasks(initialTasks.filter(task => !data.completedTaskIds.includes(task.taskId)))
-      // setCompletedTasks(data.completedTaskIds);
+      setCompletedTasks(data.completedTaskIds);
     } catch (error) {
       console.error('Error fetching completed tasks:', error);
       setError('Failed to fetch completed tasks');
