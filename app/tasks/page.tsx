@@ -69,13 +69,6 @@ export default function Home() {
       // Устанавливаем состояние для незавершенных заданий
       setNewTasks(uncompletedTaskIds);
       
-      // Загружаем до 10 заданий из newTasks
-      const tasksToLoad = initialTasks
-        .filter(task => uncompletedTaskIds.includes(task.taskId))
-        .slice(0, 10);
-      
-      setLocalTasks(tasksToLoad);
-      
       return uncompletedTaskIds;
     } catch (error) {
       console.error('Error fetching completed tasks:', error);
