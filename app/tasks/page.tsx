@@ -40,7 +40,7 @@ export default function Home() {
     };
 
     initializeTasks();
-  }, []);
+  }, [completedTasks]);
 
   const handleOpenPopup = (task: Task) => {
     setCurrentTask(task);
