@@ -86,7 +86,7 @@ export default function Wallet() {
               Receive
             </button>
             <button 
-              onClick={() => handleButtonClick('Send')}
+              onClick={() => handleButtonClick('send')}
               className="w-32 bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded"
             >
               Send
@@ -94,13 +94,13 @@ export default function Wallet() {
           </div>
         </div>
         <button 
-          onClick={() => handleButtonClick('Up Core')}
+          onClick={() => handleButtonClick('upCore')}
           className="w-72 bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded"
         >
           Up Core
         </button>
         
-        {(selectedAction === 'Send' || selectedAction === 'Up Core' )&& (
+        {(selectedAction === 'send' || selectedAction === 'upCore' )&& (
           <div className="mt-8 p-4 border border-gray-300 rounded">
             <h2 className="text-xl font-bold mb-4">
               {selectedAction}
