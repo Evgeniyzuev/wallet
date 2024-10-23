@@ -15,6 +15,7 @@ export default function Core() {
   const [dailyRewardInput, setDailyRewardInput] = useState('1');
   const [targetAmount, setTargetAmount] = useState('');
   // const [daysToTarget, setDaysToTarget] = useState(0);
+  const [plusStartCore, setPlusStartCore ] = useState(0);
 
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
@@ -28,7 +29,6 @@ export default function Core() {
   };
 
 
-  // const currentImage = aicoreBalance > 1000 ? aissist2Image : aissistImage;
   const currentImage = aissistImage;
 
   const balanceRequiredForNextLevel = [
@@ -54,9 +54,7 @@ export default function Core() {
       const aicoreIncrease = user.aicoreBalance * (dailyCoreRate * reinvestmentPart);
       const walletIncrease = user.aicoreBalance * (dailyCoreRate * (1 - reinvestmentPart));
       
-      // Implement these functions in your UserContext or as API calls
-      // const walletResult = await handleIncreaseWalletBalance(walletIncrease);
-      // const aicoreResult = await handleIncreaseAicoreBalance(aicoreIncrease);
+
       await handleUpdateUser({
         walletBalance: walletIncrease,  // Increase wallet balance by 10
         aicoreBalance: aicoreIncrease,   // Increase aicore balance by 5
@@ -113,51 +111,6 @@ export default function Core() {
     }
   };
 
-  // const [targetAmount, setTargetAmount] = useState('1000000');
-  // const [daysToTarget, setdaysToTarget] = useState(0);
-
-  // const calculateDaysToTarget = () => {
-  //   const target = parseFloat(targetAmount.replace(/\s/g, ''));
-  //   const initialBalance = user?.aicoreBalance || 0;
-    
-  //   if (isNaN(target) || target <= initialBalance) {
-  //     return 0;
-  //   }
-
-  //   const dailyGrowthRate = dailyCoreRate * reinvestmentPart + 1;
-  //   const dailyAddition = dailyReward * reinvestmentPart;
-
-  //   // Если нет ежедневного пополнения, используем простую формулу
-  //   if (dailyAddition === 0) {
-  //     return Math.log(target / initialBalance) / Math.log(dailyGrowthRate);
-  //   }
-
-  //   // Если есть ежедневное пополнение, используем более сложную формулу
-  //   const a = Math.log(dailyGrowthRate);
-  //   const b = dailyAddition * (dailyGrowthRate - 1) / a;
-  //   const c = initialBalance - b;
-
-  //   const days = Math.log((target - b) / c) / a;
-
-  //   return Math.ceil(days);
-  // };
-
-  // const calculateDaysToTarget = () => {
-  //   const target = parseFloat(targetAmount.replace(/\s/g, ''));
-  //   const initialBalance = user?.aicoreBalance || 0;
-    
-  //   if (isNaN(target) || target <= initialBalance) {
-  //     setDaysToTarget(0);
-  //   }
-  // }
-
-  
-  // Используйте эту функцию в useEffect или там, где вам нужно
-
-  // useEffect(() => {
-  //   const daysToTarget = calculateDaysToTarget();
-  //   setdaysToTarget(daysToTarget);
-  // }, [targetAmount, user?.aicoreBalance, dailyReward, reinvestmentPart, dailyCoreRate]);
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen flex flex-col">
@@ -214,6 +167,26 @@ export default function Core() {
               </div>
             </div>
             <div>
+              {/* <label htmlFor="initialBalance">Введите сумму теоретического пополнения стартового баланса:</label>
+              <input
+                type="number"
+                id="initialBalance"
+                placeholder="Сумма пополнения"
+                onChange={(e) => setPlusCoreToday(e.target.value)}
+              /> */}
+              <span className="mr-2">+ Start Core</span>
+              <input
+                type="number"
+                value={plusStartCore}
+                onChange={(e) => setPlusStartCore(Math.min(99999, Math.max(0, parseInt(e.target.value) )))}
+                className="w-14 h-6 p-1 border border-black text-black rounded ml-3"
+                min="1"
+                max="99999"
+              />
+              <span className="ml-1">$</span>
+ 
+            </div>
+            <div>
             <span className="mr-2">Task rewards</span>
               <input
                 type="text"
@@ -238,7 +211,7 @@ export default function Core() {
                     setDailyReward(numValue);
                   }
                 }}
-                className="w-10 h-6 p-1 border border-black text-black rounded mx-1"
+                className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
               />
               <span className="ml-1">$/d</span>
             </div>
@@ -252,8 +225,8 @@ export default function Core() {
                 min="1"
                 max="30"
               />
-              <span className="ml-2 text-yellow-500 font-bold">
-               {(((user?.aicoreBalance || 0) + dailyReward * 365.25 * coreAfterXyears) * 
+              <span className="ml-8 text-yellow-500 font-bold">
+               {((((user?.aicoreBalance || 0)+ plusStartCore) + dailyReward * 365.25 * coreAfterXyears) * 
                 ((dailyCoreRate * reinvestmentPart + 1) ** 365.25) ** coreAfterXyears)
                 .toFixed(0)
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
