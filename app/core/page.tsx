@@ -17,6 +17,7 @@ export default function Core() {
   const [targetAmount, setTargetAmount] = useState('');
   // const [daysToTarget, setDaysToTarget] = useState(0);
   const [plusStartCore, setPlusStartCore ] = useState(0);
+  const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(0); // Track input value
 
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
@@ -57,22 +58,13 @@ export default function Core() {
     if (!user) return;
 
     try {
-      const aicoreIncrease = user.aicoreBalance * (dailyCoreRate * reinvestmentPart);
-      const walletIncrease = user.aicoreBalance * (dailyCoreRate * (1 - reinvestmentPart));
-      
-
+      const aicoreIncrease = user.aicoreBalance * (dailyCoreRate * user.reinvestSetup);
+      const walletIncrease = user.aicoreBalance * (dailyCoreRate * (1 - user.reinvestSetup));
       await handleUpdateUser({
         walletBalance: walletIncrease,  // Increase wallet balance by 10
         aicoreBalance: aicoreIncrease,   // Increase aicore balance by 5
         level: 0            // Increase level by 1
       });
-
-
-      // if (result?.success) {
-      //   console.log('Successfully skipped 1 day. Aicore balance increased by', aicoreIncrease.toFixed(2), 'and Wallet balance increased by', walletIncrease.toFixed(2));
-      // } else {
-      //   console.log('Failed to update balances');
-      // }
     } catch (error) {
       console.error('Error updating balances:', error);
       alert('An error occurred while updating balances');
@@ -118,9 +110,11 @@ export default function Core() {
   };
 
   const handleSaveReinvestSetup = async () => {
-    await handleUpdateUser({ reinvestSetup: reinvestmentSetup });
+    if (reinvestmentSetupInput <= minValue) return;
+    await handleUpdateUser({ reinvestSetup: reinvestmentSetupInput });
   };
 
+  const minValue = 100 - aicoreLevel * 5; // Calculate minValue
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen flex flex-col">
@@ -297,23 +291,21 @@ export default function Core() {
           
         )}
         <div className="mt-4"> Settings
-          <div> 
-            <div>
-              min Reinvest {Math.max(0, 100 - aicoreLevel * 5)}%  -5%*level
-            </div>
-              <input 
-                type="number" 
-              value={reinvestmentSetup} 
-              className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
+          <div>
+            <span>min Reinvest {Math.max(0, minValue)}%</span>
+            <input 
+              type="number" 
+              value={reinvestmentSetupInput} 
               onChange={(e) => {
-                const minValue = 100 - aicoreLevel * 5; // Calculate the minimum value
-                setReinvestmentSetup(Math.min(user?.reinvestSetup || 100, Math.max(minValue, parseInt(e.target.value))));
+                const value = Math.min(100, Math.max(0, parseInt(e.target.value))); // Ensure value is between 0 and 100
+                setReinvestmentSetupInput(value);
               }} 
             /> %
             {/* TODO: button to save to database */}
 
               <button 
               onClick={handleSaveReinvestSetup}
+              disabled={reinvestmentSetupInput <= minValue}
               className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 rounded"
               >
                 Save
