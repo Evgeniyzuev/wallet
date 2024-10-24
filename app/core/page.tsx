@@ -48,7 +48,7 @@ export default function Core() {
   const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
   const progressPercentage = Math.min(100, ((user?.aicoreBalance || 0) / nextLevelThreshold) * 100);
 
-  // зане��ти уровень в базу данных
+  // занети уровень в базу данных
   handleUpdateUser({
     level: aicoreLevel - (user?.level || 0)
   });
@@ -116,13 +116,18 @@ export default function Core() {
 
   const handleSaveReinvestSetup = async () => {
     if (!user) return;
-    if (reinvestmentSetupInput < minValue )  setReinvestmentSetupInput(minValue);
+    if (reinvestmentSetupInput < minValue) setReinvestmentSetupInput(minValue);
     else if (reinvestmentSetupInput > 100) setReinvestmentSetupInput(100);
-    const result = await handleUpdateUser({ reinvestSetup: (reinvestmentSetupInput - (user?.reinvestSetup || 100)) });
+    const reinvestSetup = reinvestmentSetupInput - (user?.reinvestSetup || 100);
+    
+    // Send the direct value instead of an increment
+    const result = await handleUpdateUser({
+      reinvestSetup: reinvestSetup // Use 'set' instead of 'increment'
+    });
+    
     if (result?.success) {
       setIsSaved(true);
-          // Optionally, reset the save status after a delay
-    setTimeout(() => setIsSaved(false), 2000); // Reset after 2 seconds
+      setTimeout(() => setIsSaved(false), 2000);
       console.log('Successfully updated reinvest setup');
     } else {
       console.error('Failed to update reinvest setup');
@@ -324,9 +329,13 @@ export default function Core() {
           </div>
           
         )}
-        <div className="mt-4"> Settings
+        <div className="mt-4">
           <div>
-            <span>min Reinvest {Math.max(0, minValue)}%</span>
+            <div>
+              current reinvest {user?.reinvestSetup}%
+              <span>min Reinvest (-5%*lvl): {Math.max(0, minValue)}%</span>
+            </div>
+            
             <input 
               type="number" 
               value={reinvestmentSetupInput} 
