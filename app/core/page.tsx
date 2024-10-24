@@ -11,6 +11,7 @@ export default function Core() {
   const [dailyCoreRate] = useState(0.000633);
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
   const [reinvestmentPart, setReinvestmentPart] = useState(1);
+  const [reinvestmentSetup, setReinvestmentSetup] = useState(100);
   const [dailyReward, setDailyReward] = useState(1);
   const [dailyRewardInput, setDailyRewardInput] = useState('1');
   const [targetAmount, setTargetAmount] = useState('');
@@ -44,6 +45,11 @@ export default function Core() {
   const aicoreLevel = getAICoreLevel(user?.aicoreBalance || 0);
   const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
   const progressPercentage = Math.min(100, ((user?.aicoreBalance || 0) / nextLevelThreshold) * 100);
+
+  // занести уровень в базу данных
+  handleUpdateUser({
+    level: aicoreLevel
+  });
   
 
 
@@ -109,6 +115,10 @@ export default function Core() {
     } catch (error) {
       console.error('Error updating core balance:', error);
     }
+  };
+
+  const handleSaveReinvestSetup = async () => {
+    await handleUpdateUser({ reinvestSetup: reinvestmentSetup });
   };
 
 
@@ -284,7 +294,34 @@ export default function Core() {
               Confirm Up Core
             </button>
           </div>
+          
         )}
+        <div className="mt-4"> Settings
+          <div> 
+            <div>
+              min Reinvest {Math.max(0, 100 - aicoreLevel * 5)}%  -5%*level
+            </div>
+              <input 
+                type="number" 
+              value={reinvestmentSetup} 
+              className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
+              onChange={(e) => {
+                const minValue = 100 - aicoreLevel * 5; // Calculate the minimum value
+                setReinvestmentSetup(Math.min(user?.reinvestSetup || 100, Math.max(minValue, parseInt(e.target.value))));
+              }} 
+            /> %
+            {/* TODO: button to save to database */}
+
+              <button 
+              onClick={handleSaveReinvestSetup}
+              className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 rounded"
+              >
+                Save
+              </button>
+
+
+          </div>
+        </div>
 
     </main>
   );

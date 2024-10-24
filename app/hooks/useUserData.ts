@@ -10,6 +10,7 @@ const initialUser: User = {
   username: '',
   firstName: '',
   lastName: '',
+  reinvestSetup: 100,
   aicoreBalance: 0,
   walletBalance: 0,
   level: 0
@@ -66,6 +67,7 @@ export function useUserData() {
     walletBalance?: number;
     level?: number;
     aicoreBalance?: number;
+    reinvestSetup?: number;
   }) => {
     if (!user) return;
 
@@ -77,7 +79,10 @@ export function useUserData() {
         return acc;
       }, {} as Record<string, { increment: number }>);
 
-      const res = await fetch('/api/user-update', {
+      // Use absolute URL with window.location.origin
+      const apiUrl = `${window.location.origin}/api/user-update`;
+      
+      const res = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

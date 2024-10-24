@@ -8,6 +8,7 @@ export interface User {
   username?: string;
   firstName?: string;
   lastName?: string;
+  reinvestSetup: number;
   aicoreBalance: number;
   walletBalance: number;
   level: number;
