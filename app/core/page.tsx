@@ -300,6 +300,7 @@ export default function Core() {
             <input 
               type="number" 
               value={reinvestmentSetupInput} 
+              className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
               onChange={(e) => {
                 const value = Math.min(100, Math.max(0, parseInt(e.target.value))); // Ensure value is between 0 and 100
                 setReinvestmentSetupInput(value);
@@ -310,7 +311,7 @@ export default function Core() {
               <button 
               onClick={handleSaveReinvestSetup}
               disabled={reinvestmentSetupInput <= minValue}
-              className="w-10 h-6 p-1 border border-black text-black rounded mx-2"
+              className=" bg-blue-500 hover:bg-blue-700 text-white font-bold w-10 py-0 px-4 rounded"
               >
                 Save
               </button>
