@@ -11,7 +11,6 @@ export default function Core() {
   const [dailyCoreRate] = useState(0.000633);
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
   const [reinvestmentPart, setReinvestmentPart] = useState(1);
-  const [reinvestmentSetup, setReinvestmentSetup] = useState(100);
   const [dailyReward, setDailyReward] = useState(1);
   const [dailyRewardInput, setDailyRewardInput] = useState('1');
   const [targetAmount, setTargetAmount] = useState('');
@@ -49,13 +48,17 @@ export default function Core() {
 
   // занести уровень в базу данных
   handleUpdateUser({
-    level: aicoreLevel
+    level: aicoreLevel - (user?.level || 0)
   });
   
 
 
   const handleSkipDay = async () => {
     if (!user) return;
+    let reinvestSetup = 0;
+    if (user.reinvestSetup <= minValue) reinvestSetup = minValue;
+    else if (user.reinvestSetup > 100) reinvestSetup = 100;
+    else reinvestSetup = user.reinvestSetup;
 
     try {
       const aicoreIncrease = user.aicoreBalance * (dailyCoreRate * user.reinvestSetup);
@@ -110,8 +113,9 @@ export default function Core() {
   };
 
   const handleSaveReinvestSetup = async () => {
-    if (reinvestmentSetupInput <= minValue) return;
-    await handleUpdateUser({ reinvestSetup: reinvestmentSetupInput });
+    if (!user) return;
+    if (reinvestmentSetupInput <= minValue || reinvestmentSetupInput > 100) return;
+    await handleUpdateUser({ reinvestSetup: (reinvestmentSetupInput - (user?.reinvestSetup || 100)) });
   };
 
   const minValue = 100 - aicoreLevel * 5; // Calculate minValue

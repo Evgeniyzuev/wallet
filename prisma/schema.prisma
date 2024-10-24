@@ -33,14 +33,14 @@ model User {
 
 model Contact {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  contactId String   @db.ObjectId
+  userId    Int   
+  contactId Int   
   isReferral Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User     @relation("UserContacts", fields: [userId], references: [id])
-  contact   User     @relation("UserReferrals", fields: [contactId], references: [id])
+  user      User     @relation("UserContacts", fields: [userId], references: [telegramId])
+  contact   User     @relation("UserReferrals", fields: [contactId], references: [telegramId])
 
   @@unique([userId, contactId])
 }

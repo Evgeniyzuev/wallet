@@ -33,8 +33,8 @@ export async function POST(req: NextRequest) {
                 if (referrer) {
                     await prisma.contact.create({
                         data: {
-                            userId: referrer.id,
-                            contactId: dbUser.id,
+                            userId: referrer.telegramId,
+                            contactId: dbUser.telegramId,
                             isReferral: true
                         }
                     })
