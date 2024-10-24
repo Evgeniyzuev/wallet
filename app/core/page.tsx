@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import aissistImage from '../images/aissist0.png';
 import { useUser } from '../UserContext'; 
@@ -18,6 +18,7 @@ export default function Core() {
   const [plusStartCore, setPlusStartCore ] = useState(0);
   const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(0); // Track input value
   const [isSaved, setIsSaved] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
@@ -47,7 +48,7 @@ export default function Core() {
   const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
   const progressPercentage = Math.min(100, ((user?.aicoreBalance || 0) / nextLevelThreshold) * 100);
 
-  // занести уровень в базу данных
+  // зане��ти уровень в базу данных
   handleUpdateUser({
     level: aicoreLevel - (user?.level || 0)
   });
@@ -128,6 +129,25 @@ export default function Core() {
   };
 
   const minValue = 100 - aicoreLevel * 5; // Calculate minValue
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (inputRef.current) {
+        inputRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    };
+
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      inputElement.addEventListener('focus', handleFocus);
+    }
+
+    return () => {
+      if (inputElement) {
+        inputElement.removeEventListener('focus', handleFocus);
+      }
+    };
+  }, []);
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen flex flex-col">
@@ -309,9 +329,10 @@ export default function Core() {
             <input 
               type="number" 
               value={reinvestmentSetupInput} 
+              ref={inputRef} // Attach ref to the input
               className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
               onChange={(e) => {
-                const value = Math.min(100, Math.max(user?.reinvestSetup || 100, parseInt(e.target.value))); // Ensure value is between 0 and 100
+                const value = Math.min(100, Math.max(0, parseInt(e.target.value))); // Ensure value is between 0 and 100
                 setReinvestmentSetupInput(value);
               }} 
             /> %
@@ -321,11 +342,10 @@ export default function Core() {
               onClick={handleSaveReinvestSetup}
               disabled={reinvestmentSetupInput <= minValue}
               className={`py-0 px-4 rounded font-bold ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
-              >
-                {isSaved ? '✔' : 'Save'}
-              </button>
+            >
+              {isSaved ? '✔' : 'Save'}
+            </button>
             }
-
           </div>
         </div>
 
