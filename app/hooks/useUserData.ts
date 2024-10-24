@@ -74,30 +74,41 @@ export function useUserData() {
     try {
       const updatedFields = Object.entries(updates).reduce((acc, [key, value]) => {
         if (value !== undefined) {
-          acc[key] = { increment: value };
+          // Special handling for reinvestSetup - use set instead of increment
+          if (key === 'reinvestSetup') {
+            acc[key] = value; // Direct value
+          } else {
+            acc[key] = { increment: value }; // Increment for other fields
+          }
         }
         return acc;
-      }, {} as Record<string, { increment: number }>);
+      }, {} as Record<string, any>);
 
-      // Use absolute URL with window.location.origin
+      console.log('Sending update to API:', updatedFields);
+
       const apiUrl = `${window.location.origin}/api/user-update`;
-      
       const res = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ telegramId: user.telegramId, updates: updatedFields }),
+        body: JSON.stringify({ 
+          telegramId: user.telegramId, 
+          updates: updatedFields 
+        }),
       });
+
       const data = await res.json();
+      console.log('API response:', data);
+
       if (data.success) {
         setUser(data.user);
         return { success: true, message: 'User updated successfully!' };
       } else {
-        return { success: false, message: 'Failed to update user' };
+        return { success: false, message: data.error || 'Failed to update user' };
       }
     } catch (err) {
-      console.error(err);
+      console.error('Error in handleUpdateUser:', err);
       return { success: false, message: 'An error occurred while updating user' };
     }
   };

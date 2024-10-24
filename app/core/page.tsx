@@ -115,22 +115,35 @@ export default function Core() {
   };
 
   const handleSaveReinvestSetup = async () => {
-    if (!user) return;
-    if (reinvestmentSetupInput < minValue) setReinvestmentSetupInput(minValue);
-    else if (reinvestmentSetupInput > 100) setReinvestmentSetupInput(100);
-    const reinvestSetup = reinvestmentSetupInput - (user?.reinvestSetup || 100);
-    
-    // Send the direct value instead of an increment
-    const result = await handleUpdateUser({
-      reinvestSetup: reinvestSetup // Use 'set' instead of 'increment'
-    });
-    
-    if (result?.success) {
-      setIsSaved(true);
-      setTimeout(() => setIsSaved(false), 2000);
-      console.log('Successfully updated reinvest setup');
-    } else {
-      console.error('Failed to update reinvest setup');
+    if (!user) {
+      console.log('No user found');
+      return;
+    }
+
+    // Ensure value is within bounds
+    let finalValue = reinvestmentSetupInput;
+    if (finalValue < minValue) finalValue = minValue;
+    else if (finalValue > 100) finalValue = 100;
+
+    console.log('Current user reinvestSetup:', user.reinvestSetup);
+    console.log('New reinvestSetup value:', finalValue);
+
+    try {
+      const result = await handleUpdateUser({
+        reinvestSetup: finalValue // Send the actual value, not the difference
+      });
+      
+      console.log('API response:', result);
+
+      if (result?.success) {
+        setIsSaved(true);
+        setTimeout(() => setIsSaved(false), 2000);
+        console.log('Successfully updated reinvest setup');
+      } else {
+        console.error('Failed to update reinvest setup:', result);
+      }
+    } catch (error) {
+      console.error('Error in handleSaveReinvestSetup:', error);
     }
   };
 
@@ -333,7 +346,7 @@ export default function Core() {
           <div>
             <div>
               current reinvest {user?.reinvestSetup}%
-              <span>min Reinvest (-5%*lvl): {Math.max(0, minValue)}%</span>
+              <p>min Reinvest (-5%*lvl): {Math.max(0, minValue)}%</p>
             </div>
             
             <input 
@@ -350,7 +363,7 @@ export default function Core() {
             {(reinvestmentSetupInput >= minValue) && 
               <button 
               onClick={handleSaveReinvestSetup}
-              disabled={reinvestmentSetupInput >= minValue}
+              // disabled={reinvestmentSetupInput >= minValue}
               className={`py-0 px-4 rounded font-bold ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
             >
               {isSaved ? '✔' : 'Save'}
