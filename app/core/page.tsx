@@ -302,20 +302,20 @@ export default function Core() {
               value={reinvestmentSetupInput} 
               className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
               onChange={(e) => {
-                const value = Math.min(100, Math.max(0, parseInt(e.target.value))); // Ensure value is between 0 and 100
+                const value = Math.min(100, Math.max(user?.reinvestSetup || 100, parseInt(e.target.value))); // Ensure value is between 0 and 100
                 setReinvestmentSetupInput(value);
               }} 
             /> %
             {/* TODO: button to save to database */}
-
+            {(reinvestmentSetupInput <= minValue) && 
               <button 
               onClick={handleSaveReinvestSetup}
               disabled={reinvestmentSetupInput <= minValue}
-              className=" bg-blue-500 hover:bg-blue-700 text-white font-bold w-10 py-0 px-4 rounded"
+              className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 rounded"
               >
                 Save
               </button>
-
+            }
 
           </div>
         </div>
