@@ -17,6 +17,7 @@ export default function Core() {
   // const [daysToTarget, setDaysToTarget] = useState(0);
   const [plusStartCore, setPlusStartCore ] = useState(0);
   const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(0); // Track input value
+  const [isSaved, setIsSaved] = useState(false);
 
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
@@ -114,8 +115,16 @@ export default function Core() {
 
   const handleSaveReinvestSetup = async () => {
     if (!user) return;
-    if (reinvestmentSetupInput <= minValue || reinvestmentSetupInput > 100) return;
-    await handleUpdateUser({ reinvestSetup: (reinvestmentSetupInput - (user?.reinvestSetup || 100)) });
+    if (reinvestmentSetupInput < minValue || reinvestmentSetupInput > 100) return;
+    const result = await handleUpdateUser({ reinvestSetup: (reinvestmentSetupInput - (user?.reinvestSetup || 100)) });
+    if (result?.success) {
+      setIsSaved(true);
+          // Optionally, reset the save status after a delay
+    setTimeout(() => setIsSaved(false), 2000); // Reset after 2 seconds
+      console.log('Successfully updated reinvest setup');
+    } else {
+      console.error('Failed to update reinvest setup');
+    }
   };
 
   const minValue = 100 - aicoreLevel * 5; // Calculate minValue
@@ -311,9 +320,9 @@ export default function Core() {
               <button 
               onClick={handleSaveReinvestSetup}
               disabled={reinvestmentSetupInput <= minValue}
-              className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 rounded"
+              className={`py-0 px-4 rounded font-bold ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
               >
-                Save
+                {isSaved ? '✔' : 'Save'}
               </button>
             }
 

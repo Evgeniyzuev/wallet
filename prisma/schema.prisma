@@ -21,7 +21,7 @@ model User {
   firstName  String?
   lastName   String?
   level      Int     @default(0)
-  reinvestSetup Float @default(0)
+  reinvestSetup Float @default(100)
   aicoreBalance     Float     @default(0)
   walletBalance     Float     @default(0)
   createdAt  DateTime @default(now())
