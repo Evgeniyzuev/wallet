@@ -26,12 +26,12 @@ export default function Wallet() {
     let result;
 
     switch (selectedAction) {
-      // case 'receive':
+      case 'receive':
 
-      //   result = await handleUpdateUser({
-      //     walletBalance: amountNumber
-      //   });
-      //   break;
+        result = await handleUpdateUser({
+          walletBalance: amountNumber
+        });
+        break;
       case 'send':
         if (amountNumber > (user?.walletBalance || 0)) {
           console.error('Insufficient balance');
@@ -80,7 +80,7 @@ export default function Wallet() {
         <div className="flex justify-center mb-4">
           <div className="flex items-center space-x-4 w-72">
             <button 
-              onClick={() => handleButtonClick('Receive')}
+              onClick={() => handleButtonClick('receive')}
               className="w-32 bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-2 px-4 rounded mr-4"
             >
               Receive
@@ -100,7 +100,7 @@ export default function Wallet() {
           Up Core
         </button>
         
-        {(selectedAction === 'send' || selectedAction === 'upCore' )&& (
+        {(selectedAction === 'send' || selectedAction === 'upCore' || selectedAction === 'receive')&& (
           <div className="mt-8 p-4 border border-gray-300 rounded">
             <h2 className="text-xl font-bold mb-4">
               {selectedAction}
@@ -123,7 +123,7 @@ export default function Wallet() {
           
           
         )}
-        {selectedAction === 'Receive' && <TonConnect />}
+        {selectedAction === 'receive' && <TonConnect />}
 
       </div>                                          
 

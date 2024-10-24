@@ -310,7 +310,7 @@ export default function Core() {
               <button 
               onClick={handleSaveReinvestSetup}
               disabled={reinvestmentSetupInput <= minValue}
-              className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 rounded"
+              className="w-10 h-6 p-1 border border-black text-black rounded mx-2"
               >
                 Save
               </button>
