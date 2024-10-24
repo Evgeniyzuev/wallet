@@ -150,7 +150,7 @@ export default function Core() {
   }, []);
 
   return (
-    <main className="bg-[#1c2033] text-white min-h-screen flex flex-col">
+    <main className="bg-[#1c2033] text-white min-h-screen" style={{ height: '200vh' }}>
       <div className="h-1/4 flex items-center justify-center overflow-hidden relative">
       <Image src={currentImage} alt="AI Assistant" className="w-full h-full object-cover" />
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center">
@@ -340,7 +340,7 @@ export default function Core() {
             {(reinvestmentSetupInput <= minValue) && 
               <button 
               onClick={handleSaveReinvestSetup}
-              disabled={reinvestmentSetupInput <= minValue}
+              disabled={reinvestmentSetupInput >= minValue}
               className={`py-0 px-4 rounded font-bold ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
             >
               {isSaved ? '✔' : 'Save'}
