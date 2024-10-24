@@ -116,7 +116,8 @@ export default function Core() {
 
   const handleSaveReinvestSetup = async () => {
     if (!user) return;
-    if (reinvestmentSetupInput < minValue || reinvestmentSetupInput > 100) return;
+    if (reinvestmentSetupInput < minValue )  setReinvestmentSetupInput(minValue);
+    else if (reinvestmentSetupInput > 100) setReinvestmentSetupInput(100);
     const result = await handleUpdateUser({ reinvestSetup: (reinvestmentSetupInput - (user?.reinvestSetup || 100)) });
     if (result?.success) {
       setIsSaved(true);
@@ -150,7 +151,7 @@ export default function Core() {
   }, []);
 
   return (
-    <main className="bg-[#1c2033] text-white min-h-screen" style={{ height: '200vh' }}>
+    <main className="bg-[#1c2033] text-white min-h-screen" style={{ height: '150vh' }}>
       <div className="h-1/4 flex items-center justify-center overflow-hidden relative">
       <Image src={currentImage} alt="AI Assistant" className="w-full h-full object-cover" />
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center">
@@ -337,7 +338,7 @@ export default function Core() {
               }} 
             /> %
             {/* TODO: button to save to database */}
-            {(reinvestmentSetupInput <= minValue) && 
+            {(reinvestmentSetupInput >= minValue) && 
               <button 
               onClick={handleSaveReinvestSetup}
               disabled={reinvestmentSetupInput >= minValue}
