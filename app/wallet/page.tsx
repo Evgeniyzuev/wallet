@@ -10,6 +10,7 @@ export default function Wallet() {
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [amount, setAmount] = useState<string>('');
   // const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
+  const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
 
   const handleButtonClick = (action: string) => {
     setSelectedAction(action);
@@ -17,6 +18,11 @@ export default function Wallet() {
   };
 
   const handleActionSubmit = async () => {
+    if (isTransactionInProgress) {
+      console.error('Transaction already in progress');
+      return; // Prevent further actions if a transaction is in progress
+    }
+
     if (!amount || isNaN(Number(amount))) {
       console.error('Invalid amount');
       return;
@@ -25,51 +31,57 @@ export default function Wallet() {
     let amountNumber = Number(amount);
     let result;
 
-    switch (selectedAction) {
-      case 'receive':
+    try {
+      setIsTransactionInProgress(true); // Set the transaction in progress state
 
-        result = await handleUpdateUser({
-          walletBalance: amountNumber
-        });
-        break;
-      case 'send':
-        if (amountNumber > (user?.walletBalance || 0)) {
-          console.error('Insufficient balance');
+      switch (selectedAction) {
+        case 'receive':
+          result = await handleUpdateUser({
+            walletBalance: amountNumber
+          });
+          break;
+        case 'send':
+          if (amountNumber > (user?.walletBalance || 0)) {
+            console.error('Insufficient balance');
+            return;
+          }
+
+          result = await handleUpdateUser({
+            walletBalance: -amountNumber
+          });
+          break;
+        case 'upCore':
+          // Handle topUpCore action handleIncreaseAicoreBalance
+          if (amountNumber > (user?.walletBalance || 0)) {
+            console.error('Insufficient balance');
+            return;
+          }
+          result = await handleUpdateUser({
+            walletBalance: -amountNumber,
+            aicoreBalance: amountNumber
+          });
+
+          console.log('Top Up Core action not implemented yet');
+          break;
+        default:
+          console.error('Unknown action');
           return;
-        }
+      }
 
-        result = await handleUpdateUser({
-          walletBalance: -amountNumber
-        });
-        break;
-      case 'upCore':
-        // Handle topUpCore action handleIncreaseAicoreBalance
-        if (amountNumber > (user?.walletBalance || 0)) {
-          console.error('Insufficient balance');
-          return;
-        }
-        result = await handleUpdateUser({
-          walletBalance: -amountNumber,
-          aicoreBalance: amountNumber
-        });
-
-        console.log('Top Up Core action not implemented yet');
-        break;
-      default:
-        console.error('Unknown action');
-        return;
+      if (result?.success) {
+        console.log(result.message);
+        // Update the local wallet balance immediately
+        // setWalletBalance((user?.walletBalance || 0) + amountNumber);
+      } else {
+        console.error(result?.message || 'Action failed');
+      }
+    } catch (error) {
+      console.error('Error during transaction:', error);
+    } finally {
+      setIsTransactionInProgress(false); // Reset the transaction state
+      setSelectedAction(null);
+      setAmount('');
     }
-
-    if (result?.success) {
-      console.log(result.message);
-      // Update the local wallet balance immediately
-      // setWalletBalance((user?.walletBalance || 0) + amountNumber);
-    } else {
-      console.error(result?.message || 'Action failed');
-    }
-
-    setSelectedAction(null);
-    setAmount('');
   };
 
   return (

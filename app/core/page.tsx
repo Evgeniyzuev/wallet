@@ -13,12 +13,13 @@ export default function Core() {
   const [reinvestmentPart, setReinvestmentPart] = useState(1);
   const [dailyReward, setDailyReward] = useState(1);
   const [dailyRewardInput, setDailyRewardInput] = useState('1');
-  const [targetAmount, setTargetAmount] = useState('');
-  // const [daysToTarget, setDaysToTarget] = useState(0);
+  const [targetAmount, setTargetAmount] = useState(0);
+  const [daysToTarget, setDaysToTarget] = useState(0);
   const [plusStartCore, setPlusStartCore ] = useState(0);
   const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(0); // Track input value
   const [isSaved, setIsSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
 
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
@@ -85,6 +86,11 @@ export default function Core() {
   };
 
   const handleActionSubmit = async () => {
+    if (isTransactionInProgress) {
+      console.error('Transaction already in progress');
+      return; // Prevent further actions if a transaction is in progress
+    }
+
     if (!amount || isNaN(Number(amount))) {
       console.error('Invalid amount');
       return;
@@ -98,6 +104,7 @@ export default function Core() {
     }
 
     try {
+      setIsTransactionInProgress(true); // Set the transaction in progress state
       const result = await handleUpdateUser({
         walletBalance: -amountNumber,
         aicoreBalance: amountNumber
@@ -111,6 +118,8 @@ export default function Core() {
       }
     } catch (error) {
       console.error('Error updating core balance:', error);
+    } finally {
+      setIsTransactionInProgress(false); // Reset the transaction state
     }
   };
 
@@ -149,6 +158,39 @@ export default function Core() {
 
   const minValue = 100 - aicoreLevel * 5; // Calculate minValue
 
+  const calculateDaysToTarget = () => {
+    if (!user) return;
+
+    const dailyReward = 1; // Replace with your actual daily reward value
+    const dailyCoreRate = 0.000633; // Replace with your actual daily core rate value
+    const reinvestmentPart = 1; // Replace with your actual reinvestment part value
+    const targetAmount = 1000; // Replace with your actual target amount
+
+    let minDays = 0;
+    let maxDays = 16384;
+
+    const recursiveCalculate = (minDays: number, maxDays: number) => {
+      const days = Math.floor((minDays + maxDays) / 2);
+      const currentAmount = (user.aicoreBalance + dailyReward * days) * ((dailyCoreRate * reinvestmentPart + 1) ** days);
+
+
+      // Base case: if the difference is small enough
+      if (-2 < maxDays - minDays && maxDays - minDays < 2) {
+        setDaysToTarget(days);
+        return;
+      }
+
+      // Adjust the search range based on the current amount
+      if (currentAmount < targetAmount) {
+        recursiveCalculate(days, maxDays); // Increase days
+      } else {
+        recursiveCalculate(minDays, days); // Decrease days
+      }
+    };
+
+    recursiveCalculate(minDays, maxDays);
+  };
+
   useEffect(() => {
     const handleFocus = () => {
       if (inputRef.current) {
@@ -178,9 +220,6 @@ export default function Core() {
               className="absolute top-0 left-0 h-full bg-yellow-500 bg-opacity-50"
               style={{ width: `${progressPercentage}%` }}
             >
-              {/* <div className="absolute inset-0 flex items-center justify-center text-xs text-black font-bold">
-                {Math.floor(progressPercentage)}%
-              </div> */}
             </div>
             <div className="absolute inset-0 flex items-center justify-center text-xs text-white">
             {Math.floor((user?.aicoreBalance || 0) * 100) / 100}$ / {balanceRequiredForNextLevel[aicoreLevel]}$
@@ -223,13 +262,6 @@ export default function Core() {
               </div>
             </div>
             <div>
-              {/* <label htmlFor="initialBalance">Введите сумму теоретического пополнения стартового баланса:</label>
-              <input
-                type="number"
-                id="initialBalance"
-                placeholder="Сумма пополнения"
-                onChange={(e) => setPlusCoreToday(e.target.value)}
-              /> */}
               <span className="mr-2">+ Start Core</span>
               <input
                 type="number"
@@ -290,7 +322,7 @@ export default function Core() {
             </span>
             </div>
 
-            {/* {<div className="mb-0 flex items-center">
+            {<div className="mb-0 flex items-center">
               <span className="mr-2">Target</span>
               <input
                 type="text"
@@ -298,13 +330,13 @@ export default function Core() {
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^\d]/g, '');
                   const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-                  setTargetAmount(formattedValue);
+                  setTargetAmount(formattedValue.length > 0 ? parseInt(formattedValue) : 0);
                 }}
                 className="w-32 h-6 p-1 border border-black text-black rounded"
               />
               <span className="ml-1">$</span>
-            </div> } */}
-            {/* <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Calculate</button>
+            </div> }
+            <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Calculate</button>
             <div className="mb-4">
               Time to target: {
                 (() => {
@@ -314,7 +346,7 @@ export default function Core() {
                   return `${years} years ${remainingDays} days`;
                 })()
               }
-            </div> */}
+            </div>
             <button onClick={handleSkipDay} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Skip 1 day</button>
             <button 
               onClick={() => handleButtonClick('upCore')}
@@ -335,6 +367,7 @@ export default function Core() {
             />
             <button
               onClick={handleActionSubmit}
+              disabled={isTransactionInProgress} // Disable button while transaction is in progress
               className="w-full bg-purple-500 hover:bg-purple-700 text-sm text-white font-bold py-2 px-4 rounded"
             >
               Confirm Up Core
