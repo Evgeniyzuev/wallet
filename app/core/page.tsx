@@ -311,14 +311,20 @@ export default function Core() {
                 min="1"
                 max="30"
               />
-              <span className="ml-8 text-yellow-500 font-bold">
+              <span className="ml-0 text-yellow-500 font-bold">
                {
                 
                 totalFutureValue
                 .toFixed(0)
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-              } $.  
+              } $
+              <span style={{ color: 'white' }}>
+                Per day 
+              </span>
+              <span style={{ color: 'yellow' }}>
               {(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.
+              </span>
+
             </span>
             </div>
 
