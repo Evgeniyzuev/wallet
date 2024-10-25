@@ -161,11 +161,6 @@ export default function Core() {
   const calculateDaysToTarget = () => {
     if (!user) return;
 
-    const dailyReward = 1; // Replace with your actual daily reward value
-    const dailyCoreRate = 0.000633; // Replace with your actual daily core rate value
-    const reinvestmentPart = 1; // Replace with your actual reinvestment part value
-    const targetAmount = 1000; // Replace with your actual target amount
-
     let minDays = 0;
     let maxDays = 16384;
 
@@ -335,9 +330,11 @@ export default function Core() {
                 className="w-32 h-6 p-1 border border-black text-black rounded"
               />
               <span className="ml-1">$</span>
+              <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 ml-4 rounded">Calculate</button>
             </div> }
-            <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Calculate</button>
+
             <div className="mb-4">
+              days to target: {daysToTarget}
               Time to target: {
                 (() => {
                   const years = Math.floor(daysToTarget / 365);
