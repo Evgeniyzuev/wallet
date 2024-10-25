@@ -205,6 +205,9 @@ export default function Core() {
     };
   }, []);
 
+  const totalFutureValue = ((((user?.aicoreBalance || 0) + plusStartCore) + dailyReward * 365.25 * coreAfterXyears) * 
+    ((dailyCoreRate * reinvestmentPart + 1) ** 365.25) ** coreAfterXyears);
+
   return (
     <main className="bg-[#1c2033] text-white min-h-screen" style={{ height: '150vh' }}>
       <div className="h-1/4 flex items-center justify-center overflow-hidden relative">
@@ -309,11 +312,13 @@ export default function Core() {
                 max="30"
               />
               <span className="ml-8 text-yellow-500 font-bold">
-               {((((user?.aicoreBalance || 0)+ plusStartCore) + dailyReward * 365.25 * coreAfterXyears) * 
-                ((dailyCoreRate * reinvestmentPart + 1) ** 365.25) ** coreAfterXyears)
+               {
+                
+                totalFutureValue
                 .toFixed(0)
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-              } $
+              } $.  
+              {(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.
             </span>
             </div>
 
@@ -333,11 +338,11 @@ export default function Core() {
               <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 ml-4 rounded">Calculate</button>
             </div> }
 
-            <div className="mb-4">
+            <div className="mb-4 text-yellow-500">
               Time to target: {
                 (() => {
-                  const years = Math.floor(daysToTarget / 365);
-                  const remainingDays = Math.floor(daysToTarget % 365);
+                  const years = Math.floor(daysToTarget / 365.25);
+                  const remainingDays = Math.floor(daysToTarget % 365.25);
 
                   return `${years} years ${remainingDays} days`;
                 })()
