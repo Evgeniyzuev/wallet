@@ -166,7 +166,7 @@ export default function Core() {
 
     const recursiveCalculate = (minDays: number, maxDays: number) => {
       const days = Math.floor((minDays + maxDays) / 2);
-      const currentAmount = (user.aicoreBalance + dailyReward * days) * ((dailyCoreRate * reinvestmentPart + 1) ** days);
+      const currentAmount = (user.aicoreBalance + plusStartCore + dailyReward * days) * ((dailyCoreRate * reinvestmentPart + 1) ** days);
 
 
       // Base case: if the difference is small enough
@@ -330,11 +330,10 @@ export default function Core() {
                 className="w-32 h-6 p-1 border border-black text-black rounded"
               />
               <span className="ml-1">$</span>
-              <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 ml-4 rounded">Calculate</button>
+              <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 ml-4 rounded">Calculate</button>
             </div> }
 
             <div className="mb-4">
-              days to target: {daysToTarget}
               Time to target: {
                 (() => {
                   const years = Math.floor(daysToTarget / 365);
