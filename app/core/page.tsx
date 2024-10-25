@@ -329,7 +329,7 @@ export default function Core() {
                 value={targetAmount}
                 onChange={(e) => {
                   const value = e.target.value.replace(/[^\d]/g, '');
-                  const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+                  const formattedValue = value.replace(/\B(?=(\d{10})+(?!\d))/g, " ");
                   setTargetAmount(formattedValue.length > 0 ? parseInt(formattedValue) : 0);
                 }}
                 className="w-32 h-6 p-1 border border-black text-black rounded"
