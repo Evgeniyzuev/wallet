@@ -9,20 +9,15 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
   const navItems = [
     { href: 'home', label: 'Core' },
     { href: 'ai', label: 'Ai' },
-    { href: 'wallet', label: 'Wallet' },
+    { href: 'wallet', label: 'Wallet', icon: (
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3z" />
+        </svg>
+    ) },
     { href: 'tasks', label: 'Tasks' },
     { href: 'friends', label: 'Frens' },
     { href: 'goals', label: 'Goals' },
   ]
-
-  // if (pathname !== '/') {
-  //   return (
-  //     <>
-  //       {/* <BackButton /> */}
-  //       <TelegramBackButton />
-  //     </>
-  //   );
-  // }
 
   return (
     
@@ -38,6 +33,7 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
                 : 'text-white hover:text-blue-300'
             }`}
           >
+            {item.icon} {/* Добавлено отображение иконки */}
             {item.label}
           </button>
         ))}

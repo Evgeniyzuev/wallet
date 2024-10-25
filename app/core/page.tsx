@@ -318,13 +318,8 @@ export default function Core() {
                 .toFixed(0)
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
               } $
-              <span style={{ color: 'white' }}>
-                Per day 
-              </span>
-              <span style={{ color: 'yellow' }}>
-              {(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.
-              </span>
-
+              <span className="ml-4 text-white font-bold">Per day </span>
+              <span className="ml-10 text-yellow-500 font-bold">{(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.</span>
             </span>
             </div>
 
