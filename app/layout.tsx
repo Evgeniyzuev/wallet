@@ -3,7 +3,6 @@
 import "./globals.css";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { useEffect } from 'react';
-import BackButton from './components/BackButton'
 import { usePathname } from 'next/navigation';
 import { UserProvider } from './UserContext';
 
