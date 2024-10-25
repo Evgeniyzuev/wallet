@@ -2,6 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import walletIcon from '../images/icon-wallet.svg';
+import tasksIcon from '../images/icon-tasks.svg';
+import friendsIcon from '../images/icon-friends.svg';
+import coinsIcon from '../images/ph_coins-fill.svg'; 
+
+import React from 'react';
 
 export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
   const pathname = usePathname()
@@ -9,14 +15,10 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
   const navItems = [
     { href: 'home', label: 'Core' },
     { href: 'ai', label: 'Ai' },
-    { href: 'wallet', label: 'Wallet', icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3z" />
-        </svg>
-    ) },
-    { href: 'tasks', label: 'Tasks' },
-    { href: 'friends', label: 'Frens' },
-    { href: 'goals', label: 'Goals' },
+    { href: 'wallet', label: 'Wallet', icon: <img src={walletIcon.src} alt="Wallet" className="w-6 h-6" /> },
+    { href: 'tasks', label: 'Tasks', icon: <img src={tasksIcon.src} alt="Tasks" className="w-6 h-6" /> },
+    { href: 'friends', label: 'Frens', icon: <img src={friendsIcon.src} alt="Frens" className="w-6 h-6" /> },
+    { href: 'goals', label: 'Goals', icon: <img src={coinsIcon.src} alt="Goals" className="w-6 h-6" /> },
   ]
 
   return (
@@ -33,7 +35,9 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
                 : 'text-white hover:text-blue-300'
             }`}
           >
-            {item.icon} {/* Добавлено отображение иконки */}
+            {item.icon && React.cloneElement(item.icon, {
+                className: `w-6 h-6 ${pathname === item.href ? 'text-blue-300' : 'text-white'}`
+            })}
             {item.label}
           </button>
         ))}
