@@ -16,9 +16,9 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
     { href: 'home', label: 'Core' },
     { href: 'ai', label: 'Ai' },
     { href: 'wallet', label: 'Wallet', icon: <img src={walletIcon.src} alt="Wallet" className="w-6 h-6" /> },
-    { href: 'tasks', label: 'Tasks', icon: <img src={tasksIcon.src} alt="Tasks" className="w-6 h-6" /> },
+    { href: 'tasks', label: 'Tasks', icon: <img src={coinsIcon.src} alt="Tasks" className="w-6 h-6" /> },
     { href: 'friends', label: 'Frens', icon: <img src={friendsIcon.src} alt="Frens" className="w-6 h-6" /> },
-    { href: 'goals', label: 'Goals', icon: <img src={coinsIcon.src} alt="Goals" className="w-6 h-6" /> },
+    { href: 'goals', label: 'Goals', icon: <img src={tasksIcon.src} alt="Goals" className="w-6 h-6" /> },
   ]
 
   return (
@@ -29,14 +29,14 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
           <button
             key={item.href}
             onClick={() => setCurrentPage(item.href)}
-            className={`font-medium flex flex-col items-center ${
+            className={`font-medium flex flex-col items-center p-2 rounded-lg transition-all ${
               pathname === item.href
-                ? 'text-blue-300'
-                : 'text-white hover:text-blue-300'
+                ? 'text-blue-300 bg-gray-700' // добавляем фон для активной кнопки
+                : 'text-white hover:text-blue-300 hover:bg-gray-700'
             }`}
           >
             {item.icon && React.cloneElement(item.icon, {
-                className: `w-6 h-6 ${pathname === item.href ? 'text-blue-300' : 'text-white'}`
+                className: 'w-6 h-6'
             })}
             {item.label}
           </button>
