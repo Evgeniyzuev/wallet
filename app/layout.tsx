@@ -34,7 +34,7 @@ export default function RootLayout({
       <body>
         <TonConnectUIProvider manifestUrl="https://blush-keen-constrictor-906.mypinata.cloud/ipfs/QmSBEGs7dqLGi5SAWGYfQpmp7uW8bWjy2KpiBiWSviWHRZ">
           <UserProvider>
-            {usePathname() !== '/' && <BackButton />}
+            {/* {usePathname() !== '/' && <BackButton />} */}
             {children}
           </UserProvider>
         </TonConnectUIProvider>
