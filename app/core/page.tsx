@@ -4,10 +4,35 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import aissistImage from '../images/aissist0.png';
 import { useUser } from '../UserContext'; 
+import { skipDay } from '../utils/skipDay';
 
 
 export default function Core() {
   const { user, handleUpdateUser } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  const handleSkipDay = async () => {
+    if (isLoading) {
+      console.log('User data is still loading...');
+      return;
+    }
+
+    const result = await skipDay();
+    if (!result.success) {
+      alert(result.error || 'An error occurred while skipping day');
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   const [dailyCoreRate] = useState(0.000633);
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
   const [reinvestmentPart, setReinvestmentPart] = useState(1);
@@ -55,27 +80,6 @@ export default function Core() {
   });
   
 
-
-  const handleSkipDay = async () => {
-    if (!user) return;
-    let reinvestSetup = 0;
-    if (user.reinvestSetup <= minValue) reinvestSetup = minValue;
-    else if (user.reinvestSetup > 100) reinvestSetup = 100;
-    else reinvestSetup = user.reinvestSetup;
-
-    try {
-      const aicoreIncrease = user.aicoreBalance * (dailyCoreRate * user.reinvestSetup);
-      const walletIncrease = user.aicoreBalance * (dailyCoreRate * (1 - user.reinvestSetup));
-      await handleUpdateUser({
-        walletBalance: walletIncrease,  // Increase wallet balance by 10
-        aicoreBalance: aicoreIncrease,   // Increase aicore balance by 5
-        level: 0            // Increase level by 1
-      });
-    } catch (error) {
-      console.error('Error updating balances:', error);
-      alert('An error occurred while updating balances');
-    }
-  };
 
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [amount, setAmount] = useState('');

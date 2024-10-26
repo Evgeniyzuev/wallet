@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
 import { User } from '../UserContext';
+import { getDaysBetweenDates } from '../utils/dateDiff';
+import { skipDay } from '../utils/skipDay';
 let cachedUser: any = null;
 
 const initialUser: User = {
@@ -13,13 +15,56 @@ const initialUser: User = {
   reinvestSetup: 100,
   aicoreBalance: 0,
   walletBalance: 0,
-  level: 0
+  level: 0,
+  lastLoginDate: new Date()
 };
 
 export function useUserData() {
   const [user, setUser] = useState<User | null>(initialUser);
   const [error, setError] = useState<string | null>(null);
   const [startParam, setStartParam] = useState('');
+
+  const checkAndUpdateDate = async (userData: User) => {
+    if (!userData) return;
+
+    const today = new Date(); // Get current date
+    today.setHours(0, 0, 0, 0); // Reset time to 00:00:00
+    
+    let lastLogin = userData.lastLoginDate ? new Date(userData.lastLoginDate) : new Date();
+    lastLogin.setHours(0, 0, 0, 0); // Reset time to 00:00:00
+
+    const daysDiff = getDaysBetweenDates(lastLogin, today);
+    
+    if (daysDiff > 0) {
+      try {
+        // Run skipDay for each missed day
+        for (let i = 0; i < daysDiff; i++) {
+          await skipDay();
+        }
+
+        // Update the login date after processing all missed days
+        const response = await fetch('/api/update-login-date', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            telegramId: userData.telegramId,
+            newDate: today
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to update login date');
+        }
+
+        const updatedUser = await response.json();
+        setUser(updatedUser);
+      } catch (error) {
+        console.error('Error updating login date:', error);
+      }
+    }
+  };
 
   useEffect(() => {
     if (cachedUser) return;
@@ -62,6 +107,12 @@ export function useUserData() {
       setError('This app should be opened in Telegram');
     }
   }, []);
+
+  useEffect(() => {
+    if (user && user.telegramId !== 0) {
+      checkAndUpdateDate(user);
+    }
+  }, [user?.telegramId]);
 
   const handleUpdateUser = async (updates: {
     walletBalance?: number;

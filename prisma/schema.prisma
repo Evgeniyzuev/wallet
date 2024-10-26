@@ -14,20 +14,19 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  telegramId Int     @unique
-  referrerId Int?
-  username   String?
-  firstName  String?
-  lastName   String?
-  level      Int     @default(0)
-  reinvestSetup Float @default(100)
-  aicoreBalance     Float     @default(0)
-  walletBalance     Float     @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  contacts   Contact[] @relation("UserContacts")
-  referrals  Contact[] @relation("UserReferrals")
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  telegramId    Int      @unique
+  referrerId    Int?
+  username      String?
+  firstName     String?
+  lastName      String?
+  reinvestSetup Int      @default(100)
+  aicoreBalance Float    @default(0)
+  walletBalance Float    @default(0)
+  level         Int      @default(0)
+  lastLoginDate DateTime @default(now())
+  contacts      Contact[] @relation("UserContacts")
+  referrals     Contact[] @relation("UserReferrals")
   completedTasks CompletedTask[]
 }
 

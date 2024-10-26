@@ -12,6 +12,7 @@ export interface User {
   aicoreBalance: number;
   walletBalance: number;
   level: number;
+  lastLoginDate?: Date; // Add this field
 }
 
 interface UserContextType {
