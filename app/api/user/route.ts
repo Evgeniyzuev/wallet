@@ -21,6 +21,11 @@ export async function POST(req: NextRequest) {
                     username: user.username || '',
                     firstName: user.first_name || '',
                     lastName: user.last_name || '',
+                    lastLoginDate: new Date(),
+                    reinvestSetup: 100,
+                    aicoreBalance: 0,
+                    walletBalance: 0,
+                    level: 0
                 }
             })
 
