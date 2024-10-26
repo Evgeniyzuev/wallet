@@ -265,20 +265,20 @@ export default function Core() {
               </div>
             </div>
             <div>
-              <span className="mr-2">+ Start Core</span>
+              <span className="mr-0">+ Start Core</span>
               <input
                 type="number"
                 value={plusStartCore}
                 onChange={(e) => setPlusStartCore(Math.min(99999, Math.max(0, parseInt(e.target.value) )))}
-                className="w-14 h-6 p-1 border border-black text-black rounded ml-3"
+                className="w-14 h-6 p-1 border border-black text-black rounded ml-1"
                 min="1"
                 max="99999"
               />
-              <span className="ml-1">$</span>
+              <span className="ml-0">$</span>
  
             </div>
             <div>
-            <span className="mr-2">Task rewards</span>
+            <span className="mr-0">Task rewards</span>
               <input
                 type="text"
                 value={dailyRewardInput}
@@ -302,17 +302,17 @@ export default function Core() {
                     setDailyReward(numValue);
                   }
                 }}
-                className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
+                className="w-10 h-6 p-1 border border-black text-black rounded"
               />
-              <span className="ml-1">$/d</span>
+              <span>$/d</span>
             </div>
             <div className="mb-1 flex items-center">
-              <span className="mr-2">Core in years</span>
+              <span>Core in years</span>
               <input
                 type="number"
                 value={coreAfterXyears}
                 onChange={(e) => setCoreAfterXyears(Math.min(30, Math.max(0, parseInt(e.target.value) )))}
-                className="w-10 h-6 p-1 border border-black text-black rounded mx-2"
+                className="w-10 h-6 p-1 border border-black text-black rounded mx-0"
                 min="1"
                 max="30"
               />
@@ -322,8 +322,8 @@ export default function Core() {
                 totalFutureValue
                 .toFixed(0)
                 .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-              } $
-              <span className="ml-2 text-white font-bold">Per day </span>
+              }$
+              <span className="ml-2 text-white font-bold">Daily </span>
               <span className="text-yellow-500 font-bold">{(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.</span>
             </span>
             </div>

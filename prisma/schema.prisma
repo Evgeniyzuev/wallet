@@ -24,6 +24,7 @@ model User {
   aicoreBalance Float    @default(0)
   walletBalance Float    @default(0)
   level         Int      @default(0)
+  createdAt     DateTime @default(now())
   lastLoginDate DateTime @default(now())
   contacts      Contact[] @relation("UserContacts")
   referrals     Contact[] @relation("UserReferrals")
@@ -36,8 +37,6 @@ model Contact {
   contactId Int   
   isReferral Boolean @default(false)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
   user      User     @relation("UserContacts", fields: [userId], references: [telegramId])
   contact   User     @relation("UserReferrals", fields: [contactId], references: [telegramId])
 
