@@ -73,6 +73,86 @@ export const tasks: Task[] = [
     }
   },
   // Add more tasks here as needed, each with their own action and secondAction
+  // 3 обучение тест
+  // 4 пополнить кошелек
+  // 5 качнуть ядро
+  // 6 получить код у ассистента
+  // 7 определить размер убд для: 1безопасности 2независимости 3свободы
+  {
+    taskId: 3,
+    title: 'Learning test',
+    image: '/images/brain.jpg',
+    description: 'Pass the learning test',
+    reward: '🔘 1$',
+    actionText: 'Do it',
+    action: () => {
+      window.open('https://t.me/WeAi_ch', '_blank');
+    },  
+    secondActionText: 'Done',
+    secondAction: async (user, handleUpdateUser, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
+      setTaskCompleted(true);
+    }
+  },
+  {
+    taskId: 4,
+    title: 'Top up the wallet',
+    image: '/images/top_wallet.jpg',
+    description: 'Top up the wallet',
+    reward: '🔘 1$',
+    actionText: 'Do it',
+    action: () => {
+      window.open('https://t.me/WeAi_ch', '_blank');
+    },
+    secondActionText: 'Done',
+    secondAction: async (user, handleUpdateUser, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
+      setTaskCompleted(true);
+    }
+  },
+  {
+    taskId: 5,
+    title: 'Upgrade the core',
+    image: '/images/core-xs.jpg',
+    description: 'Upgrade the core',
+    reward: '🔘 1$',  
+    actionText: 'Do it',
+    action: () => {
+      window.open('https://t.me/WeAi_ch', '_blank');
+    },
+    secondActionText: 'Done',
+    secondAction: async (user, handleUpdateUser, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
+      setTaskCompleted(true);
+    }
+  },
+  {
+    taskId: 6,
+    title: 'Get the code from the assistant',
+    image: '/images/cyber.png',
+    description: 'Get the code from the assistant',
+    reward: '🔘 1$',
+    actionText: 'Do it',
+    action: () => {
+      window.open('https://t.me/WeAi_ch', '_blank');
+    },
+    secondActionText: 'Done',
+    secondAction: async (user, handleUpdateUser, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
+      setTaskCompleted(true);
+    }
+  },
+  {
+    taskId: 7,
+    title: 'Determine the size of the UBI',
+    image: '/images/core-xs.jpg',
+    description: 'Determine the size of the UBI for: 1. safety 2. independence 3. freedom',
+    reward: '🔘 1$',
+    actionText: 'Do it',  
+    action: () => {
+      window.open('https://t.me/WeAi_ch', '_blank');
+    },
+    secondActionText: 'Done',
+    secondAction: async (user, handleUpdateUser, setNotification, setTaskCompleted, setIsPopupOpen, setError) => {
+      setTaskCompleted(true);
+    }
+  }
 ];
 
 export const handleSubscribe = async () => {

@@ -26,6 +26,8 @@ export default function Core() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
 
+  const previousLevelRef = useRef(user?.level); // Создаем реф для хранения предыдущего уровня
+
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
     setReinvestmentPart(value / 100);
@@ -55,9 +57,9 @@ export default function Core() {
   const progressPercentage = Math.min(100, ((user?.aicoreBalance || 0) / nextLevelThreshold) * 100);
 
   // занети уровень в базу данных
-  handleUpdateUser({
-    level: aicoreLevel - (user?.level || 0)
-  });
+  // handleUpdateUser({
+  //   level: aicoreLevel - (user?.level || 0)
+  // });
   
   // useEffect(() => {
   //   if (user) {
@@ -65,17 +67,17 @@ export default function Core() {
   //   }
   // }, [user]);
 
-  const handleSkipDay = async () => {
-    if (!user) {
-      console.log('User data is still loading...');
-      return;
-    }
+  // const handleSkipDay = async () => {
+  //   if (!user) {
+  //     console.log('User data is still loading...');
+  //     return;
+  //   }
 
-    const result = await skipDay(user, handleUpdateUser);
-    if (!result.success) {
-      alert(result.error || 'An error occurred while skipping day');
-    }
-  };
+  //   const result = await skipDay(user, handleUpdateUser);
+  //   if (!result.success) {
+  //     alert(result.error || 'An error occurred while skipping day');
+  //   }
+  // };
 
   // if (isLoading) {
   //   return <div>Loading...</div>;
@@ -214,18 +216,32 @@ export default function Core() {
     ((dailyCoreRate * reinvestmentPart + 1) ** 365.25) ** coreAfterXyears);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Remove non-digit characters and limit to 10 digits
-    const value = e.target.value.replace(/[^\d]/g, '').slice(0, 10);
-
-    // Format the number with spaces every 3 digits
-    // const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-
-    // // Update the input value with the formatted string
-    // e.target.value = formattedValue;
-
-    // Update state (assuming you're using state to store this value)
+    // Удаляем все нецифровые символы
+    const value = e.target.value.replace(/[^\d]/g, '');
+    
+    // Форматируем число с пробелами
+    const formattedValue = value ? Number(value).toLocaleString('en-US').replace(/,/g, ' ') : '';
+    
+    // Обновляем значение в input
+    e.target.value = formattedValue.toString();
+    
+    // Обновляем состояние с числовым значением
     setTargetAmount(value ? parseInt(value) : 0);
   };
+
+  useEffect(() => {
+    if (user) {
+      const newLevel = aicoreLevel - (user?.level || 0);
+      
+      // Проверяем, изменился ли уровень
+      if (previousLevelRef.current !== newLevel) {
+        handleUpdateUser({
+          level: newLevel
+        });
+        previousLevelRef.current = newLevel; // Обновляем реф на новый уровень
+      }
+    }
+  }, [aicoreLevel, user]); // Зависимости: уровень и пользователь
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen" style={{ height: '150vh' }}>
@@ -364,7 +380,7 @@ export default function Core() {
                 })()
               }
             </div>
-            <button onClick={handleSkipDay} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Skip 1 day</button>
+            {/* <button onClick={handleSkipDay} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Skip 1 day</button> */}
             <button 
               onClick={() => handleButtonClick('upCore')}
               className="w-full bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded mt-4"
