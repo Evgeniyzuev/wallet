@@ -1,4 +1,4 @@
-import { User, useUser } from '../UserContext';
+import { User } from '../UserContext';
 
 interface SkipDayResult {
   success: boolean;
@@ -6,10 +6,9 @@ interface SkipDayResult {
 }
 
 export const skipDay = async (
-
+  user: User,
+  handleUpdateUser: (updates: Partial<User>) => Promise<{ success: boolean; message: string } | undefined>,
 ): Promise<SkipDayResult> => {
-
-  const { user, handleUpdateUser } = useUser();
   if (!user) {
     return { success: false, error: 'No user found' };
   }

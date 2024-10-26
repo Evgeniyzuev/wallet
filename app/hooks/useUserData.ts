@@ -27,7 +27,7 @@ export function useUserData() {
   const checkAndUpdateDate = async (userData: User) => {
     if (!userData) return;
 
-    const today = new Date(); // Get current date
+    const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time to 00:00:00
     
     let lastLogin = userData.lastLoginDate ? new Date(userData.lastLoginDate) : new Date();
@@ -39,7 +39,7 @@ export function useUserData() {
       try {
         // Run skipDay for each missed day
         for (let i = 0; i < daysDiff; i++) {
-          await skipDay();
+          await skipDay(userData, handleUpdateUser);
         }
 
         // Update the login date after processing all missed days

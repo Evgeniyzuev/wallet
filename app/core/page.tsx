@@ -9,29 +9,9 @@ import { skipDay } from '../utils/skipDay';
 
 export default function Core() {
   const { user, handleUpdateUser } = useUser();
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if (user) {
-      setIsLoading(false);
-    }
-  }, [user]);
 
-  const handleSkipDay = async () => {
-    if (isLoading) {
-      console.log('User data is still loading...');
-      return;
-    }
-
-    const result = await skipDay();
-    if (!result.success) {
-      alert(result.error || 'An error occurred while skipping day');
-    }
-  };
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   const [dailyCoreRate] = useState(0.000633);
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
@@ -79,6 +59,27 @@ export default function Core() {
     level: aicoreLevel - (user?.level || 0)
   });
   
+  // useEffect(() => {
+  //   if (user) {
+  //     setIsLoading(false);
+  //   }
+  // }, [user]);
+
+  const handleSkipDay = async () => {
+    if (!user) {
+      console.log('User data is still loading...');
+      return;
+    }
+
+    const result = await skipDay(user, handleUpdateUser);
+    if (!result.success) {
+      alert(result.error || 'An error occurred while skipping day');
+    }
+  };
+
+  // if (isLoading) {
+  //   return <div>Loading...</div>;
+  // }
 
 
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
