@@ -84,7 +84,7 @@ export default function Home() {
                 />
               </div>
               <div className="flex-grow text-left">{task.title}
-              <div className="text-sm text-yellow-300 flex-shrink-0">{task.reward}</div>
+              <div className="text-sm text-green-300 flex-shrink-0">🔘{task.reward} $</div>
 
               </div>
               <div className="text-sm text-right text-yellow-300 flex-shrink-0">▶️</div>
