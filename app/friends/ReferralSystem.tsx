@@ -10,7 +10,7 @@ interface Referral {
   telegramId: number;
   username: string | null;
   firstName: string | null;
-  level: number | null;
+  level: number;
 }
 
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
@@ -90,7 +90,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
             <ul>
               {referrals.map((referral, index) => (
                 <li key={index} className="bg-dark-blue p-2 mb-2 rounded">
-                  ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`} {referral.level ? `(level: ${referral.level})` : ''}
+                  ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`} {referral.level ? `(level: ${referral.level})` : 'level: 0'}
                 </li>
               ))}
             </ul>

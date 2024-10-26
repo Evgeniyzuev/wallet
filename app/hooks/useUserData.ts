@@ -42,24 +42,15 @@ export function useUserData() {
           await skipDay(userData, handleUpdateUser);
         }
 
-        // Update the login date after processing all missed days
-        const response = await fetch('/api/update-login-date', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            telegramId: userData.telegramId,
-            newDate: today
-          }),
+        // Update the login date using handleUpdateUser
+        const result = await handleUpdateUser({
+          lastLoginDate: today
         });
 
-        if (!response.ok) {
+        if (!result?.success) {
           throw new Error('Failed to update login date');
         }
 
-        const updatedUser = await response.json();
-        setUser(updatedUser);
       } catch (error) {
         console.error('Error updating login date:', error);
       }
@@ -119,6 +110,7 @@ export function useUserData() {
     level?: number;
     aicoreBalance?: number;
     reinvestSetup?: number;
+    lastLoginDate?: Date;
   }) => {
     if (!user) return;
 

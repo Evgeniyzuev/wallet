@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
                     username: user.username || '',
                     firstName: user.first_name || '',
                     lastName: user.last_name || '',
-                    lastLoginDate: new Date(),
+                    lastLoginDate: new Date(new Date().setHours(0, 0, 0, 0)),
                     reinvestSetup: 100,
                     aicoreBalance: 0,
                     walletBalance: 0,

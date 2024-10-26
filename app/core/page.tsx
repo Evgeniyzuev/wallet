@@ -216,12 +216,12 @@ export default function Core() {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Remove non-digit characters and limit to 10 digits
     const value = e.target.value.replace(/[^\d]/g, '').slice(0, 10);
-    
-    // Format the number with spaces every 3 digits
-    const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ").trim();
 
-    // Update the input value with the formatted string
-    e.target.value = formattedValue;
+    // Format the number with spaces every 3 digits
+    // const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+
+    // // Update the input value with the formatted string
+    // e.target.value = formattedValue;
 
     // Update state (assuming you're using state to store this value)
     setTargetAmount(value ? parseInt(value) : 0);
