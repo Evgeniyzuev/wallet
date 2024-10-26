@@ -1,3 +1,5 @@
+'use client';
+  
 import { useState, useEffect } from 'react';
 import WebApp from '@twa-dev/sdk';
 import { User } from '../UserContext';
@@ -83,8 +85,12 @@ export function useUserData() {
             if (data.error) {
               setError(data.error);
             } else {
-              cachedUser = data;
-              setUser(data);
+              if (typeof window !== 'undefined') {
+                // код, использующий window
+                cachedUser = data;
+                setUser(data);
+              }
+
             }
           })
           .catch((err) => {

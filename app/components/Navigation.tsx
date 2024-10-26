@@ -1,12 +1,12 @@
 'use client'
 
-import Link from 'next/link'
+// import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import walletIcon from '../images/icon-wallet.svg';
 import tasksIcon from '../images/icon-tasks.svg';
 import friendsIcon from '../images/icon-friends.svg';
+import walletIcon from '../images/icon-wallet.svg';
 import coinsIcon from '../images/ph_coins-fill.svg';
-import messageIcon from '../images/icon-message.png'; 
+import messageIcon from '../images/icon-ai.svg'; 
 import coreIcon from '../images/icon-core.png';
 
 import React from 'react';
@@ -24,25 +24,26 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
   ]
 
   return (
-    
-    <div className="w-full bg-gray-800 py-3 fixed bottom-0">
+    <div className="w-full bg-gray-800 fixed bottom-0">
       <div className="flex justify-around max-w-screen-lg mx-auto">
-        {navItems.map((item) => (
-          <button
-            key={item.href}
-            onClick={() => setCurrentPage(item.href)}
-            className={`font-medium flex w-1/6 flex-col items-center p-2 rounded-lg transition-all ${
-              pathname === item.href
-                ? 'text-blue-300 bg-gray-700' // добавляем фон для активной кнопки
-                : 'text-white hover:text-blue-300 hover:bg-gray-700'
-            }`}
-          >
-            {item.icon && React.cloneElement(item.icon, {
-                className: 'w-6 h-6'
-            })}
-            {item.label}
-          </button>
-        ))}
+        {navItems.map((item) => {
+          const isActive = pathname === `/${item.href}`;
+          
+          return (
+            <button
+              key={item.href}
+              onClick={() => setCurrentPage(item.href)}
+              className={`font-medium flex w-1/6 flex-col items-center p-2 rounded-lg transition-all ${
+                isActive
+                  ? 'text-blue-300 bg-gray-700'
+                  : 'text-white hover:text-blue-300 hover:bg-gray-700'
+              }`}
+            >
+              {item.icon}
+              {item.label}
+            </button>
+          );
+        })}
       </div>
     </div>
   )
