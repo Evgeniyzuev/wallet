@@ -213,6 +213,20 @@ export default function Core() {
   const totalFutureValue = ((((user?.aicoreBalance || 0) + plusStartCore) + dailyReward * 365.25 * coreAfterXyears) * 
     ((dailyCoreRate * reinvestmentPart + 1) ** 365.25) ** coreAfterXyears);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove non-digit characters and limit to 10 digits
+    const value = e.target.value.replace(/[^\d]/g, '').slice(0, 10);
+    
+    // Format the number with spaces every 3 digits
+    const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ").trim();
+
+    // Update the input value with the formatted string
+    e.target.value = formattedValue;
+
+    // Update state (assuming you're using state to store this value)
+    setTargetAmount(value ? parseInt(value) : 0);
+  };
+
   return (
     <main className="bg-[#1c2033] text-white min-h-screen" style={{ height: '150vh' }}>
       <div className="h-1/4 flex items-center justify-center overflow-hidden relative">
@@ -333,11 +347,7 @@ export default function Core() {
               <input
                 type="text"
                 value={targetAmount}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^\d]/g, '');
-                  const formattedValue = value.replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-                  setTargetAmount(formattedValue.length > 0 ? parseInt(formattedValue) : 0);
-                }}
+                onChange={handleInputChange}
                 className="w-32 h-6 p-1 border border-black text-black rounded"
               />
               <span className="ml-1">$</span>
