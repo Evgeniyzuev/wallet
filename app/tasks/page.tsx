@@ -18,7 +18,7 @@ export default function Home() {
     title: '',
     image: '',
     description: '',
-    reward: '',
+    reward: 0,
     actionText: '',
     action: () => {},
     secondActionText: '',
@@ -105,7 +105,7 @@ export default function Home() {
         onAction={currentTask.action}
         actionText={currentTask.actionText}
         onSecondAction={() => {
-          currentTask.secondAction(user, handleUpdateUser, setNotification, () => handleTaskCompletion(currentTask), setIsPopupOpen, setError);
+          currentTask.secondAction(user, handleUpdateUser, setNotification, () => handleTaskCompletion(currentTask), setError);
         }}
         secondActionText={currentTask.secondActionText}
       />

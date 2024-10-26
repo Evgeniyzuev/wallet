@@ -3,7 +3,7 @@ export interface Task {
   title: string;
   image: string;
   description: string;
-  reward: string;
+  reward: number;
   actionText: string;
   action: () => void;
   secondActionText: string;
@@ -18,15 +18,15 @@ export const tasks: Task[] = [
         title: 'Test task',
         image: '/images/core-xs.jpg',
         description: 'Test me',
-        reward: '🔘 1$',
+        reward: 1,
         actionText: 'Do it',
         action: () => {
             window.open('https://t.me/WeAi_ch', '_blank');
         },
         secondActionText: 'Done',   
         secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-          const taskId = this.taskId;
-            await completeTask(taskId, 1, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+          // const taskId = this.taskId;
+            await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
         },
     },
   {
@@ -34,17 +34,16 @@ export const tasks: Task[] = [
     title: 'Subscribe to the channel',
     image: '/images/core-xs.jpg',
     description: 'Subscribe to the WeAi channel',
-    reward: '🔘 0.5$',
+    reward: 1,
     actionText: 'Subscribe',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
     },
     secondActionText: 'Check Membership',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-        const taskId = this.taskId;
         const isMember = await checkMembership(user, 'WeAi_ch', setError);
         if (isMember) {
-          await completeTask(taskId, 0.5, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+          await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
         } else {
             setError('Please subscribe to the channel to receive the bonus');
         }
@@ -61,15 +60,14 @@ export const tasks: Task[] = [
     title: 'Learning test',
     image: '/images/brain.jpg',
     description: 'Pass the learning test',
-    reward: '🔘 1$',
+    reward: 1,
     actionText: 'Do it',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
     },  
     secondActionText: 'Done',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      const taskId = this.taskId;
-        await completeTask(taskId, 1, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+        await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
   {
@@ -77,15 +75,14 @@ export const tasks: Task[] = [
     title: 'Top up the wallet',
     image: '/images/top_wallet.jpg',
     description: 'Top up the wallet',
-    reward: '🔘 1$',
+    reward: 1,
     actionText: 'Do it',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
     },
     secondActionText: 'Done',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      const taskId = this.taskId;
-        await completeTask(taskId, 1, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+        await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
   {
@@ -93,15 +90,14 @@ export const tasks: Task[] = [
     title: 'Upgrade the core',
     image: '/images/core-xs.jpg',
     description: 'Upgrade the core',
-    reward: '🔘 1$',  
+    reward: 1,  
     actionText: 'Do it',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
     },
     secondActionText: 'Done',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      const taskId = this.taskId;
-        await completeTask(taskId, 1, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
   {
@@ -109,15 +105,15 @@ export const tasks: Task[] = [
     title: 'Get the code from the assistant',
     image: '/images/cyber.png',
     description: 'Get the code from the assistant',
-    reward: '🔘 1$',
+    reward: 1,
     actionText: 'Do it',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
     },
     secondActionText: 'Done',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      const taskId = this.taskId;
-        await completeTask(taskId, 1, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
   {
@@ -125,15 +121,14 @@ export const tasks: Task[] = [
     title: 'Determine the size of the UBI',
     image: '/images/core-xs.jpg',
     description: 'Determine the size of the UBI for: 1. safety 2. independence 3. freedom',
-    reward: '🔘 1$',
+    reward: 1,
     actionText: 'Do it',  
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
     },
     secondActionText: 'Done',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      const taskId = this.taskId;
-        await completeTask(taskId, 1, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   }
 ];

@@ -7,7 +7,7 @@ interface TaskPopupProps {
   onClose: () => void;
   title: string;
   description: string;
-  reward: string;
+  reward: number;
   onAction: () => void;
   actionText: string;
   onSecondAction: () => void;
@@ -42,7 +42,7 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
               className="rounded-lg"
             />
           </div>
-          <div className="text-orange-400 font-bold text-xl">{reward}</div>
+          <div className="text-orange-400 font-bold text-xl">🔘{reward} $</div>
         </div>
         <h2 className="text-2xl font-bold mb-4">{title}</h2>
         <p className="text-gray-300 mb-6">{description}</p>
