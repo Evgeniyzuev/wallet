@@ -19,6 +19,8 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const [referrer, setReferrer] = useState<Referral | null>(null);
   const [showContacts, setShowContacts] = useState(false);
   const [referralsLoaded, setReferralsLoaded] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const ITEMS_PER_PAGE = 10;
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
   const { user } = useUser()
 
@@ -39,22 +41,41 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
     }
   }
 
+  const loadMoreReferrals = async () => {
+    const startIndex = currentPage * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const nextPageIds = referralIds.slice(startIndex, endIndex);
+
+    if (nextPageIds.length > 0) {
+      const newReferralDetails = await Promise.all(
+        nextPageIds.map(id => fetchContact(id))
+      );
+
+      setReferrals(prev => [...prev, ...newReferralDetails.filter((ref): ref is Referral => ref !== null)]);
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
   const fetchReferrals = async () => {
     if (userId && !referralsLoaded) {
       try {
         const response = await fetch(`/api/referrals?userId=${userId}`);
         if (!response.ok) throw new Error('Failed to fetch referrals');
         const data = await response.json();
-        setReferralIds(data.referrals.map((ref: any) => ref.telegramId));
         
-        // Fetch each contact's details
+        // Store all referral IDs
+        const allReferralIds = data.referrals.map((ref: any) => ref.telegramId);
+        setReferralIds(allReferralIds);
+
+        // Load first page
+        const firstPageIds = allReferralIds.slice(0, ITEMS_PER_PAGE);
         const referralDetails = await Promise.all(
-          data.referrals.map((ref: any) => fetchContact(ref.telegramId))
+          firstPageIds.map((id: number) => fetchContact(id))
         );
         
-        // Filter out any null results and set the referrals
         setReferrals(referralDetails.filter((ref): ref is Referral => ref !== null));
         setReferralsLoaded(true);
+        setCurrentPage(1);
       } catch (error) {
         console.error('Error fetching referrals:', error);
       }
@@ -89,23 +110,23 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
     alert('Invite link copied to clipboard!')
   }
 
-  const fetchReferrer = async () => {
-    if (user?.referrerId) {
-      try {
-        const response = await fetch(`/api/user?telegramId=${user.referrerId}`);
-        if (!response.ok) throw new Error('Failed to fetch referrer');
-        const data = await response.json();
-        setReferrer({
-          telegramId: data.telegramId,
-          username: data.username,
-          firstName: data.firstName,
-          level: data.level
-        });
-      } catch (error) {
-        console.error('Error fetching referrer:', error);
-      }
-    }
-  };
+  // const fetchReferrer = async () => {
+  //   if (user?.referrerId) {
+  //     try {
+  //       const response = await fetch(`/api/user?telegramId=${user.referrerId}`);
+  //       if (!response.ok) throw new Error('Failed to fetch referrer');
+  //       const data = await response.json();
+  //       setReferrer({
+  //         telegramId: data.telegramId,
+  //         username: data.username,
+  //         firstName: data.firstName,
+  //         level: data.level
+  //       });
+  //     } catch (error) {
+  //       console.error('Error fetching referrer:', error);
+  //     }
+  //   }
+  // };
 
 
 
@@ -150,6 +171,14 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
                 </li>
               ))}
             </ul>
+            {referralIds.length > referrals.length && (
+              <button
+                onClick={loadMoreReferrals}
+                className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
+              >
+                Show More Referrals
+              </button>
+            )}
           </>
         )}
       </div>
