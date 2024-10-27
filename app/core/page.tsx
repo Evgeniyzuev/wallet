@@ -351,7 +351,7 @@ export default function Core() {
             type="number"
             value={coreAfterXyears}
             onChange={(e) => setCoreAfterXyears(Math.min(30, Math.max(0, parseInt(e.target.value) )))}
-            className="w-10 h-6 p-1 border border-black text-black rounded mx-0"
+            className="w-10 h-6 p-1 border border-black text-black rounded mx-2"
             min="1"
             max="30"
           />
@@ -426,8 +426,8 @@ export default function Core() {
 
       {/* Reinvest setup */}
       <div className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all p-2 mb-1">
-        <div>
-          <div>
+        <div className="flex justify-between">
+          <div >
             Reinvest
             
             <input 
@@ -440,8 +440,8 @@ export default function Core() {
                 setReinvestmentSetupInput(value);
               }} 
             /> %
-            {/* TODO: button to save to database */}
-            {(reinvestmentSetupInput >= minValue) && 
+          </div>
+          {(reinvestmentSetupInput >= minValue) && 
               <button 
               onClick={handleSaveReinvestSetup}
               // disabled={reinvestmentSetupInput >= minValue}
@@ -450,11 +450,11 @@ export default function Core() {
               {isSaved ? '✔' : 'Save'}
             </button>
             }
-            <div className="flex justify-between text-sm mt-2">
+
+        </div>
+        <div className="flex justify-between text-sm mt-2">
               <span> current: {user?.reinvestSetup}%</span>
-              <span>min(-5%*lvl): {Math.max(0, minValue)}%</span >
-            </div>
-          </div>
+          <span>min(-5%*lvl): {Math.max(0, minValue)}%</span >
         </div>
       </div>
     </main>
