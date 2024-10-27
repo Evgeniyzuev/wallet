@@ -3,9 +3,7 @@
 import "./globals.css";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { UserProvider } from './UserContext';
-import WelcomePopup from './components/WelcomePopup';
 
 export default function RootLayout({
   children,
@@ -38,10 +36,6 @@ export default function RootLayout({
           <UserProvider>
             {/* {usePathname() !== '/' && <BackButton />} */}
             {children}
-            <WelcomePopup 
-              isOpen={showWelcomePopup} 
-              onClose={() => setShowWelcomePopup(false)} 
-            />
           </UserProvider>
         </TonConnectUIProvider>
       </body>

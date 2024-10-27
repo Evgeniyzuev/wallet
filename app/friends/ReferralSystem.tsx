@@ -14,6 +14,7 @@ interface Referral {
 }
 
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
+  const [referralIds, setReferralIds] = useState<number[]>([])
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [referrer, setReferrer] = useState<Referral | null>(null);
   const [showContacts, setShowContacts] = useState(false);
@@ -21,13 +22,38 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
   const { user } = useUser()
 
+  const fetchContact = async (contactId: number) => {
+    try {
+      const response = await fetch(`/api/user?telegramId=${contactId}`);
+      if (!response.ok) throw new Error('Failed to fetch contact');
+      const data = await response.json();
+      return {
+        telegramId: data.telegramId,
+        username: data.username,
+        firstName: data.firstName,
+        level: data.level
+      };
+    } catch (error) {
+      console.error(`Error fetching contact ${contactId}:`, error);
+      return null;
+    }
+  }
+
   const fetchReferrals = async () => {
     if (userId && !referralsLoaded) {
       try {
         const response = await fetch(`/api/referrals?userId=${userId}`);
         if (!response.ok) throw new Error('Failed to fetch referrals');
         const data = await response.json();
-        setReferrals(data.referrals);
+        setReferralIds(data.referrals.map((ref: any) => ref.telegramId));
+        
+        // Fetch each contact's details
+        const referralDetails = await Promise.all(
+          data.referrals.map((ref: any) => fetchContact(ref.telegramId))
+        );
+        
+        // Filter out any null results and set the referrals
+        setReferrals(referralDetails.filter((ref): ref is Referral => ref !== null));
         setReferralsLoaded(true);
       } catch (error) {
         console.error('Error fetching referrals:', error);
@@ -38,7 +64,13 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const handleShowContacts = () => {
     setShowContacts(!showContacts);
     if (!referralsLoaded) {
-      fetchReferrer();
+      if (user?.referrerId) {
+        fetchContact(user.referrerId).then(referrerData => {
+          if (referrerData) {
+            setReferrer(referrerData);
+          }
+        });
+      }
       fetchReferrals();
     }
   }

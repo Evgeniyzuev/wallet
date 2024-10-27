@@ -26,15 +26,8 @@ export async function GET(request: NextRequest) {
       include: {
         contacts: {
           where: { isReferral: true },
-          include: {
-            contact: {
-              select: {
-                telegramId: true,
-                firstName: true,
-                username: true,
-                level: true
-              }
-            }
+          select: {
+            contactId: true
           }
         }
       }
@@ -45,10 +38,7 @@ export async function GET(request: NextRequest) {
     }
 
     const referrals = user.contacts.map(contact => ({
-      telegramId: contact.contact.telegramId,
-      firstName: contact.contact.firstName,
-      username: contact.contact.username,
-      level: contact.contact.level
+      telegramId: contact.contactId
     }));
 
     return NextResponse.json({ referrals });
