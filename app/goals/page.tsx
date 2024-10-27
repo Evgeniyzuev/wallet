@@ -19,6 +19,9 @@ export default function FriendsPage() {
           <span>💪 фитнес</span>
           <span>🏠 имущество</span>
           <span>💁‍♂️ персональное</span>
+          <span>👨‍👩‍👦‍👦 социальное</span>
+          <span>🗺 карта желаний</span>
+          <span>🔮 рекомендации</span>
         </div>
         <div className="flex flex-col ml-14"> {/* Added margin for spacing */}
           <span>🏋️ health</span>
@@ -36,6 +39,9 @@ export default function FriendsPage() {
           <span>💪 fitness</span>
           <span>🏠 property</span>
           <span>💁‍♂️ personal</span>
+          <span>👨‍👩‍👦‍👦 social</span>
+          <span>🗺 wish map</span>
+          <span>🔮 recommendations</span>
         </div>
       </div>
 

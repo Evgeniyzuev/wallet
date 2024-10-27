@@ -86,34 +86,63 @@ export default function Wallet() {
 
   return (
     <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Wallet</h1>
-        <p className="text-2xl mb-8">Wallet Balance: {Math.floor((user?.walletBalance || 0) * 100) / 100} USD</p>
-        <div className="flex justify-center mb-4">
-          <div className="flex items-center space-x-4 w-72">
-            <button 
-              onClick={() => handleButtonClick('receive')}
-              className="w-32 bg-blue-500 hover:bg-blue-700 text-sm text-white font-bold py-2 px-4 rounded mr-4"
-            >
-              Receive
-            </button>
-            <button 
-              onClick={() => handleButtonClick('send')}
-              className="w-32 bg-red-500 hover:bg-red-700 text-sm text-white font-bold py-2 px-4 rounded"
-            >
-              Send
-            </button>
-          </div>
-        </div>
-        <button 
-          onClick={() => handleButtonClick('upCore')}
-          className="w-72 bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded"
-        >
-          Up Core
-        </button>
+      <div className="text-center w-full max-w-lg px-4">
+        <p className="text-4xl text-bold mb-4 mt-4 ml-4">{Math.floor((user?.walletBalance || 0) * 100) / 100}$</p>
         
-        {(selectedAction === 'send' || selectedAction === 'upCore' || selectedAction === 'receive')&& (
-          <div className="mt-8 p-4 border border-gray-300 rounded">
+        <div className="grid grid-cols-3 gap-1 mb-8">
+          <button 
+            onClick={() => handleButtonClick('send')}
+            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+          >
+            <span className="text-2xl mb-2">↑</span>
+            <span className="text-sm">Send</span>
+          </button>
+
+          <button 
+            onClick={() => handleButtonClick('receive')}
+            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+          >
+            <span className="text-2xl mb-2">↓</span>
+            <span className="text-sm">Receive</span>
+          </button>
+
+          <button 
+            onClick={() => handleButtonClick('upCore')}
+            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+          >
+            <span className="text-2xl mb-2">↗</span>
+            <span className="text-sm">Up Core</span>
+          </button>
+
+          <button 
+            onClick={() => handleButtonClick('scan')}
+            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+          >
+            <span className="text-2xl mb-2">⟲</span>
+            <span className="text-sm">Scan</span>
+          </button>
+
+          <button 
+            onClick={() => handleButtonClick('exchange')}
+            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+          >
+            <span className="text-2xl mb-2">↑↓</span>
+            <span className="text-sm">Exchange</span>
+          </button>
+
+          <button 
+            onClick={() => handleButtonClick('buy')}
+            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+          >
+            <span className="text-2xl mb-2">$</span>
+            <span className="text-sm">Buy TON</span>
+          </button>
+
+
+        </div>
+
+        {(selectedAction === 'send' || selectedAction === 'upCore' || selectedAction === 'receive') && (
+          <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
             <h2 className="text-xl font-bold mb-4">
               {selectedAction}
             </h2>
@@ -122,24 +151,37 @@ export default function Wallet() {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount"
-              className="text-black w-full p-2 mb-2 border border-gray-300 rounded"
+              className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
             />
             <button
               onClick={handleActionSubmit}
-              className="w-full bg-purple-500 hover:bg-purple-700 text-sm text-white font-bold py-2 px-4 rounded"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
             >
               Confirm
             </button>
-
           </div>
-          
-          
         )}
+        
         {selectedAction === 'receive' && <TonConnect />}
 
-      </div>                                          
-
-      {/* <ReceivePopup isOpen={isReceivePopupOpen} onClose={() => setIsReceivePopupOpen(false)} /> */}
+        <div className="mt-8 p-4 bg-gray-800 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                <span className="text-xl">👆</span>
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="text-sm">Включите биометрию</span>
+                <span className="text-xs text-gray-400">для подтверждения транзакций</span>
+              </div>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" className="sr-only peer" />
+              <div className="w-11 h-6 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+            </label>
+          </div>
+        </div>
+      </div>
     </main>
   );
 }
