@@ -53,3 +53,32 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }
+
+export async function GET(req: NextRequest) {
+    const telegramId = req.nextUrl.searchParams.get('telegramId');
+    
+    if (!telegramId) {
+        return NextResponse.json({ error: 'Missing telegramId' }, { status: 400 });
+    }
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: { telegramId: parseInt(telegramId) },
+            select: {
+                telegramId: true,
+                username: true,
+                firstName: true,
+                level: true
+            }
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        return NextResponse.json(user);
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}

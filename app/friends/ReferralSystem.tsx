@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { initUtils } from '@telegram-apps/sdk'
 import { useUser } from '../UserContext'; 
 
@@ -15,7 +15,8 @@ interface Referral {
 
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const [referrals, setReferrals] = useState<Referral[]>([])
-  const [showReferrals, setShowReferrals] = useState(false);
+  const [referrer, setReferrer] = useState<Referral | null>(null);
+  const [showContacts, setShowContacts] = useState(false);
   const [referralsLoaded, setReferralsLoaded] = useState(false);
   const INVITE_URL = "https://t.me/WeAiBot_bot/WeAi"
   const { user } = useUser()
@@ -34,9 +35,10 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
     }
   }
 
-  const handleShowReferrals = () => {
-    setShowReferrals(!showReferrals);
+  const handleShowContacts = () => {
+    setShowContacts(!showContacts);
     if (!referralsLoaded) {
+      fetchReferrer();
       fetchReferrals();
     }
   }
@@ -54,6 +56,24 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
     navigator.clipboard.writeText(inviteLink)
     alert('Invite link copied to clipboard!')
   }
+
+  const fetchReferrer = async () => {
+    if (user?.referrerId) {
+      try {
+        const response = await fetch(`/api/user?telegramId=${user.referrerId}`);
+        if (!response.ok) throw new Error('Failed to fetch referrer');
+        const data = await response.json();
+        setReferrer({
+          telegramId: data.telegramId,
+          username: data.username,
+          firstName: data.firstName,
+          level: data.level
+        });
+      } catch (error) {
+        console.error('Error fetching referrer:', error);
+      }
+    }
+  };
 
 
 
@@ -73,19 +93,23 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
           Copy Invite Link
         </button>
       </div>
-      <div className="mt-8">
-        <h2 className="text-xl font-bold mb-4">Your Referrer: {user?.referrerId ? `User ${user.referrerId}` : "No referrer"}</h2>
-        
-      </div>
+
       <div className="mt-8">
         <button
-          onClick={handleShowReferrals}
+          onClick={handleShowContacts}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
         >
-          {showReferrals ? 'Hide Referrals' : 'Show Referrals'}
+          {showContacts ? 'Hide Referrals' : 'Show Referrals'}
         </button>
-        {showReferrals && (
+        {showContacts && (
           <>
+            <div className="mt-8">
+            {/* показывать Имя и уровень реферера */}
+            <h2 className="text-xl font-bold mb-4">
+              Your Referrer: {referrer ? `${referrer.firstName} (level: ${referrer.level})` : "No referrer"}
+            </h2>
+
+            </div>
             <h2 className="text-2xl font-bold mb-4">Your Referrals:</h2>
             <ul>
               {referrals.map((referral, index) => (

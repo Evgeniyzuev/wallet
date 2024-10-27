@@ -39,19 +39,22 @@ export function useUserData() {
     
     if (daysDiff > 0) {
       try {
-        // Run skipDay for each missed day
-        for (let i = 0; i < daysDiff; i++) {
-          await skipDay(userData, handleUpdateUser);
-        }
+          let totalAicoreIncrease = 0;
+          let totalWalletIncrease = 0;
 
-        // Update the login date using handleUpdateUser
-        const result = await handleUpdateUser({
-          lastLoginDate: today
-        });
+          // Calculate total increases for all missed days
+          for (let i = 0; i < daysDiff; i++) {
+            const { aicoreIncrease, walletIncrease } = skipDay(userData);
+            totalAicoreIncrease += aicoreIncrease;
+            totalWalletIncrease += walletIncrease;
+          }
 
-        if (!result?.success) {
-          throw new Error('Failed to update login date');
-        }
+          // Make a single update with the total increases
+          await handleUpdateUser({
+            aicoreBalance: totalAicoreIncrease,
+            walletBalance: totalWalletIncrease,
+            lastLoginDate: today
+          });        
 
       } catch (error) {
         console.error('Error updating login date:', error);

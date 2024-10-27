@@ -209,7 +209,7 @@ const completeTask = async (
   const result2 = await completeTaskApi(user.telegramId, taskId);
 
   if (result?.success) {
-    setNotification(`Task completed! ${reward} Aicore added to your balance.`);
+    setNotification(`Task completed! ${reward}$ added to your Aicore.`);
   } else {
     setError('Failed to increase Aicore balance');
   }
