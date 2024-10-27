@@ -33,7 +33,8 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!isLoading) {
+    // if (!isLoading) 
+      {
       const filteredTasks = initialTasks.filter(task => !completedTasks.includes(task.taskId));
       setLocalTasks(filteredTasks.slice(0, 10));
     }
