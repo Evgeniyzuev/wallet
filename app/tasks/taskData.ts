@@ -17,7 +17,7 @@ export const tasks: Task[] = [
         taskId: 1,
         title: 'Open Bot',
         image: '/images/core-xs.jpg',
-        description: 'Open the bot',
+        description: 'Open the bot press start',
         reward: 1,
         secondActionText: 'Open Bot',   
         secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
@@ -114,9 +114,9 @@ export const tasks: Task[] = [
   },
   {
     taskId: 7,
-    title: 'Determine the size of the UBI',
+    title: 'UBI size',
     image: '/images/core-xs.jpg',
-    description: 'Determine the size of the UBI for: 1. safety 2. independence 3. freedom',
+    description: 'What size of the UBI for:/n1. safety /n2. independence /n3. freedom',
     reward: 1,
     actionText: 'Do it',  
     action: () => {
