@@ -171,6 +171,7 @@ export const completeTaskApi = async (telegramId: number, taskId: number) => {
         console.error('User or telegramId is undefined');
         return false;
     }
+    
     const response = await fetch('/api/complete-task', {
         method: 'POST',
         headers: {
@@ -205,8 +206,20 @@ const completeTask = async (
     return;
   }
 
-  const result = await handleUpdateUser({ aicoreBalance: reward });
-  const result2 = await completeTaskApi(user.telegramId, taskId);
+  // Save to localStorage first
+
+    const completedTasksStr = localStorage.getItem('completedTasks');
+    const completedTasks = completedTasksStr ? JSON.parse(completedTasksStr) : [];
+    
+    // Add new taskId if not already present
+    if (!completedTasks.includes(taskId)) {
+      completedTasks.push(taskId);
+      localStorage.setItem('completedTasks', JSON.stringify(completedTasks));
+    }
+
+    // Proceed with API calls
+    const result = await handleUpdateUser({ aicoreBalance: reward });
+    const result2 = await completeTaskApi(user.telegramId, taskId);
 
   if (result?.success) {
     setNotification(`Task completed! ${reward}$ added to your Aicore.`);

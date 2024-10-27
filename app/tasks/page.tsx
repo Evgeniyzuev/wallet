@@ -51,6 +51,14 @@ export default function Home() {
 
   const fetchCompletedTasks = async () => {
     if (!user?.telegramId) return;
+    
+    // First load from localStorage
+    const localCompletedTasksStr = localStorage.getItem('completedTasks');
+    const localCompletedTasks = localCompletedTasksStr ? JSON.parse(localCompletedTasksStr) : [];
+    
+    // Set initial state from localStorage
+    setCompletedTasks(localCompletedTasks);
+    
     try {
       const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
       const data = await response.json();
