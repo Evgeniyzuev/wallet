@@ -27,7 +27,9 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetchCompletedTasks();
+    if (user?.telegramId) {
+      fetchCompletedTasks();
+    }
   }, []);
 
   useEffect(() => {
@@ -48,6 +50,7 @@ export default function Home() {
   };
 
   const fetchCompletedTasks = async () => {
+    if (!user?.telegramId) return;
     try {
       const response = await fetch(`/api/completed-tasks?telegramId=${user?.telegramId}`);
       const data = await response.json();

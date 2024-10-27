@@ -13,7 +13,9 @@ export async function POST(req: NextRequest) {
             where: { telegramId: user.id }
         })
 
+        let isNewUser = false;
         if (!dbUser) {
+            isNewUser = true;
             dbUser = await prisma.user.create({
                 data: {
                     telegramId: user.id,
@@ -47,7 +49,7 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        return NextResponse.json(dbUser)
+        return NextResponse.json({ ...dbUser, isNewUser })
     } catch (error) {
         console.error('Error processing user data:', error)
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
