@@ -25,7 +25,6 @@ export function useUserData() {
   const [user, setUser] = useState<User | null>(initialUser);
   const [error, setError] = useState<string | null>(null);
   const [startParam, setStartParam] = useState('');
-  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
 
   const checkAndUpdateDate = async (userData: User) => {
     if (!userData) return;
@@ -88,12 +87,11 @@ export function useUserData() {
               setError(data.error);
             } else {
               if (typeof window !== 'undefined') {
+                // код, использующий window
                 cachedUser = data;
                 setUser(data);
-                if (data.isNewUser) {
-                  setShowWelcomePopup(true);
-                }
               }
+
             }
           })
           .catch((err) => {
@@ -174,7 +172,5 @@ export function useUserData() {
     error,
     setError,
     handleUpdateUser,
-    showWelcomePopup,
-    setShowWelcomePopup
   };
 }
