@@ -29,11 +29,9 @@ export function useUserData() {
   const checkAndUpdateDate = async (userData: User) => {
     if (!userData) return;
 
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to 00:00:00
+    const today = new Date(new Date().setHours(0, 0, 0, 0))
     
-    let lastLogin = userData.lastLoginDate ? new Date(userData.lastLoginDate) : new Date();
-    lastLogin.setHours(0, 0, 0, 0); // Reset time to 00:00:00
+    let lastLogin = userData.lastLoginDate ? new Date(userData.lastLoginDate) : new Date(new Date().setHours(0, 0, 0, 0));
 
     const daysDiff = getDaysBetweenDates(lastLogin, today);
     
