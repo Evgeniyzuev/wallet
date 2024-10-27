@@ -15,13 +15,13 @@ export interface Task {
 export const tasks: Task[] = [
     {
         taskId: 1,
-        title: 'Test task',
+        title: 'Open Bot',
         image: '/images/core-xs.jpg',
-        description: 'Test me',
+        description: 'Open the bot',
         reward: 1,
         actionText: 'Do it',
         action: () => {
-            window.open('https://t.me/WeAi_ch', '_blank');
+            window.open('https://t.me/WeAiBot_bot', '_blank');
         },
         secondActionText: 'Done',   
         secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
