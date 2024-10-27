@@ -127,7 +127,7 @@ export function useUserData() {
       const updatedFields = Object.entries(updates).reduce((acc, [key, value]) => {
         if (value !== undefined) {
           // Special handling for reinvestSetup - use set instead of increment
-          if (key === 'reinvestSetup') {
+          if (key === 'reinvestSetup' || key === 'lastLoginDate') {
             acc[key] = value; // Direct value
           } else {
             acc[key] = { increment: value }; // Increment for other fields

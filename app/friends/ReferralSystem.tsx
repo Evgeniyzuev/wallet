@@ -99,7 +99,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
           onClick={handleShowContacts}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
         >
-          {showContacts ? 'Hide Referrals' : 'Show Referrals'}
+          {showContacts ? 'Hide Contacts' : 'Show Contacts'}
         </button>
         {showContacts && (
           <>
