@@ -84,7 +84,7 @@ export default function Home() {
           <button 
             key={index}
             onClick={() => handleOpenPopup(task)}
-            className="bg-gray-500 bg-opacity-50 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-xl mt-1 w-full"
+            className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all text-white font-bold py-2 px-4 mt-1 w-full"
           >
             <div className="flex items-center">
               <div className="w-10 h-10 mr-2 flex-shrink-0">

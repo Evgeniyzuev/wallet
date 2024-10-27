@@ -244,71 +244,75 @@ export default function Core() {
   }, [aicoreLevel, user]); // Зависимости: уровень и пользователь
 
   return (
-    <main className="bg-[#1c2033] text-white min-h-screen" style={{ height: '150vh' }}>
-      <div className="h-1/4 flex items-center justify-center overflow-hidden relative">
-      <Image src={currentImage} alt="AI Assistant" className="w-full h-full object-cover" />
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center">
-          <div className="relative w-80 h-4 bg-gray-700 bg-opacity-50 rounded-full overflow-hidden mr-2">
+    <main className="bg-[#1c2033] text-white min-h-screen p-2">
+      {/* Header section with image and progress */}
+      <div className="h-48 rounded-lg overflow-hidden relative mb-1">
+        <Image src={currentImage} alt="AI Assistant" className="w-full h-full object-cover" />
+        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center">
+          <div className="relative w-80 opacity-40 h-4 mr-10 bg-gray-700 rounded-full overflow-hidden">
             <div
-              className="absolute top-0 left-0 h-full bg-yellow-500 bg-opacity-50"
+              className="absolute top-0 left-0 h-full bg-yellow-500"
               style={{ width: `${progressPercentage}%` }}
-            >
-            </div>
-            <div className="absolute inset-0 flex items-center justify-center text-xs text-white">
-            {Math.floor((user?.aicoreBalance || 0) * 100) / 100}$ / {balanceRequiredForNextLevel[aicoreLevel]}$
+            />
+            <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+              {Math.floor((user?.aicoreBalance || 0) * 100) / 100}$ / {balanceRequiredForNextLevel[aicoreLevel]}$
             </div>
           </div>
-          <div className="text-yellow-500 border border-yellow-500 rounded-full w-8 h-8 flex items-center justify-center">
+          {/* Move the aicoreLevel display to the bottom right corner */}
+          <div className="absolute bottom-0 right-0 text-yellow-500 border-2 border-yellow-500 rounded-full w-8 h-8 flex items-center justify-center font-bold">
             {aicoreLevel}
           </div>
         </div>
       </div>
-      <div className="mb-1 mt-2">APY 26%. Core: {((user?.aicoreBalance || 0) * dailyCoreRate * (reinvestmentPart)).toFixed(2)}$/d.   Wallet: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(2)}$/d</div>
-            <div className="mb-1 flex items-center">
-              <span className="mr-2">Reinvest</span>
-              <input
-                autoComplete="off"
-                type="number"
-                value={Math.round(reinvestmentPart * 100)}
-                onChange={handleReinvestmentChange}
-                onInput={(e) => {
-                  const target = e.target as HTMLInputElement;
-                  if (target.value.length > 3) {
-                    target.value = target.value.slice(0, 3);
-                  }
-                  if (parseInt(target.value) > 100) {
-                    target.value = '100';
-                  }
-                }}
-                className="w-10 h-6 p-1 border border-black text-black rounded"
-                min="0"
-                max="100"
-              />
 
-              <div 
-                className="w-40 h-4 bg-gray-200 rounded-full overflow-hidden mr-2"
-              >
-                <div
-                  className="h-full bg-green-500"
-                  style={{ width: `${reinvestmentPart * 100}%` }}
-                ></div>
-              </div>
-            </div>
-            <div>
-              <span className="mr-0">+ Start Core</span>
+      {/* Stats section */}
+      <div className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all p-2 mb-1">
+
+        {/* Reinvestment slider */}
+        <div className="mb-1">
+          <label className="flex items-center justify-between mb-0">
+            APY 26% 
+            <span>Reinvest</span>
+            <input
+              type="number"
+              value={Math.round(reinvestmentPart * 100)}
+              onChange={handleReinvestmentChange}
+              className="w-16 h-6 text-black rounded text-center"
+              min="0"
+              max="100"
+            />
+          </label>
+          <div className="w-full h-2 bg-gray-200 rounded-full">
+            <div
+              className="h-full bg-green-500 rounded-full"
+              style={{ width: `${reinvestmentPart * 100}%` }}
+            />
+          </div>
+        </div>
+        <div className="text-lg font-semibold mb-1">
+          
+          <div className="flex justify-between text-sm mt-0">
+            <span>Wallet: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(2)}$/d</span>
+            <span>Core: {((user?.aicoreBalance || 0) * dailyCoreRate * (reinvestmentPart)).toFixed(2)}$/d</span>
+          </div>
+        </div>
+
+        {/* Input fields in grid */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="block">
+              <span className="text-sm">Start Core $</span>
               <input
                 type="number"
                 value={plusStartCore}
-                onChange={(e) => setPlusStartCore(Math.min(99999, Math.max(0, parseInt(e.target.value) )))}
-                className="w-14 h-6 p-1 border border-black text-black rounded ml-1"
-                min="1"
-                max="99999"
+                onChange={(e) => setPlusStartCore(Math.min(99999, Math.max(0, parseInt(e.target.value))))}
+                className="w-full mt-1 px-3 py-0 text-black rounded"
               />
-              <span className="ml-0">$</span>
- 
-            </div>
-            <div>
-            <span className="mr-0">Task rewards</span>
+            </label>
+          </div>
+          <div className="space-y-2">
+            <label className="block">
+              <span className="text-sm">Daily Rewards $/d</span>
               <input
                 type="text"
                 value={dailyRewardInput}
@@ -332,88 +336,99 @@ export default function Core() {
                     setDailyReward(numValue);
                   }
                 }}
-                className="w-10 h-6 p-1 border border-black text-black rounded"
+                className="w-full mt-1 px-3 py-0 text-black rounded"
               />
-              <span>$/d</span>
-            </div>
-            <div className="mb-1 flex items-center">
-              <span>Core in years</span>
-              <input
-                type="number"
-                value={coreAfterXyears}
-                onChange={(e) => setCoreAfterXyears(Math.min(30, Math.max(0, parseInt(e.target.value) )))}
-                className="w-10 h-6 p-1 border border-black text-black rounded mx-0"
-                min="1"
-                max="30"
-              />
-              <span className="ml-0 text-yellow-500 font-bold">
-               {
-                
-                totalFutureValue
-                .toFixed(0)
-                .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
-              }$
-              <span className="ml-2 text-white font-bold">Daily </span>
-              <span className="text-yellow-500 font-bold">{(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.</span>
-            </span>
-            </div>
-
-            {<div className="mb-0 flex items-center">
-              <span className="mr-2">Target</span>
-              <input
-                type="text"
-                value={targetAmount}
-                onChange={handleInputChange}
-                className="w-32 h-6 p-1 border border-black text-black rounded"
-              />
-              <span className="ml-1">$</span>
-              <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 ml-4 rounded">Calculate</button>
-            </div> }
-
-            <div className="mb-4 text-yellow-500">
-              Time to target: {
-                (() => {
-                  const years = Math.floor(daysToTarget / 365.25);
-                  const remainingDays = Math.floor(daysToTarget % 365.25);
-
-                  return `${years} years ${remainingDays} days`;
-                })()
-              }
-            </div>
-            {/* <button onClick={handleSkipDay} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Skip 1 day</button> */}
-            <button 
-              onClick={() => handleButtonClick('upCore')}
-              className="w-full bg-green-500 hover:bg-green-700 text-sm text-white font-bold py-2 px-4 rounded mt-4"
-            >
-              Up Core
-            </button>
-        {selectedAction === 'upCore' && (
-          <div className="mt-8 p-2 border border-gray-300 rounded">
-            {/* <h2 className="text-xl font-bold mb-4">Up Core</h2> */}
-            <div className="mb-1 text-center">Wallet: {Math.floor((user?.walletBalance || 0) * 100) / 100} $</div>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="Enter amount"
-              className="text-black w-full p-2 mb-2 border border-gray-300 rounded"
-            />
-            <button
-              onClick={handleActionSubmit}
-              disabled={isTransactionInProgress} // Disable button while transaction is in progress
-              className="w-full bg-purple-500 hover:bg-purple-700 text-sm text-white font-bold py-2 px-4 rounded"
-            >
-              Confirm Up Core
-            </button>
+            </label>
           </div>
-          
-        )}
-        <div className="mt-4">
+        </div>
+      </div>
+
+      {/* Calculator section */}
+      <div className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all p-2 mb-1">
+        <div className="mb-1 flex items-center">
+          <span>Core in years</span>
+          <input
+            type="number"
+            value={coreAfterXyears}
+            onChange={(e) => setCoreAfterXyears(Math.min(30, Math.max(0, parseInt(e.target.value) )))}
+            className="w-10 h-6 p-1 border border-black text-black rounded mx-0"
+            min="1"
+            max="30"
+          />
+          <span className="ml-0 text-yellow-500 font-bold">
+           {
+            
+            totalFutureValue
+            .toFixed(0)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, " ")
+          }$
+          </span>
+        </div>
+        <div className="flex items-center">
+          <span className="ml-0 text-white">Daily </span>
+          <span className="ml-2 text-yellow-500 font-bold">{(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.</span>
+        </div>
+
+        {<div className="mb-0 flex items-center">
+          <span className="mr-2">Goal</span>
+          <input
+            type="text"
+            value={targetAmount}
+            onChange={handleInputChange}
+            className="w-32 h-6 p-1 border border-black text-black rounded"
+          />
+          <span className="ml-1">$</span>
+          <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 ml-4 rounded">Calculate</button>
+        </div> }
+
+        <div className="mt-2 text-yellow-500">
+          Time to Goal: {
+            (() => {
+              const years = Math.floor(daysToTarget / 365.25);
+              const remainingDays = Math.floor(daysToTarget % 365.25);
+
+              return `${years} years ${remainingDays} days`;
+            })()
+          }
+        </div>
+        {/* <button onClick={handleSkipDay} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Skip 1 day</button> */}
+      </div>
+
+      {/* Action buttons */}
+      <button 
+        onClick={() => handleButtonClick('upCore')}
+        className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
+                   text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-200"
+      >
+        Up Core
+      </button>
+
+      {/* Up Core modal */}
+      {selectedAction === 'upCore' && (
+        <div className="mt-1 bg-[#252a41] p-4 rounded-lg border border-gray-600">
+          <div className="mb-1 text-center">Wallet: {Math.floor((user?.walletBalance || 0) * 100) / 100} $</div>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Enter amount"
+            className="text-black w-full p-2 mb-2 border border-gray-300 rounded"
+          />
+          <button
+            onClick={handleActionSubmit}
+            disabled={isTransactionInProgress} // Disable button while transaction is in progress
+            className="w-full bg-purple-500 hover:bg-purple-700 text-sm text-white font-bold py-2 px-4 rounded"
+          >
+            Confirm Up Core
+          </button>
+        </div>
+      )}
+
+      {/* Reinvest setup */}
+      <div className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all p-2 mb-1">
+        <div>
           <div>
-            <div>
-              current reinvest {user?.reinvestSetup}%
-              <p>min Reinvest (-5%*lvl): {Math.max(0, minValue)}%</p>
-            </div>
+            Reinvest
             
             <input 
               type="number" 
@@ -435,9 +450,13 @@ export default function Core() {
               {isSaved ? '✔' : 'Save'}
             </button>
             }
+            <div className="flex justify-between text-sm mt-2">
+              <span> current: {user?.reinvestSetup}%</span>
+              <span>min(-5%*lvl): {Math.max(0, minValue)}%</span >
+            </div>
           </div>
         </div>
-
+      </div>
     </main>
   );
 }
