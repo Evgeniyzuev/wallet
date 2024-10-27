@@ -4,8 +4,8 @@ export interface Task {
   image: string;
   description: string;
   reward: number;
-  actionText: string;
-  action: () => void;
+  actionText?: string; // Make actionText optional
+  action?: () => void; // Make action optional
   secondActionText: string;
   secondAction: (user: any, handleUpdateUser: any, setNotification: any, setTaskCompleted: any, setError: any) => void;
 }
@@ -19,13 +19,9 @@ export const tasks: Task[] = [
         image: '/images/core-xs.jpg',
         description: 'Open the bot',
         reward: 1,
-        actionText: 'Do it',
-        action: () => {
-            window.open('https://t.me/WeAiBot_bot', '_blank');
-        },
-        secondActionText: 'Done',   
+        secondActionText: 'Open Bot',   
         secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-          // const taskId = this.taskId;
+            window.open('https://t.me/WeAiBot_bot', '_blank');
             await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
         },
     },

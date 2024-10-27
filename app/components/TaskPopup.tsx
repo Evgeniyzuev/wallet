@@ -8,8 +8,8 @@ interface TaskPopupProps {
   title: string;
   description: string;
   reward: number;
-  onAction: () => void;
-  actionText: string;
+  onAction?: () => void;
+  actionText?: string;
   onSecondAction: () => void;
   secondActionText: string;
 }
@@ -47,12 +47,14 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
         <h2 className="text-2xl font-bold mb-4">{title}</h2>
         <p className="text-gray-300 mb-6">{description}</p>
         <div className="flex space-x-4">
-          <button
-            onClick={onAction}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-lg transition duration-300"
-          >
-            {actionText}
-          </button>
+          {actionText && onAction && (
+            <button
+              onClick={onAction}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-lg transition duration-300"
+            >
+              {actionText}
+            </button>
+          )}
           <button
             onClick={onSecondAction}
             className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg text-lg transition duration-300"
