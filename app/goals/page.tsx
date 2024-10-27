@@ -21,7 +21,7 @@ export default function FriendsPage() {
           <span>💁‍♂️ персональное</span>
           <span>👨‍👩‍👦‍👦 социальное</span>
           <span>🗺 карта желаний</span>
-          <span>🔮 рекомендации</span>
+          <span>🔮 рекомендации!</span>
         </div>
         <div className="flex flex-col ml-14"> {/* Added margin for spacing */}
           <span>🏋️ health</span>
