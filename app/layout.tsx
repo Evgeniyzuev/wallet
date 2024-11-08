@@ -32,7 +32,12 @@ export default function RootLayout({
         {/* <link rel="icon" href="data:,"></link> */}
       </head>
       <body>
-        <TonConnectUIProvider manifestUrl="https://blush-keen-constrictor-906.mypinata.cloud/ipfs/QmSBEGs7dqLGi5SAWGYfQpmp7uW8bWjy2KpiBiWSviWHRZ">
+        <TonConnectUIProvider 
+        manifestUrl="https://blush-keen-constrictor-906.mypinata.cloud/ipfs/QmSBEGs7dqLGi5SAWGYfQpmp7uW8bWjy2KpiBiWSviWHRZ"
+        actionsConfiguration={{
+          twaReturnUrl: 'https://t.me/WeAiBot_bot/WeAi'
+        }}
+        >
           <UserProvider>
             {/* {usePathname() !== '/' && <BackButton />} */}
             {children}

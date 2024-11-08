@@ -1,0 +1,79 @@
+#pragma version =0.4.5;
+
+;; Storage
+;; owner_address: MsgAddress
+;; users: HashmapE(256, Coins) ;; telegram_id -> balance
+;; ton_price: Coins ;; Current TON/USD price stored in contract
+
+() save_data(slice owner, cell users, int ton_price) impure inline {
+    begin_cell()
+        .store_slice(owner)
+        .store_dict(users)
+        .store_coins(ton_price)
+        .end_cell()
+        .set_data();
+}
+
+(slice, cell, int) load_data() inline {
+    slice ds = get_data().begin_parse();
+    return (
+        ds~load_msg_addr(),  ;; owner
+        ds~load_dict(),      ;; users
+        ds~load_coins()      ;; ton_price
+    );
+}
+
+() recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
+    slice cs = in_msg_full.begin_parse();
+    int flags = cs~load_uint(4);
+    slice sender_address = cs~load_msg_addr();
+    
+    ;; Load contract data
+    (slice owner, cell users, int ton_price) = load_data();
+    
+    ;; Handle deposit
+    if (in_msg_body.slice_bits() >= 32) {
+        int op = in_msg_body~load_uint(32);
+        
+        if (op == 0) {  ;; Deposit operation
+            int user_id = in_msg_body~load_uint(64);  ;; Telegram user ID
+            throw_unless(708, user_id != 0);  ;; Ensure user_id is provided
+            int ton_amount = msg_value;
+            
+            ;; Calculate USD amount using stored price
+            int usd_amount = (ton_amount * ton_price) / 1000000000; ;; Adjust for decimals
+            
+            ;; Update user balance
+            (slice user_balance, int found?) = users.udict_get?(256, user_id);
+            int new_balance = (found? ? user_balance~load_coins() : 0) + usd_amount;
+            
+            users~udict_set(256, user_id, begin_cell().store_coins(new_balance).end_cell());
+            save_data(owner, users, ton_price);
+            
+            return ();
+        }
+        
+        if (op == 1) {  ;; Update TON price (only owner can do this)
+            throw_unless(707, equal_slices(sender_address, owner));
+            int new_price = in_msg_body~load_coins();
+            save_data(owner, users, new_price);
+            return ();
+        }
+    }
+}
+
+;; Get current TON price
+(int) get_ton_price() method_id {
+    (_, _, int price) = load_data();
+    return price;
+}
+
+;; Get user balance
+(int) get_user_balance(int user_id) method_id {
+    (_, cell users, _) = load_data();
+    (slice balance, int found?) = users.udict_get?(256, user_id);
+    if (found?) {
+        return balance~load_coins();
+    }
+    return 0;
+}
