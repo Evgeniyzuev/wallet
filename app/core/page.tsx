@@ -249,12 +249,12 @@ export default function Core() {
       <div className="h-48 rounded-lg overflow-hidden relative mb-1">
         <Image src={currentImage} alt="AI Assistant" className="w-full h-full object-cover" />
         <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex items-center">
-          <div className="relative w-80 opacity-40 h-4 mr-10 bg-gray-700 rounded-full overflow-hidden">
+          <div className="relative w-80 opacity-80 h-4 mr-10 bg-gray-700 rounded-full overflow-hidden">
             <div
               className="absolute top-0 left-0 h-full bg-yellow-500"
               style={{ width: `${progressPercentage}%` }}
             />
-            <div className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+            <div className="absolute inset-0 opacity-100 flex items-center justify-center text-xs font-bold text-yellow-500 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
               {Math.floor((user?.aicoreBalance || 0) * 100) / 100}$ / {balanceRequiredForNextLevel[aicoreLevel]}$
             </div>
           </div>
