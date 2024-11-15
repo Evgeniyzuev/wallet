@@ -254,7 +254,7 @@ export default function Core() {
               className="absolute top-0 left-0 h-full bg-yellow-500"
               style={{ width: `${progressPercentage}%` }}
             />
-            <div className="absolute inset-0 opacity-100 flex items-center justify-center text-xs font-bold text-yellow-500 drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
+            <div className="absolute inset-0 opacity-100 flex items-center justify-center text-xs font-bold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.8)]">
               {Math.floor((user?.aicoreBalance || 0) * 100) / 100}$ / {balanceRequiredForNextLevel[aicoreLevel]}$
             </div>
           </div>
