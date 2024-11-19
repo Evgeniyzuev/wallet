@@ -11,21 +11,16 @@ export default function Wallet() {
   const [amount, setAmount] = useState<string>('');
   // const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
-  const [handleTonSend, setHandleTonSend] = useState<((amount: string) => Promise<void>) | null>(null);
 
   const handleButtonClick = (action: string) => {
     setSelectedAction(action);
     setAmount('');
   };
 
-  const handleTonConnectReady = (sendFunction: (amount: string) => Promise<void>) => {
-    setHandleTonSend(sendFunction);
-  };
-
   const handleActionSubmit = async () => {
     if (isTransactionInProgress) {
       console.error('Transaction already in progress');
-      return;
+      return; // Prevent further actions if a transaction is in progress
     }
 
     if (!amount || isNaN(Number(amount))) {
@@ -37,19 +32,13 @@ export default function Wallet() {
     let result;
 
     try {
-      setIsTransactionInProgress(true);
+      setIsTransactionInProgress(true); // Set the transaction in progress state
 
       switch (selectedAction) {
         case 'receive':
-          if (handleTonSend) {
-            await handleTonSend(amount);
-            result = await handleUpdateUser({
-              walletBalance: amountNumber
-            });
-          } else {
-            console.error('TON wallet not connected');
-            return;
-          }
+          result = await handleUpdateUser({
+            walletBalance: amountNumber
+          });
           break;
         case 'send':
           if (amountNumber > (user?.walletBalance || 0)) {
@@ -89,7 +78,7 @@ export default function Wallet() {
     } catch (error) {
       console.error('Error during transaction:', error);
     } finally {
-      setIsTransactionInProgress(false);
+      setIsTransactionInProgress(false); // Reset the transaction state
       setSelectedAction(null);
       setAmount('');
     }
@@ -173,9 +162,7 @@ export default function Wallet() {
           </div>
         )}
         
-        {selectedAction === 'receive' && <TonConnect onSendToncoin={async (callback) => {
-          if (handleTonSend) await handleTonSend(amount);
-        }} />}
+        {selectedAction === 'receive' && <TonConnect />}
 
         <div className="mt-8 p-4 bg-gray-800 rounded-lg">
           <div className="flex items-center justify-between">

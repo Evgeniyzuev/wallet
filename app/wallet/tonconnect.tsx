@@ -8,11 +8,43 @@ import TonWeb from "tonweb";
 import { useTransactionStatus } from '../hooks/useTransactionStatus';
 import { useUser } from '../UserContext';
 
-interface TonConnectProps {
-  onSendToncoin?: (callback: () => Promise<void>) => Promise<void>;
-}
 
-export default function TonConnect({ onSendToncoin }: TonConnectProps) {
+
+
+ 
+
+// const forwardPayload = beginCell()
+//     .storeUint(0, 32) // 0 opcode means we have a comment
+//     .storeStringTail('Hello, TON!')
+//     .endCell();
+
+// const body = beginCell()
+//     // .storeUint(0xf8a7ea5, 32) // opcode for jetton transfer
+//     // .storeUint(0, 64) // query id
+//     // .storeCoins(toNano("0.5")) // Jetton amount for transfer (decimals = 6 - USDT, 9 - default). Function toNano use decimals = 9 (remember it)
+//     // .storeAddress(destinationAddress) // TON wallet destination address
+//     // .storeAddress(destinationAddress) // response excess destination
+//     // .storeBit(0) // no custom payload
+//     // .storeCoins(toNano("0.2")) // forward amount (if >0, will send notification message)
+//     // .storeBit(1) // we store forwardPayload as a reference
+//     // .storeRef(forwardPayload)
+//     // .endCell();
+//     .storeUint(0xf8a7ea5, 32) // op transfer
+//     .storeUint(0, 64) // queryId
+//     .storeCoins(toNano(2)) // deposit_amount
+//     .storeAddress(
+//       Address.parse(destinationAddress.toString()),
+//     ) // receiver address
+//     .storeAddress(Address.parse(destinationAddress.toString())) //response_adress - address nhận phí GD thừa
+//     .storeMaybeRef(null) // custom_payload
+//     .storeCoins(toNano("0.05")) // forward_ton_amount
+//     .storeMaybeRef(beginCell().storeStringTail("something").endCell()) // forward_payload_amount if receiver is a smart contract
+//     .endCell();
+
+
+
+
+export default function TonConnect() {
   const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY}));
   const [tonConnectUI] = useTonConnectUI();
   const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
@@ -214,12 +246,6 @@ export default function TonConnect({ onSendToncoin }: TonConnectProps) {
   //     setWalletBalance(newBalance);
   //   }
   // }, [user, handleUpdateUser]);
-
-  useEffect(() => {
-    if (onSendToncoin) {
-      onSendToncoin(handleSendToncoin);
-    }
-  }, [onSendToncoin]);
 
   return (
     <main className="flex min-h-screen flex-col">
