@@ -162,7 +162,7 @@ export default function Wallet() {
           </div>
         )}
         
-        {/* {selectedAction === 'receive' && <TonConnect />} */}
+        {selectedAction === 'receive' && <TonConnect />}
 
         <div className="mt-8 p-4 bg-gray-800 rounded-lg">
           <div className="flex items-center justify-between">
