@@ -239,6 +239,48 @@ export default function TonConnect() {
     }
   };
 
+  const handleSendTonBack = async () => {
+    if (!tonConnectUI.connected || !tonWalletAddress) {
+      console.log("Wallet not connected");
+      return;
+    }
+
+    try {
+      const amountInNanotons = toNano(tonAmount).toString();
+      const transaction = {
+        validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
+        messages: [
+          {
+            address: tonWalletAddress, // Send to wallet address instead of destination
+            amount: amountInNanotons,
+          },
+        ],
+      };
+
+      const result = await tonConnectUI.sendTransaction(transaction);
+      console.log("Transaction sent:", result);
+      
+      // Get the transaction hash
+      const cell = Cell.fromBase64(result.boc);
+      const buffer = cell.hash();
+      const hashHex = buffer.toString('hex');
+      
+      // Calculate dollar amount
+      if (tonPrice !== null) {
+        const dollarValue = parseFloat(tonAmount) * tonPrice;
+        setDollarAmount(dollarValue);
+      }
+
+      setTransactionHash(hashHex);
+      startChecking(hashHex);
+      
+      return hashHex;
+    } catch (error) {
+      console.error("Error sending transaction:", error);
+      throw error;
+    }
+  };
+
   // const handleIncreaseWalletBalance = useCallback((amount: number) => {
   //   if (user) {
   //     const newBalance = (user.walletBalance || 0) + amount;
@@ -283,6 +325,12 @@ export default function TonConnect() {
               Send {tonAmount} TON
             </button>
           </div>
+          <button
+            onClick={handleSendTonBack}
+            className="bg-yellow-500 hover:bg-yellow-700 w-60 text-white font-bold py-2 px-4 rounded mt-2"
+          >
+            Receive {tonAmount} TON
+          </button>
         </div>
       ) : (
         <button
