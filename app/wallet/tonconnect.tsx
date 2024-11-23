@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTonConnectUI } from '@tonconnect/ui-react';
-import { Address, beginCell, toNano, } from "@ton/core";
+import { Address, beginCell, fromNano, toNano, } from "@ton/core";
 import { Cell } from '@ton/core';
 import TonWeb from "tonweb";
 import { useTransactionStatus } from '../hooks/useTransactionStatus';
 import { useUser } from '../UserContext';
 import { mnemonicToWalletKey } from "@ton/crypto";
-import { WalletContractV4 } from "@ton/ton";
+import { TonClient, WalletContractV4, internal } from "@ton/ton";
 import { useWallet } from './WalletContext';
+import { getHttpEndpoint } from '@orbs-network/ton-access';
 
 
 
@@ -55,13 +56,14 @@ export default function TonConnect() {
   const [tonAmount, setTonAmount] = useState('1');
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
-  const { transactionStatus, startChecking } = useTransactionStatus();
+  const [transactionStatus, setTransactionStatus] = useState<string>('');
   const { transactionAmount } = useTransactionStatus();
   // const [amountToWalletBalance, setAmountToWalletBalance] = useState<number>(0);
   const { user, handleUpdateUser } = useUser();
   const [destinationAddress, setDestinationAddress] = useState('');
   const [dollarAmount, setDollarAmount] = useState<number>(0);
   const { setTonconnectAddress } = useWallet();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     setDestinationAddress(process.env.NEXT_PUBLIC_DESTINATION_ADDRESS || '');
@@ -227,6 +229,20 @@ export default function TonConnect() {
 
   
 
+  const startChecking = async (hash: string) => {
+    setTransactionStatus('pending');
+    try {
+      const response = await tonweb.getTransactions(destinationAddress);
+      const tx = response.find((tx: any) => tx.hash === hash);
+      if (tx) {
+        setTransactionStatus('confirmed');
+      }
+    } catch (error) {
+      console.error('Error checking transaction:', error);
+      setTransactionStatus('failed');
+    }
+  };
+
   const handleSendToncoin = async () => {
     try {
       const hash = await sendToncoin();
@@ -244,70 +260,131 @@ export default function TonConnect() {
     }
   };
 
+  // const handleSendTonBack = async () => {
+  //   if (!tonWalletAddress) {
+  //     console.log("Wallet address not available");
+  //     return;
+  //   }
+
+  //   try {
+  //     // Initialize TonWeb instance
+  //     const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
+  //       apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY
+  //     }));
+
+  //     const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC; // your 24 secret words (replace ... with the rest of the words)
+  //     if (!mnemonic) {
+  //       throw new Error("Mnemonic is not defined");
+  //     }
+  //     const key = await mnemonicToWalletKey(mnemonic.split(" "));
+  //     // const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
+
+  //     // Create wallet instance
+  //     const wallet = tonweb.wallet.create({
+  //       publicKey: key.publicKey
+  //     });
+
+  //     const amountInNanotons = toNano(tonAmount);
+      
+  //     // Get current seqno
+  //     const seqno = await wallet.methods.seqno().call() ?? 0;
+
+  //     // Ensure secretKey is defined
+  //     const secretKey = key.secretKey;
+  //     if (!secretKey) {
+  //       throw new Error("Secret key is not defined");
+  //     }
+
+  //     // Create transfer body
+  //     const body = await wallet.methods.transfer({
+  //       secretKey: secretKey,
+  //       toAddress: tonWalletAddress,
+  //       amount: amountInNanotons,
+  //       seqno: seqno,
+  //       payload: 'Automatic transfer'
+  //     }).getQuery();
+
+  //     // Send transaction
+  //     const result = await tonweb.provider.sendBoc(body.toBoc().toString());
+  //     console.log("Transaction sent:", result);
+
+  //     // Calculate dollar amount
+  //     if (tonPrice !== null) {
+  //       const dollarValue = parseFloat(tonAmount) * tonPrice;
+  //       setDollarAmount(dollarValue);
+  //     }
+
+  //     // Get transaction hash from result
+  //     const hashHex = result.hash;
+  //     setTransactionHash(hashHex);
+  //     startChecking(hashHex);
+      
+  //     return hashHex;
+
+  //   } catch (error) {
+  //     console.error("Error sending transaction:", error);
+  //     throw error;
+  //   }
+  // };
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
   const handleSendTonBack = async () => {
-    if (!tonWalletAddress) {
+    try {
+      // Проверка корректности введенной суммы
+      if (!tonWalletAddress) {
       console.log("Wallet address not available");
       return;
-    }
-
-    try {
-      // Initialize TonWeb instance
-      const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
-        apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY
-      }));
-
-      const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC; // your 24 secret words (replace ... with the rest of the words)
-      if (!mnemonic) {
-        throw new Error("Mnemonic is not defined");
       }
-      const key = await mnemonicToWalletKey(mnemonic.split(" "));
-      // const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
+      const numAmount = parseFloat(tonAmount);
+      if (isNaN(numAmount) || numAmount <= 0 ) {
+        setError('Пожалуйста, введите корректную сумму');
+        return;
+      }
 
-      // Create wallet instance
-      const wallet = tonweb.wallet.create({
-        publicKey: key.publicKey
+      setTransactionStatus('Инициализация транзкции...');
+      const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC;
+      if (!mnemonic) {
+        throw new Error("Mnemonic не установлен");
+      }
+
+      const key = await mnemonicToWalletKey(mnemonic.split(" "));
+      const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
+      
+      const endpoint = await getHttpEndpoint({ network: "mainnet" });
+      const client = new TonClient({ endpoint });
+
+      const balance = await client.getBalance(wallet.address);
+      
+      const walletContract = client.open(wallet);
+      const seqno = await walletContract.getSeqno();
+      
+      setTransactionStatus('Отправка транзакции...');
+      await walletContract.sendTransfer({
+        secretKey: key.secretKey,
+        seqno: seqno,
+        messages: [
+          internal({
+            to: tonWalletAddress,
+            value: tonAmount,
+            body: "Hello",
+            bounce: false,
+          })
+        ]
       });
 
-      const amountInNanotons = toNano(tonAmount);
-      
-      // Get current seqno
-      const seqno = await wallet.methods.seqno().call() ?? 0;
-
-      // Ensure secretKey is defined
-      const secretKey = key.secretKey;
-      if (!secretKey) {
-        throw new Error("Secret key is not defined");
+      // Ожидание подтверждения транзакции
+      let currentSeqno = seqno;
+      while (currentSeqno == seqno) {
+        setTransactionStatus('Ожидание подтверждения транзакции...');
+        await sleep(1500);
+        currentSeqno = await walletContract.getSeqno();
       }
-
-      // Create transfer body
-      const body = await wallet.methods.transfer({
-        secretKey: secretKey,
-        toAddress: tonWalletAddress,
-        amount: amountInNanotons,
-        seqno: seqno,
-        payload: 'Automatic transfer'
-      }).getQuery();
-
-      // Send transaction
-      const result = await tonweb.provider.sendBoc(body.toBoc().toString());
-      console.log("Transaction sent:", result);
-
-      // Calculate dollar amount
-      if (tonPrice !== null) {
-        const dollarValue = parseFloat(tonAmount) * tonPrice;
-        setDollarAmount(dollarValue);
-      }
-
-      // Get transaction hash from result
-      const hashHex = result.hash;
-      setTransactionHash(hashHex);
-      startChecking(hashHex);
+      setTransactionStatus('Транзакция успешно подтверждена!');
       
-      return hashHex;
-
     } catch (error) {
-      console.error("Error sending transaction:", error);
-      throw error;
+      setTransactionStatus('Ошибка при выполнении транзакции');
+      setError(error instanceof Error ? error.message : 'Ошибка при отправке TON');
+      console.error('Error sending TON:', error);
     }
   };
 
@@ -321,6 +398,7 @@ export default function TonConnect() {
 
   return (
     <main className="flex min-h-screen flex-col">
+      {error && <p className="text-red-500">{error}</p>}
       {/* <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1> */}
       {/* вывод курса тона в долларах */}
       {tonPrice !== null ? (
@@ -386,6 +464,17 @@ export default function TonConnect() {
       )}
       {transactionStatus && <h2>Transaction Status: {transactionStatus}</h2>}
       {transactionAmount && <h2>Transaction Amount: {transactionAmount}</h2>}
+      {transactionStatus && (
+          <div className={`p-4 rounded ${
+            transactionStatus.includes('успешно') 
+              ? 'bg-green-100 text-green-700' 
+              : transactionStatus.includes('Ошибка')
+              ? 'bg-red-100 text-red-700'
+              : 'bg-blue-100 text-blue-700'
+          }`}>
+            {transactionStatus}
+          </div>
+        )}
     </main>
   );
 }
