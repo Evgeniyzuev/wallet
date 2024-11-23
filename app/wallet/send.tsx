@@ -21,7 +21,7 @@ const formatAddress = (address: string) => {
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string>('');
-  const [workchain, setWorkchain] = useState<number | null>(null);
+//   const [workchain, setWorkchain] = useState<number | null>(null);
   const [balance, setBalance] = useState<string>('');
   const [error, setError] = useState<string>('');
   const [transactionStatus, setTransactionStatus] = useState<string>('');
@@ -30,7 +30,7 @@ export default function Home() {
   const [tonConnectUI] = useTonConnectUI();
   const { user, handleUpdateUser } = useUser();
   const [tonPrice, setTonPrice] = useState<number | null>(null);
-  const [maxAmount, setMaxAmount] = useState<number>(0);
+//   const [maxAmount, setMaxAmount] = useState<number>(0);
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonConnectAddress(address);
@@ -69,7 +69,7 @@ export default function Home() {
         const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
         
         setWalletAddress(wallet.address.toString({ testOnly: true }));
-        setWorkchain(wallet.address.workChain);
+        // setWorkchain(wallet.address.workChain);
         setError('');
          // initialize ton rpc client on testnet
         const endpoint = await getHttpEndpoint({ network: "mainnet" });
@@ -78,10 +78,6 @@ export default function Home() {
         // query balance from chain
         const balance = await client.getBalance(wallet.address);
         setBalance(fromNano(balance));
-        setMaxAmount(user?.walletBalance && tonPrice 
-          ? Math.min(parseFloat(fromNano(balance)), user.walletBalance / tonPrice)
-          : 0
-        );
 
         // query seqno from chain
         const walletContract = client.open(wallet);
@@ -152,7 +148,7 @@ export default function Home() {
       const usdAmount = numAmount * tonPrice;
 
       // Check if user has enough balance
-      if (!user || usdAmount > (maxAmount)) {
+      if (!user || usdAmount > (user.walletBalance)) {
         setError('Недостаточно средств на балансе');
         return;
       }
@@ -249,7 +245,7 @@ export default function Home() {
             onChange={(e) => setAmount(e.target.value)}
             step="0.01"
             min="0"
-            max={maxAmount}
+            max={user?.walletBalance}
             placeholder="Enter amount"
             className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
           />
@@ -261,7 +257,7 @@ export default function Home() {
           </button>
         </div>
 
-        <h1 className="text-lg">Максимально допустимая сумма: {maxAmount.toFixed(2)} TON</h1>
+        <h1 className="text-lg">Максимально допустимая сумма: {user?.walletBalance} TON</h1>
       {error ? (
         <div className="text-red-500 mb-4">{error}</div>
       ) : (
