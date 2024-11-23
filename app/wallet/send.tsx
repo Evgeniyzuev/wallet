@@ -18,7 +18,7 @@ export default function Home() {
   const [error, setError] = useState<string>('');
   const [transactionStatus, setTransactionStatus] = useState<string>('');
   const [amount, setAmount] = useState<string>('0.05');
-  const { tonWalletAddress } = useWallet();
+  const { tonConnectAddress } = useWallet();
 
   useEffect(() => {
     async function getWalletInfo() {
@@ -83,7 +83,7 @@ export default function Home() {
       if (!mnemonic) {
         throw new Error("Mnemonic не установлен");
       }
-      if (!tonWalletAddress) {
+      if (!tonConnectAddress) {
         throw new Error("Tonconnect адрес не установлен");
       }
 
@@ -105,7 +105,7 @@ export default function Home() {
         seqno: seqno,
         messages: [
           internal({
-            to: tonWalletAddress,
+            to: tonConnectAddress,
             value: amount,
             body: "Hello",
             bounce: false,
@@ -142,7 +142,7 @@ export default function Home() {
           </div>
           <div className="font-mono break-all">
             <span className="font-bold">Адрес Tonconnect:</span>{' '}
-            {tonWalletAddress || 'Загрузка...'}
+            {tonConnectAddress || 'Загрузка...'}
           </div>
           <p>
             <span className="font-bold">Воркчейн:</span>{' '}
