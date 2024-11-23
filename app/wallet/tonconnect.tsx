@@ -9,6 +9,7 @@ import { useTransactionStatus } from '../hooks/useTransactionStatus';
 import { useUser } from '../UserContext';
 import { mnemonicToWalletKey } from "@ton/crypto";
 import { WalletContractV4 } from "@ton/ton";
+import { useWallet } from './WalletContext';
 
 
 
@@ -60,6 +61,7 @@ export default function TonConnect() {
   const { user, handleUpdateUser } = useUser();
   const [destinationAddress, setDestinationAddress] = useState('');
   const [dollarAmount, setDollarAmount] = useState<number>(0);
+  const { setTonconnectAddress } = useWallet();
 
   useEffect(() => {
     setDestinationAddress(process.env.NEXT_PUBLIC_DESTINATION_ADDRESS || '');
@@ -111,9 +113,10 @@ export default function TonConnect() {
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonWalletAddress(address);
+    setTonconnectAddress(address);
     console.log("Wallet connected successfully!");
     setIsLoading(false);
-  }, []);
+  }, [setTonconnectAddress]);
 
   const handleWalletDisconnection = useCallback(() => {
     setTonWalletAddress(null);
@@ -356,7 +359,7 @@ export default function TonConnect() {
             onClick={handleSendTonBack}
             className="bg-yellow-500 hover:bg-yellow-700 w-60 text-white font-bold py-2 px-4 rounded mt-2"
           >
-            Receive {tonAmount} TON
+            Send to Tonconnect Wallet {tonAmount} TON
           </button>
         </div>
       ) : (
@@ -371,7 +374,7 @@ export default function TonConnect() {
         <div className="mt-4 text-white p-2 rounded">
           <p className="text-sm">Transaction Message Hash:</p>
           <p className="font-mono text-xs break-all">{transactionHash}</p>
-          {/* время тра��закции */}
+          {/* время тразакции */}
           <p className="text-sm">Transaction Time: {new Date().toLocaleString()}</p>
           {/* сумма транзакции */}
           <p className="text-sm">Transaction Amount: {tonAmount} TON</p>

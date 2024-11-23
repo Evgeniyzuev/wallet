@@ -4,6 +4,7 @@ import "./globals.css";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { useEffect, useState } from 'react';
 import { UserProvider } from './UserContext';
+import { WalletProvider } from './wallet/WalletContext';
 
 export default function RootLayout({
   children,
@@ -39,8 +40,9 @@ export default function RootLayout({
         }}
         >
           <UserProvider>
-            {/* {usePathname() !== '/' && <BackButton />} */}
-            {children}
+            <WalletProvider>
+              {children}
+            </WalletProvider>
           </UserProvider>
         </TonConnectUIProvider>
       </body>
