@@ -11,6 +11,7 @@ import { internal } from "@ton/ton";
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address } from "@ton/core";
 import { useUser } from '../UserContext';
+import { useTonPrice } from '../TonPriceContext';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -29,7 +30,7 @@ export default function Home() {
   const [tonConnectAddress, setTonConnectAddress] = useState<string | null>(null);
   const [tonConnectUI] = useTonConnectUI();
   const { user, handleUpdateUser } = useUser();
-  const [tonPrice, setTonPrice] = useState<number | null>(null);
+  const { tonPrice } = useTonPrice();
 //   const [maxAmount, setMaxAmount] = useState<number>(0);
 
   const handleWalletConnection = useCallback((address: string) => {
@@ -90,23 +91,6 @@ export default function Home() {
     }
 
     getWalletInfo();
-  }, []);
-
-  useEffect(() => {
-    const fetchTonPrice = async () => {
-      try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
-        const data = await response.json();
-        setTonPrice(data['the-open-network'].usd);
-      } catch (error) {
-        console.error('Error fetching TON price:', error);
-      }
-    };
-
-    fetchTonPrice();
-    const interval = setInterval(fetchTonPrice, 60000); // Update every minute
-
-    return () => clearInterval(interval);
   }, []);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {

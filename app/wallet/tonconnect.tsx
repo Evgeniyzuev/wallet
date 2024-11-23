@@ -10,6 +10,7 @@ import { useUser } from '../UserContext';
 import { mnemonicToWalletKey } from "@ton/crypto";
 import { TonClient, WalletContractV4, internal } from "@ton/ton";
 import { getHttpEndpoint } from '@orbs-network/ton-access';
+import { useTonPrice } from '../TonPriceContext';
 // import { useWallet } from './WalletContext';
 
 
@@ -64,6 +65,7 @@ export default function TonConnect() {
   const [dollarAmount, setDollarAmount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   // const { tonConnectAddress, setTonConnectAddress } = useWallet();
+  const { tonPrice } = useTonPrice();
 
   useEffect(() => {
     setDestinationAddress(process.env.NEXT_PUBLIC_DESTINATION_ADDRESS || '');
@@ -87,31 +89,6 @@ export default function TonConnect() {
 
     updateUserBalance();
   }, [transactionStatus, dollarAmount, handleUpdateUser]);
-
-  const [tonPrice, setTonPrice] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchTonPrice = async () => {
-      try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
-        const data = await response.json();
-        setTonPrice(data['the-open-network'].usd);
-      } catch (error) {
-        console.error('Error fetching TON price:', error);
-      }
-    };
-
-    fetchTonPrice();
-    // Optionally, you can set up an interval to update the price periodically
-    const interval = setInterval(fetchTonPrice, 60000); // Update every minute
-
-    return () => clearInterval(interval);
-  }, []);
-
-
-
-
-
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonWalletAddress(address);

@@ -5,6 +5,7 @@ import { useUser } from '../UserContext';
 // import ReceivePopup from '../components/ReceivePopup';
 import TonConnect from './tonconnect';
 import Send from './send';
+import { useTonPrice } from '../TonPriceContext';
 
 export default function Wallet() {
   const { user, handleUpdateUser } = useUser();
@@ -12,24 +13,7 @@ export default function Wallet() {
   const [amount, setAmount] = useState<string>('');
   // const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
-  const [tonPrice, setTonPrice] = useState<number | null>(null);
-
-  useEffect(() => {
-    const fetchTonPrice = async () => {
-      try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
-        const data = await response.json();
-        setTonPrice(data['the-open-network'].usd);
-      } catch (error) {
-        console.error('Error fetching TON price:', error);
-      }
-    };
-
-    fetchTonPrice();
-    const interval = setInterval(fetchTonPrice, 60000); // Update every minute
-
-    return () => clearInterval(interval);
-  }, []);
+  const { tonPrice } = useTonPrice();
 
   // Calculate TON amount from USD balance
   const getTonAmount = () => {
@@ -173,7 +157,7 @@ export default function Wallet() {
         </div>
 
         {( selectedAction === 'upCore') && (
-          <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
+          <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800 max-w-lg mx-auto">
             <h2 className="text-xl font-bold mb-4">
               {selectedAction}
             </h2>

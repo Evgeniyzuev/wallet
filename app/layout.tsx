@@ -4,6 +4,7 @@ import "./globals.css";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { useEffect, useState } from 'react';
 import { UserProvider } from './UserContext';
+import { TonPriceProvider } from './TonPriceContext';
 
 export default function RootLayout({
   children,
@@ -38,9 +39,11 @@ export default function RootLayout({
           twaReturnUrl: 'https://t.me/WeAiBot_bot/WeAi'
         }}
         >
-          <UserProvider>
-            {children}
-          </UserProvider>
+          <TonPriceProvider>
+            <UserProvider>
+              {children}
+            </UserProvider>
+          </TonPriceProvider>
         </TonConnectUIProvider>
       </body>
     </html>
