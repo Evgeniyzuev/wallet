@@ -31,6 +31,7 @@ export default function RootLayout({
         <title>WeAi</title>
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
         {/* <link rel="icon" href="data:,"></link> */}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
       </head>
       <body>
         <TonConnectUIProvider 

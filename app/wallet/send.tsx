@@ -116,8 +116,8 @@ export default function Home() {
     }
 
     const maxUsdBalance = user?.walletBalance || 0;
-    const maxTonBalance = maxUsdBalance / tonPrice;
-    const maxBalance = parseFloat(balance);
+    const maxTonBalance = maxUsdBalance / tonPrice - 0.005;
+    const maxBalance = parseFloat(balance)  - 0.005;
     
     // Проверяем оба ограничения
     if (numAmount * tonPrice > maxUsdBalance) {

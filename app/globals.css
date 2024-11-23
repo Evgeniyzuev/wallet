@@ -38,3 +38,17 @@ body {
 .animate-slide-up {
   animation: slide-up 0.3s ease-out;
 }
+
+html, body {
+  overscroll-behavior: none;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+main {
+  overflow-y: auto;
+  height: 100%;
+  -webkit-overflow-scrolling: touch;
+}

@@ -15,12 +15,12 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
   const pathname = usePathname()
 
   const navItems = [
-    { href: 'home', label: 'Core', icon: <img src={coreIcon.src} alt="Core" className="w-6 h-6" /> },
-    { href: 'ai', label: 'Ai', icon: <img src={messageIcon.src} alt="Ai" className="w-6 h-6" /> },
-    { href: 'wallet', label: 'Wallet', icon: <img src={walletIcon.src} alt="Wallet" className="w-6 h-6" /> },
-    { href: 'tasks', label: 'Tasks', icon: <img src={coinsIcon.src} alt="Tasks" className="w-6 h-6" /> },
-    { href: 'friends', label: 'Frens', icon: <img src={friendsIcon.src} alt="Frens" className="w-6 h-6" /> },
-    { href: 'goals', label: 'Goals', icon: <img src={tasksIcon.src} alt="Goals" className="w-6 h-6" /> },
+    { href: 'home', label: 'Core', icon: <img src={coreIcon.src} alt="Core" className="w-5 h-5" /> },
+    { href: 'ai', label: 'Ai', icon: <img src={messageIcon.src} alt="Ai" className="w-5 h-5" /> },
+    { href: 'wallet', label: 'Wallet', icon: <img src={walletIcon.src} alt="Wallet" className="w-5 h-5" /> },
+    { href: 'tasks', label: 'Tasks', icon: <img src={coinsIcon.src} alt="Tasks" className="w-5 h-5" /> },
+    { href: 'friends', label: 'Frens', icon: <img src={friendsIcon.src} alt="Frens" className="w-5 h-5" /> },
+    { href: 'goals', label: 'Goals', icon: <img src={tasksIcon.src} alt="Goals" className="w-5 h-5" /> },
   ]
 
   return (
@@ -33,7 +33,7 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
             <button
               key={item.href}
               onClick={() => setCurrentPage(item.href)}
-              className={`font-medium flex w-1/6 flex-col items-center p-2 rounded-lg transition-all ${
+              className={`font-medium flex w-1/6 flex-col items-center p-1 rounded-lg transition-all text-sm ${
                 isActive
                   ? 'text-blue-300 bg-gray-700'
                   : 'text-white hover:text-blue-300 hover:bg-gray-700'
