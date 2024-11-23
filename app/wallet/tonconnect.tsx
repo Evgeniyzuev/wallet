@@ -7,6 +7,8 @@ import { Cell } from '@ton/core';
 import TonWeb from "tonweb";
 import { useTransactionStatus } from '../hooks/useTransactionStatus';
 import { useUser } from '../UserContext';
+import { mnemonicToWalletKey } from "@ton/crypto";
+import { WalletContractV4 } from "@ton/ton";
 
 
 
@@ -240,41 +242,66 @@ export default function TonConnect() {
   };
 
   const handleSendTonBack = async () => {
-    if (!tonConnectUI.connected || !tonWalletAddress) {
-      console.log("Wallet not connected");
+    if (!tonWalletAddress) {
+      console.log("Wallet address not available");
       return;
     }
 
     try {
-      const amountInNanotons = toNano(tonAmount).toString();
-      const transaction = {
-        validUntil: Math.floor(Date.now() / 1000) + 60, // Valid for 60 seconds
-        messages: [
-          {
-            address: tonWalletAddress, // Send to wallet address instead of destination
-            amount: amountInNanotons,
-          },
-        ],
-      };
+      // Initialize TonWeb instance
+      const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
+        apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY
+      }));
 
-      const result = await tonConnectUI.sendTransaction(transaction);
+      const mnemonic = process.env.NEXT_PUBLIC_MNEMONIC_KEY; // your 24 secret words (replace ... with the rest of the words)
+      if (!mnemonic) {
+        throw new Error("Mnemonic is not defined");
+      }
+      const key = await mnemonicToWalletKey(mnemonic.split(" "));
+      // const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
+
+      // Create wallet instance
+      const wallet = tonweb.wallet.create({
+        publicKey: key.publicKey
+      });
+
+      const amountInNanotons = toNano(tonAmount);
+      
+      // Get current seqno
+      const seqno = await wallet.methods.seqno().call() ?? 0;
+
+      // Ensure secretKey is defined
+      const secretKey = key.secretKey;
+      if (!secretKey) {
+        throw new Error("Secret key is not defined");
+      }
+
+      // Create transfer body
+      const body = await wallet.methods.transfer({
+        secretKey: secretKey,
+        toAddress: tonWalletAddress,
+        amount: amountInNanotons,
+        seqno: seqno,
+        payload: 'Automatic transfer'
+      }).getQuery();
+
+      // Send transaction
+      const result = await tonweb.provider.sendBoc(body.toBoc().toString());
       console.log("Transaction sent:", result);
-      
-      // Get the transaction hash
-      const cell = Cell.fromBase64(result.boc);
-      const buffer = cell.hash();
-      const hashHex = buffer.toString('hex');
-      
+
       // Calculate dollar amount
       if (tonPrice !== null) {
         const dollarValue = parseFloat(tonAmount) * tonPrice;
         setDollarAmount(dollarValue);
       }
 
+      // Get transaction hash from result
+      const hashHex = result.hash;
       setTransactionHash(hashHex);
       startChecking(hashHex);
       
       return hashHex;
+
     } catch (error) {
       console.error("Error sending transaction:", error);
       throw error;
@@ -344,7 +371,7 @@ export default function TonConnect() {
         <div className="mt-4 text-white p-2 rounded">
           <p className="text-sm">Transaction Message Hash:</p>
           <p className="font-mono text-xs break-all">{transactionHash}</p>
-          {/* время транзакции */}
+          {/* время тра��закции */}
           <p className="text-sm">Transaction Time: {new Date().toLocaleString()}</p>
           {/* сумма транзакции */}
           <p className="text-sm">Transaction Amount: {tonAmount} TON</p>
