@@ -31,7 +31,7 @@ export default function Home() {
       }
     };
 
-    // checkWalletConnection();
+    checkWalletConnection();
 
     // const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
     //   if (wallet) {
