@@ -10,7 +10,7 @@ import { useUser } from '../UserContext';
 import { mnemonicToWalletKey } from "@ton/crypto";
 import { TonClient, WalletContractV4, internal } from "@ton/ton";
 import { getHttpEndpoint } from '@orbs-network/ton-access';
-import { useWallet } from './WalletContext';
+// import { useWallet } from './WalletContext';
 
 
 
@@ -63,7 +63,7 @@ export default function TonConnect() {
   const [destinationAddress, setDestinationAddress] = useState('');
   const [dollarAmount, setDollarAmount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-  const { tonConnectAddress, setTonConnectAddress } = useWallet();
+  // const { tonConnectAddress, setTonConnectAddress } = useWallet();
 
   useEffect(() => {
     setDestinationAddress(process.env.NEXT_PUBLIC_DESTINATION_ADDRESS || '');
@@ -115,14 +115,14 @@ export default function TonConnect() {
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonWalletAddress(address);
-    setTonConnectAddress(address);
+    // setTonConnectAddress(address);
     console.log("Wallet connected successfully!");
     setIsLoading(false);
   }, []);
 
   const handleWalletDisconnection = useCallback(() => {
     setTonWalletAddress(null);
-    setTonConnectAddress(null);
+    // setTonConnectAddress(null);
     console.log("Wallet disconnected successfully!");
     setIsLoading(false);
   }, []);
@@ -436,7 +436,7 @@ export default function TonConnect() {
       {tonWalletAddress ? (
         <div className="flex flex-col items-center">
           <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
-          <p className="mb-4">Connected: {formatAddress(tonConnectAddress || 'loading...')}</p>
+          {/* <p className="mb-4">Connected: {formatAddress(tonConnectAddress || 'loading...')}</p> */}
 
 
           <button
