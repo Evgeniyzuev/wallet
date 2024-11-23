@@ -172,7 +172,7 @@ export default function Wallet() {
 
         </div>
 
-        {( selectedAction === 'upCore' || selectedAction === 'receive') && (
+        {( selectedAction === 'upCore') && (
           <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
             <h2 className="text-xl font-bold mb-4">
               {selectedAction}
