@@ -20,40 +20,40 @@ export default function Home() {
   const [amount, setAmount] = useState<string>('0.05');
   const { tonconnectAddress } = useWallet();
 
-  // useEffect(() => {
-  //   async function getWalletInfo() {
-  //     try {
-  //       const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC;
-  //       if (!mnemonic) {
-  //         throw new Error("Mnemonic не установлен");
-  //       }
+  useEffect(() => {
+    async function getWalletInfo() {
+      try {
+        const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC;
+        if (!mnemonic) {
+          throw new Error("Mnemonic не установлен");
+        }
         
-  //       const key = await mnemonicToWalletKey(mnemonic.split(" "));
-  //       const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
+        const key = await mnemonicToWalletKey(mnemonic.split(" "));
+        const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
         
-  //       setWalletAddress(wallet.address.toString({ testOnly: true }));
-  //       setWorkchain(wallet.address.workChain);
-  //       setError('');
-  //        // initialize ton rpc client on testnet
-  //       const endpoint = await getHttpEndpoint({ network: "mainnet" });
-  //       const client = new TonClient({ endpoint });
+        setWalletAddress(wallet.address.toString({ testOnly: true }));
+        setWorkchain(wallet.address.workChain);
+        setError('');
+         // initialize ton rpc client on testnet
+        const endpoint = await getHttpEndpoint({ network: "mainnet" });
+        const client = new TonClient({ endpoint });
 
-  //       // query balance from chain
-  //       const balance = await client.getBalance(wallet.address);
-  //       setBalance(fromNano(balance));
+        // query balance from chain
+        const balance = await client.getBalance(wallet.address);
+        setBalance(fromNano(balance));
 
-  //       // query seqno from chain
-  //       const walletContract = client.open(wallet);
-  //       const seqno = await walletContract.getSeqno();
-  //       console.log("seqno:", seqno);
-  //     } catch (error) {
-  //       setError(error instanceof Error ? error.message : 'Произошла ошибка');
-  //       console.error('Error getting wallet info:', error);
-  //     }
-  //   }
+        // query seqno from chain
+        const walletContract = client.open(wallet);
+        const seqno = await walletContract.getSeqno();
+        console.log("seqno:", seqno);
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Произошла ошибка');
+        console.error('Error getting wallet info:', error);
+      }
+    }
 
-  //   getWalletInfo();
-  // }, []);
+    getWalletInfo();
+  }, []);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = e.target.value;
@@ -129,7 +129,29 @@ export default function Home() {
   return (
     <main className="p-4">
       <h1 className="text-2xl font-bold mb-4">Информация о кошельке</h1>
-      <p>Send to address: {tonconnectAddress}</p>
+      {error ? (
+        <div className="text-red-500 mb-4">{error}</div>
+      ) : (
+        <div className="space-y-2">
+          <p className="font-mono">
+            <span className="font-bold">Адрес кошелька:</span>{' '}
+            {walletAddress || 'Загрузка...'}
+          </p>
+          <p>
+            <span className="font-bold">Адрес Tonconnect:</span>{' '}
+            {tonconnectAddress || 'Загрузка...'}
+          </p>
+          <p>
+            <span className="font-bold">Воркчейн:</span>{' '}
+            {workchain !== null ? workchain : 'Загрузка...'}
+          </p>
+          <p>
+            <span className="font-bold">Баланс:</span>{' '}
+            {balance ? `${balance} TON` : 'Загрузка...'}
+          </p>
+        </div>
+      )}
+      {/* <p>Send to address: {tonconnectAddress}</p> */}
 
       <div className="mt-4 space-y-4">
         <div className="flex items-center space-x-2">
