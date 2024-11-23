@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useUser } from '../UserContext';
 // import ReceivePopup from '../components/ReceivePopup';
 import TonConnect from './tonconnect';
+import Send from './send';
 
 export default function Wallet() {
   const { user, handleUpdateUser } = useUser();
@@ -163,6 +164,7 @@ export default function Wallet() {
         )}
         
         {selectedAction === 'receive' && <TonConnect />}
+        {selectedAction === 'send' && <Send />}
 
         <div className="mt-8 p-4 bg-gray-800 rounded-lg">
           <div className="flex items-center justify-between">
