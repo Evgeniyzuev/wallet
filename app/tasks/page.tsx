@@ -84,23 +84,27 @@ export default function Home() {
           <button 
             key={index}
             onClick={() => handleOpenPopup(task)}
-            className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all text-white font-bold py-2 px-4 mt-1 w-full"
+            className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all text-white font-bold py-1 px-1 mt-1 w-full"
           >
             <div className="flex items-center">
-              <div className="w-10 h-10 mr-2 flex-shrink-0">
+              <div className="w-12 h-12 mr-2 flex-shrink-0">
                 <Image
                   src={task.image}
                   alt={task.title}
-                  width={40}
-                  height={40}
-                  className="rounded-md"
+                  width={48}
+                  height={48}
+                  className="rounded-md w-full h-full object-cover"
                 />
               </div>
               <div className="flex-grow text-left">{task.title}
               <div className="text-sm text-green-300 flex-shrink-0">🔘{task.reward} $</div>
 
               </div>
-              <div className="text-sm text-right text-yellow-300 flex-shrink-0">▶️</div>
+              <div className="text-sm text-right text-yellow-300 flex-shrink-0">
+                <span className="inline-block px-3 py-1 bg-yellow-500 text-black rounded-full text-xs font-bold">
+                  START
+                </span>
+              </div>
 
             </div>
           </button>
