@@ -112,14 +112,28 @@ export default function Home() {
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = e.target.value;
     const numAmount = parseFloat(newAmount);
+    
+    if (!tonPrice) {
+      setError('TON price is not available');
+      return;
+    }
+
+    const maxUsdBalance = user?.walletBalance || 0;
+    const maxTonBalance = maxUsdBalance / tonPrice;
     const maxBalance = parseFloat(balance);
     
-    if (!isNaN(numAmount) && numAmount > maxBalance) {
-      setError('Недостаточно средств на балансе');
-      setAmount(maxBalance.toString()); // Set to maximum available amount
-    } else {
-      setError('');
-      setAmount(newAmount);
+    // Проверяем оба ограничения
+    if (!isNaN(numAmount)) {
+      if (numAmount * tonPrice > maxUsdBalance) {
+        setError('Недостаточно средств на USD балансе');
+        setAmount((maxUsdBalance / tonPrice).toFixed(2));
+      } else if (numAmount > maxBalance) {
+        setError('Недостаточно TON на балансе');
+        setAmount(maxBalance.toString());
+      } else {
+        setError('');
+        setAmount(newAmount);
+      }
     }
   };
 
