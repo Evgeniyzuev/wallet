@@ -337,13 +337,13 @@ export default function TonConnect() {
   // }, [user, handleUpdateUser]);
 
   return (
-    <main className="flex min-h-screen flex-col">
+    <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
+      
       {error && <p className="text-red-500">{error}</p>}
-      {/* <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1> */}
-      {/* вывод курса тона в долларах */}
+
 
       {tonWalletAddress ? (
-        <div className="flex flex-col items-center">
+        <div className="text-center w-full max-w-lg px-4">
           <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
             <h2 className="text-xl font-bold mb-4">
               Receive TON
@@ -374,11 +374,11 @@ export default function TonConnect() {
           >
             Disconnect Wallet
           </button>
-          {/* {tonPrice !== null ? (
+          {tonPrice !== null ? (
         <p className="mb-1">TON Price: ${tonPrice.toFixed(2)}</p>
       ) : (
             <p className="mb-1">Loading TON Price...</p>
-          )} */}
+          )}
         </div>
       ) : (
         <button

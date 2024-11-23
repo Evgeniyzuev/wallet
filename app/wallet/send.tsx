@@ -203,8 +203,8 @@ export default function Home() {
   };
 
   return (
-    <main className="p-4">
-      <div className="flex flex-col items-center">
+    <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
+      <div className="text-center w-full max-w-lg px-4">
         <div className="mt-0 p-4 border border-gray-700 rounded-lg bg-gray-800">
           <h2 className="text-xl font-bold mb-4">
             Send TON
