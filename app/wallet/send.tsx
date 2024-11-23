@@ -29,6 +29,7 @@ export default function Home() {
   const [tonConnectAddress, setTonConnectAddress] = useState<string | null>(null);
   const [tonConnectUI] = useTonConnectUI();
   const { user, handleUpdateUser } = useUser();
+  const [tonPrice, setTonPrice] = useState<number | null>(null);
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonConnectAddress(address);
@@ -90,14 +91,39 @@ export default function Home() {
     getWalletInfo();
   }, []);
 
+  useEffect(() => {
+    const fetchTonPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
+        const data = await response.json();
+        setTonPrice(data['the-open-network'].usd);
+      } catch (error) {
+        console.error('Error fetching TON price:', error);
+      }
+    };
+
+    fetchTonPrice();
+    const interval = setInterval(fetchTonPrice, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = e.target.value;
     const numAmount = parseFloat(newAmount);
     const numBalance = parseFloat(balance);
+    
+    // Calculate max TON amount based on user's wallet balance
+    const maxTonFromWallet = user?.walletBalance && tonPrice 
+      ? (user.walletBalance / tonPrice)
+      : 0;
+    
+    // Use the smaller of the two limits
+    const maxAmount = Math.min(numBalance, maxTonFromWallet);
 
-    if (!isNaN(numAmount) && numAmount > numBalance) {
+    if (!isNaN(numAmount) && numAmount > maxAmount) {
       setError('Недостаточно средств на балансе');
-      setAmount(balance); // Устанавливаем максимально доступную сумму
+      setAmount(maxAmount.toFixed(2)); // Set to maximum available amount
     } else {
       setError('');
       setAmount(newAmount);
@@ -112,12 +138,12 @@ export default function Home() {
         return;
       }
 
-      // Fetch current TON price
-      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
-      const data = await response.json();
-      const tonPrice = data['the-open-network'].usd;
+
 
       // Calculate USD amount
+      if (!tonPrice) {
+        throw new Error("TON price is not available");
+      }
       const usdAmount = numAmount * tonPrice;
 
       // Check if user has enough balance
@@ -127,10 +153,7 @@ export default function Home() {
       }
 
       // Deduct the amount from user's wallet balance before sending transaction
-      const previousBalance = user.walletBalance || 0;
-      await handleUpdateUser({
-        walletBalance: -usdAmount
-      });
+
 
       setTransactionStatus('Инициализация транзакции...');
       const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC;
@@ -141,14 +164,20 @@ export default function Home() {
         throw new Error("Tonconnect адрес не установлен");
       }
 
+
       const key = await mnemonicToWalletKey(mnemonic.split(" "));
       const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
       
       const endpoint = await getHttpEndpoint({ network: "mainnet" });
       const client = new TonClient({ endpoint });
 
-      const balance = await client.getBalance(wallet.address);
-      setBalance(fromNano(balance));
+      const previousBalance = user.walletBalance || 0;
+      await handleUpdateUser({
+        walletBalance: -usdAmount
+      });
+
+      const currentBalance = await client.getBalance(wallet.address);
+      setBalance(fromNano(currentBalance));
       
       const walletContract = client.open(wallet);
       const seqno = await walletContract.getSeqno();
@@ -215,7 +244,10 @@ export default function Home() {
             onChange={handleAmountChange}
             step="0.01"
             min="0"
-            max={balance}
+            max={user?.walletBalance && tonPrice 
+              ? Math.min(parseFloat(balance), user.walletBalance / tonPrice).toFixed(2)
+              : '0'
+            }
             placeholder="Enter amount"
             className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
           />
