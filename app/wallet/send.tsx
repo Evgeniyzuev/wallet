@@ -9,8 +9,14 @@ import { fromNano } from "@ton/core";
 import { internal } from "@ton/ton";
 // import { useWallet } from './WalletContext';
 import { useTonConnectUI } from '@tonconnect/ui-react';
+import { Address } from "@ton/core";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+const formatAddress = (address: string) => {
+  const tempAddress = Address.parse(address).toString();
+  return `${tempAddress.slice(0, 4)}...${tempAddress.slice(-4)}`;
+};
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState<string>('');
@@ -23,31 +29,29 @@ export default function Home() {
   const [tonConnectUI] = useTonConnectUI();
 
   const handleWalletConnection = useCallback((address: string) => {
-    setTonConnectAddress(address); 
+    setTonConnectAddress(address);
+    console.log("Wallet connected successfully!");
+  }, []);
 
   useEffect(() => {
     const checkWalletConnection = async () => {
       if (tonConnectUI.account?.address) {
-        // handleWalletConnection(wallet.account.address);
-        handleWalletConnection(tonConnectUI.account?.address);
-      } 
+        handleWalletConnection(tonConnectUI.account.address);
+      }
     };
 
     checkWalletConnection();
 
-        // Сохраняет адрес в локальном состоянии       // Сохраняет адрес в глобальном контексте
+    const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
+      if (wallet) {
+        handleWalletConnection(wallet.account.address);
+      }
+    });
 
-      }, []);
-
-    // const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
-    //   if (wallet) {
-    //     handleWalletConnection(wallet.account.address);
-    //   } else {
-    //     handleWalletDisconnection();
-    //   }
-    // });
-
-  }, []);
+    return () => {
+      unsubscribe();
+    };
+  }, [tonConnectUI, handleWalletConnection]);
 
   useEffect(() => {
     async function getWalletInfo() {
@@ -171,7 +175,7 @@ export default function Home() {
           </div>
           <div className="font-mono break-all">
             <span className="font-bold">Адрес Tonconnect:</span>{' '}
-            {tonConnectAddress || 'Загрузка...'}
+            {tonConnectAddress ? formatAddress(tonConnectAddress) : 'Не подключен'}
           </div>
           <p>
             <span className="font-bold">Воркчейн:</span>{' '}
