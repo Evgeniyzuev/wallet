@@ -330,21 +330,21 @@ export default function TonConnect() {
 
   const handleSendTonBack = async () => {
     try {
-      // Проверка корректности введенной суммы
       if (!tonWalletAddress) {
-      console.log("Wallet address not available");
-      return;
-      }
-      const numAmount = parseFloat(tonAmount);
-      if (isNaN(numAmount) || numAmount <= 0 ) {
-        setError('Пожалуйста, введите корректную сумму');
+        setError('Wallet address not available');
         return;
       }
 
-      setTransactionStatus('Инициализация транзкции...');
+      const numAmount = parseFloat(tonAmount);
+      if (isNaN(numAmount) || numAmount <= 0) {
+        setError('Please enter a valid amount');
+        return;
+      }
+
+      setTransactionStatus('Initializing transaction...');
       const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC;
       if (!mnemonic) {
-        throw new Error("Mnemonic не установлен");
+        throw new Error("Mnemonic is not set");
       }
 
       const key = await mnemonicToWalletKey(mnemonic.split(" "));
@@ -353,38 +353,64 @@ export default function TonConnect() {
       const endpoint = await getHttpEndpoint({ network: "mainnet" });
       const client = new TonClient({ endpoint });
 
+      // Check deployer wallet balance
       const balance = await client.getBalance(wallet.address);
+      const balanceInTON = fromNano(balance);
       
+      // Ensure sufficient balance
+      if (parseFloat(balanceInTON) < numAmount) {
+        throw new Error(`Insufficient balance in deployer wallet: ${balanceInTON} TON`);
+      }
+
       const walletContract = client.open(wallet);
       const seqno = await walletContract.getSeqno();
       
-      setTransactionStatus('Отправка транзакции...');
+      setTransactionStatus('Sending transaction...');
+      
+      // Convert amount to nano TON
+      const valueInNano = toNano(numAmount);
+      
       await walletContract.sendTransfer({
         secretKey: key.secretKey,
         seqno: seqno,
         messages: [
           internal({
             to: tonWalletAddress,
-            value: tonAmount,
+            value: valueInNano, // Use converted value
             body: "Hello",
             bounce: false,
           })
         ]
       });
 
-      // Ожидание подтверждения транзакции
+      // Wait for confirmation
       let currentSeqno = seqno;
-      while (currentSeqno == seqno) {
-        setTransactionStatus('Ожидание подтверждения транзакции...');
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      while (currentSeqno == seqno && attempts < maxAttempts) {
+        setTransactionStatus(`Waiting for confirmation... Attempt ${attempts + 1}/${maxAttempts}`);
         await sleep(1500);
         currentSeqno = await walletContract.getSeqno();
+        attempts++;
       }
-      setTransactionStatus('Транзакция успешно подтверждена!');
+
+      if (attempts >= maxAttempts) {
+        throw new Error('Transaction confirmation timeout');
+      }
+
+      setTransactionStatus('Transaction confirmed successfully!');
+      setError(null); // Clear any previous errors
       
     } catch (error) {
-      setTransactionStatus('Ошибка при выполнении транзакции');
-      setError(error instanceof Error ? error.message : 'Ошибка при отправке TON');
-      console.error('Error sending TON:', error);
+      console.error('Full error details:', {
+        error,
+        walletAddress: tonWalletAddress,
+        amount: tonAmount,
+        network: "mainnet"
+      });
+      setTransactionStatus('Transaction failed');
+      setError(error instanceof Error ? error.message : 'Error sending TON');
     }
   };
 
