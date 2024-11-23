@@ -95,8 +95,20 @@ export default function Home() {
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = e.target.value;
-    const numAmount = parseFloat(newAmount);
     
+    // Разрешаем пустую строку или строку, начинающуюся с '0.'
+    if (newAmount === '' || newAmount === '0.') {
+      setAmount(newAmount);
+      setError('');
+      return;
+    }
+
+    // Проверяем, является ли значение числом и не начинается ли с '0' (кроме '0.')
+    const numAmount = parseFloat(newAmount);
+    if (isNaN(numAmount)) {
+      return;
+    }
+
     if (!tonPrice) {
       setError('TON price is not available');
       return;
@@ -107,17 +119,17 @@ export default function Home() {
     const maxBalance = parseFloat(balance);
     
     // Проверяем оба ограничения
-    if (!isNaN(numAmount)) {
-      if (numAmount * tonPrice > maxUsdBalance) {
-        setError('Недостаточно средств на USD балансе');
-        setAmount((maxUsdBalance / tonPrice).toFixed(2));
-      } else if (numAmount > maxBalance) {
-        setError('Недостаточно TON на балансе');
-        setAmount(maxBalance.toString());
-      } else {
-        setError('');
-        setAmount(newAmount);
-      }
+    if (numAmount * tonPrice > maxUsdBalance) {
+      setError('Недостаточно средств на USD балансе');
+      setAmount((maxUsdBalance / tonPrice).toFixed(2));
+    } else if (numAmount > maxBalance) {
+      setError('Недостаточно TON на балансе');
+      setAmount(maxBalance.toString());
+    } else {
+      setError('');
+      // Форматируем число, убирая лишние нули в конце
+      const formattedAmount = numAmount.toString();
+      setAmount(newAmount.includes('.') ? newAmount : formattedAmount);
     }
   };
 
@@ -235,7 +247,6 @@ export default function Home() {
             onChange={handleAmountChange}
             step="0.01"
             min="0"
-            max={user?.walletBalance}
             placeholder="Enter amount"
             className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
           />

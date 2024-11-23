@@ -210,25 +210,39 @@ export default function TonConnect() {
   const startChecking = async (hash: string) => {
     setTransactionStatus('Инициализация транзакции...');
     let attempts = 0;
-    const maxAttempts = 10;
+    const maxAttempts = 20;
 
     const checkTransaction = async () => {
       try {
-        const response = await tonweb.getTransactions(destinationAddress);
-        const tx = response.find((tx: any) => tx.hash === hash);
-        
-        if (tx) {
-          setTransactionStatus('Транзакция успешно подтверждена!');
-          // Calculate dollar amount and update user balance
-          if (tonPrice !== null) {
-            const dollarValue = parseFloat(tonAmount) * tonPrice;
-            await handleUpdateUser({
-              walletBalance: dollarValue
-            });
-          }
-          return true;
+        const response = await fetch(`https://toncenter.com/api/v3/transactions?msg_hash=${hash}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY || '',
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch transaction status');
         }
-        
+
+        const data = await response.json();
+        if (data && data.transactions && data.transactions.length > 0) {
+          const transaction = data.transactions[0];
+          if (transaction.description && transaction.description.compute_ph) {
+            if (transaction.description.compute_ph.success) {
+              setTransactionStatus('Транзакция успешно подтверждена!');
+              // Calculate dollar amount and update user balance
+              if (tonPrice !== null) {
+                const dollarValue = parseFloat(tonAmount) * tonPrice;
+                await handleUpdateUser({
+                  walletBalance: dollarValue
+                });
+              }
+              return true;
+            }
+          }
+        }
         return false;
       } catch (error) {
         console.error('Error checking transaction:', error);
@@ -244,12 +258,15 @@ export default function TonConnect() {
         break;
       }
 
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 3000));
       attempts++;
     }
 
     if (attempts >= maxAttempts) {
-      setTransactionStatus('Ошибка: Транзакция не подтверждена вовремя');
+      const finalCheck = await checkTransaction();
+      if (!finalCheck) {
+        setTransactionStatus('Ошибка: Транзакция не подтверждена вовремя');
+      }
     }
   };
 
