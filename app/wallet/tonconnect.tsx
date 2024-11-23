@@ -63,7 +63,7 @@ export default function TonConnect() {
   const [destinationAddress, setDestinationAddress] = useState('');
   const [dollarAmount, setDollarAmount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-  const { setTonConnectAddress } = useWallet();
+  const { tonConnectAddress, setTonConnectAddress } = useWallet();
 
   useEffect(() => {
     setDestinationAddress(process.env.NEXT_PUBLIC_DESTINATION_ADDRESS || '');
@@ -436,6 +436,8 @@ export default function TonConnect() {
       {tonWalletAddress ? (
         <div className="flex flex-col items-center">
           <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
+          <p className="mb-4">Connected: {formatAddress(tonConnectAddress || 'loading...')}</p>
+
 
           <button
             onClick={handleWalletAction}
