@@ -346,7 +346,7 @@ export default function TonConnect() {
         <div className="flex flex-col items-center">
           <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
             <h2 className="text-xl font-bold mb-4">
-              Send TON
+              Receive TON
             </h2>
             <input
               type="number"

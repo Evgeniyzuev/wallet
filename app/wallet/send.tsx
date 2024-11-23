@@ -10,6 +10,7 @@ import { internal } from "@ton/ton";
 // import { useWallet } from './WalletContext';
 import { useTonConnectUI } from '@tonconnect/ui-react';
 import { Address } from "@ton/core";
+import { useUser } from '../UserContext';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -27,6 +28,7 @@ export default function Home() {
   const [amount, setAmount] = useState<string>('0.05');
   const [tonConnectAddress, setTonConnectAddress] = useState<string | null>(null);
   const [tonConnectUI] = useTonConnectUI();
+  const { user, handleUpdateUser } = useUser();
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonConnectAddress(address);
@@ -104,12 +106,31 @@ export default function Home() {
 
   const sendTon = async () => {
     try {
-      // Проверка корректности введенной суммы
       const numAmount = parseFloat(amount);
-      if (isNaN(numAmount) || numAmount <= 0 ) {
+      if (isNaN(numAmount) || numAmount <= 0) {
         setError('Пожалуйста, введите корректную сумму');
         return;
       }
+
+      // Fetch current TON price
+      const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
+      const data = await response.json();
+      const tonPrice = data['the-open-network'].usd;
+
+      // Calculate USD amount
+      const usdAmount = numAmount * tonPrice;
+
+      // Check if user has enough balance
+      if (!user || usdAmount > (user.walletBalance || 0)) {
+        setError('Недостаточно средств на балансе');
+        return;
+      }
+
+      // Deduct the amount from user's wallet balance before sending transaction
+      const previousBalance = user.walletBalance || 0;
+      await handleUpdateUser({
+        walletBalance: -usdAmount
+      });
 
       setTransactionStatus('Инициализация транзакции...');
       const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC;
@@ -146,17 +167,36 @@ export default function Home() {
         ]
       });
 
-      // Ожидание подтверждения транзакции
+      // Wait for transaction confirmation
       let currentSeqno = seqno;
-      while (currentSeqno == seqno) {
+      let attempts = 0;
+      const maxAttempts = 10;
+
+      while (currentSeqno == seqno && attempts < maxAttempts) {
         setTransactionStatus('Ожидание подтверждения транзакции...');
         await sleep(1500);
         currentSeqno = await walletContract.getSeqno();
+        attempts++;
       }
+
+      if (attempts >= maxAttempts) {
+        // Transaction failed or timeout - restore the balance
+        await handleUpdateUser({
+          walletBalance: previousBalance
+        });
+        throw new Error('Транзакция не подтверждена вовремя');
+      }
+
       setTransactionStatus('Транзакция успешно подтверждена!');
       
     } catch (error) {
       setTransactionStatus('Ошибка при выполнении транзакции');
+      // Restore the balance in case of error
+      if (user) {
+        await handleUpdateUser({
+          walletBalance: user.walletBalance || 0
+        });
+      }
       setError(error instanceof Error ? error.message : 'Ошибка при отправке TON');
       console.error('Error sending TON:', error);
     }
@@ -192,10 +232,10 @@ export default function Home() {
         <div className="text-red-500 mb-4">{error}</div>
       ) : (
         <div className="space-y-2">
-          <div className="font-mono break-all">
+          {/* <div className="font-mono break-all">
             <span className="font-bold">Адрес кошелька:</span>{' '}
             {walletAddress || 'Загрузка...'}
-          </div>
+          </div> */}
           <div className="font-mono break-all">
             <span className="font-bold">Адрес Tonconnect:</span>{' '}
             {tonConnectAddress ? formatAddress(tonConnectAddress) : 'Не подключен'}
