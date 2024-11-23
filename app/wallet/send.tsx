@@ -7,6 +7,7 @@ import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { TonClient } from "@ton/ton";
 import { fromNano } from "@ton/core";
 import { internal } from "@ton/ton";
+import { useWallet } from './WalletContext';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -17,7 +18,7 @@ export default function Home() {
   const [error, setError] = useState<string>('');
   const [transactionStatus, setTransactionStatus] = useState<string>('');
   const [amount, setAmount] = useState<string>('0.05');
-  const  tonconnectAddress  = 'UQCKnJOLmDr3RwB9nF4_rZ8DsmVmXt866hQaOozqI-9Zsjm3';
+  const { tonWalletAddress } = useWallet();
 
   useEffect(() => {
     async function getWalletInfo() {
@@ -82,6 +83,9 @@ export default function Home() {
       if (!mnemonic) {
         throw new Error("Mnemonic не установлен");
       }
+      if (!tonWalletAddress) {
+        throw new Error("Tonconnect адрес не установлен");
+      }
 
       const key = await mnemonicToWalletKey(mnemonic.split(" "));
       const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
@@ -101,7 +105,7 @@ export default function Home() {
         seqno: seqno,
         messages: [
           internal({
-            to: tonconnectAddress,
+            to: tonWalletAddress,
             value: amount,
             body: "Hello",
             bounce: false,
@@ -138,7 +142,7 @@ export default function Home() {
           </div>
           <div className="font-mono break-all">
             <span className="font-bold">Адрес Tonconnect:</span>{' '}
-            {tonconnectAddress || 'Загрузка...'}
+            {tonWalletAddress || 'Загрузка...'}
           </div>
           <p>
             <span className="font-bold">Воркчейн:</span>{' '}
