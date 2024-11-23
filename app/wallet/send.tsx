@@ -30,6 +30,7 @@ export default function Home() {
   const [tonConnectUI] = useTonConnectUI();
   const { user, handleUpdateUser } = useUser();
   const [tonPrice, setTonPrice] = useState<number | null>(null);
+  const [maxAmount, setMaxAmount] = useState<number>(0);
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonConnectAddress(address);
@@ -77,6 +78,10 @@ export default function Home() {
         // query balance from chain
         const balance = await client.getBalance(wallet.address);
         setBalance(fromNano(balance));
+        setMaxAmount(user?.walletBalance && tonPrice 
+          ? Math.min(parseFloat(fromNano(balance)), user.walletBalance / tonPrice)
+          : 0
+        );
 
         // query seqno from chain
         const walletContract = client.open(wallet);
@@ -108,27 +113,27 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newAmount = e.target.value;
-    const numAmount = parseFloat(newAmount);
-    const numBalance = parseFloat(balance);
+//   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//     const newAmount = e.target.value;
+//     const numAmount = parseFloat(newAmount);
+//     const numBalance = parseFloat(balance);
     
-    // Calculate max TON amount based on user's wallet balance
-    const maxTonFromWallet = user?.walletBalance && tonPrice 
-      ? (user.walletBalance / tonPrice)
-      : 0;
+//     // Calculate max TON amount based on user's wallet balance
+//     const maxTonFromWallet = user?.walletBalance && tonPrice 
+//       ? (user.walletBalance / tonPrice)
+//       : 0;
     
-    // Use the smaller of the two limits
-    const maxAmount = Math.min(numBalance, maxTonFromWallet);
+//     // Use the smaller of the two limits
+//     const maxAmount = Math.min(numBalance, maxTonFromWallet);
 
-    if (!isNaN(numAmount) && numAmount > maxAmount) {
-      setError('Недостаточно средств на балансе');
-      setAmount(maxAmount.toFixed(2)); // Set to maximum available amount
-    } else {
-      setError('');
-      setAmount(newAmount);
-    }
-  };
+//     if (!isNaN(numAmount) && numAmount > maxAmount) {
+//       setError('Недостаточно средств на балансе');
+//       setAmount(maxAmount.toFixed(2)); // Set to maximum available amount
+//     } else {
+//       setError('');
+//       setAmount(newAmount);
+//     }
+//   };
 
   const sendTon = async () => {
     try {
@@ -147,7 +152,7 @@ export default function Home() {
       const usdAmount = numAmount * tonPrice;
 
       // Check if user has enough balance
-      if (!user || usdAmount > (user.walletBalance || 0)) {
+      if (!user || usdAmount > (maxAmount)) {
         setError('Недостаточно средств на балансе');
         return;
       }
@@ -241,13 +246,10 @@ export default function Home() {
           <input
             type="number"
             value={amount}
-            onChange={handleAmountChange}
+            onChange={(e) => setAmount(e.target.value)}
             step="0.01"
             min="0"
-            max={user?.walletBalance && tonPrice 
-              ? Math.min(parseFloat(balance), user.walletBalance / tonPrice).toFixed(2)
-              : '0'
-            }
+            max={maxAmount}
             placeholder="Enter amount"
             className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
           />
@@ -259,7 +261,7 @@ export default function Home() {
           </button>
         </div>
 
-        <h1 className="text-2xl font-bold mb-4">Информация о кошельке</h1>
+        <h1 className="text-lg">Максимально допустимая сумма: {maxAmount.toFixed(2)} TON</h1>
       {error ? (
         <div className="text-red-500 mb-4">{error}</div>
       ) : (
