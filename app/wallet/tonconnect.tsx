@@ -51,7 +51,7 @@ import { useWallet } from './WalletContext';
 export default function TonConnect() {
   const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY}));
   const [tonConnectUI] = useTonConnectUI();
-  const { tonWalletAddress, setTonWalletAddress } = useWallet();
+  const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [tonAmount, setTonAmount] = useState('1');
   const [walletBalance, setWalletBalance] = useState<number>(0);
@@ -63,7 +63,7 @@ export default function TonConnect() {
   const [destinationAddress, setDestinationAddress] = useState('');
   const [dollarAmount, setDollarAmount] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
-  // const { setTonConnectAddress } = useWallet();
+  const { setTonConnectAddress } = useWallet();
 
   useEffect(() => {
     setDestinationAddress(process.env.NEXT_PUBLIC_DESTINATION_ADDRESS || '');
@@ -115,14 +115,14 @@ export default function TonConnect() {
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonWalletAddress(address);
-    // setTonConnectAddress(address);
+    setTonConnectAddress(address);
     console.log("Wallet connected successfully!");
     setIsLoading(false);
   }, []);
 
   const handleWalletDisconnection = useCallback(() => {
     setTonWalletAddress(null);
-    // setTonConnectAddress(null);
+    setTonConnectAddress(null);
     console.log("Wallet disconnected successfully!");
     setIsLoading(false);
   }, []);
