@@ -9,7 +9,6 @@ import { useTransactionStatus } from '../hooks/useTransactionStatus';
 import { useUser } from '../UserContext';
 import { mnemonicToWalletKey } from "@ton/crypto";
 import { TonClient, WalletContractV4, internal } from "@ton/ton";
-import { useWallet } from './WalletContext';
 import { getHttpEndpoint } from '@orbs-network/ton-access';
 
 
@@ -62,7 +61,6 @@ export default function TonConnect() {
   const { user, handleUpdateUser } = useUser();
   const [destinationAddress, setDestinationAddress] = useState('');
   const [dollarAmount, setDollarAmount] = useState<number>(0);
-  const { setTonconnectAddress } = useWallet();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -115,10 +113,10 @@ export default function TonConnect() {
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonWalletAddress(address);
-    setTonconnectAddress(address);
+
     console.log("Wallet connected successfully!");
     setIsLoading(false);
-  }, [setTonconnectAddress]);
+  }, []);
 
   const handleWalletDisconnection = useCallback(() => {
     setTonWalletAddress(null);

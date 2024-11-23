@@ -7,7 +7,6 @@ import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { TonClient } from "@ton/ton";
 import { fromNano } from "@ton/core";
 import { internal } from "@ton/ton";
-import { useWallet } from './WalletContext';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -18,7 +17,7 @@ export default function Home() {
   const [error, setError] = useState<string>('');
   const [transactionStatus, setTransactionStatus] = useState<string>('');
   const [amount, setAmount] = useState<string>('0.05');
-  const { tonconnectAddress } = useWallet();
+  const  tonconnectAddress  = 'UQCKnJOLmDr3RwB9nF4_rZ8DsmVmXt866hQaOozqI-9Zsjm3';
 
   useEffect(() => {
     async function getWalletInfo() {
@@ -133,14 +132,14 @@ export default function Home() {
         <div className="text-red-500 mb-4">{error}</div>
       ) : (
         <div className="space-y-2">
-          <p className="font-mono">
+          <div className="font-mono break-all">
             <span className="font-bold">Адрес кошелька:</span>{' '}
             {walletAddress || 'Загрузка...'}
-          </p>
-          <p>
+          </div>
+          <div className="font-mono break-all">
             <span className="font-bold">Адрес Tonconnect:</span>{' '}
             {tonconnectAddress || 'Загрузка...'}
-          </p>
+          </div>
           <p>
             <span className="font-bold">Воркчейн:</span>{' '}
             {workchain !== null ? workchain : 'Загрузка...'}
