@@ -2,7 +2,7 @@
 
 import { mnemonicToWalletKey } from "@ton/crypto";
 import { WalletContractV4 } from "@ton/ton";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { TonClient } from "@ton/ton";
 import { fromNano } from "@ton/core";
@@ -22,16 +22,22 @@ export default function Home() {
   const [tonConnectAddress, setTonConnectAddress] = useState<string | null>(null);
   const [tonConnectUI] = useTonConnectUI();
 
+  const handleWalletConnection = useCallback((address: string) => {
+    setTonConnectAddress(address); 
+
   useEffect(() => {
     const checkWalletConnection = async () => {
       if (tonConnectUI.account?.address) {
-        setTonConnectAddress(tonConnectUI.account?.address);
-      } else {
-        setTonConnectAddress(null);
-      }
+        // handleWalletConnection(wallet.account.address);
+        handleWalletConnection(tonConnectUI.account?.address);
+      } 
     };
 
     checkWalletConnection();
+
+        // Сохраняет адрес в локальном состоянии       // Сохраняет адрес в глобальном контексте
+
+      }, []);
 
     // const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
     //   if (wallet) {
