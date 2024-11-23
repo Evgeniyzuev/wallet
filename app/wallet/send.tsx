@@ -164,7 +164,30 @@ export default function Home() {
 
   return (
     <main className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Информация о кошельке</h1>
+      <div className="mt-4 space-y-4">
+        <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
+          <h2 className="text-xl font-bold mb-4">
+            Send TON
+          </h2>
+          <input
+            type="number"
+            value={amount}
+            onChange={handleAmountChange}
+            step="0.01"
+            min="0"
+            max={balance}
+            placeholder="Enter amount"
+            className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+          />
+          <button
+            onClick={sendTon}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          >
+            Confirm
+          </button>
+        </div>
+
+        <h1 className="text-2xl font-bold mb-4">Информация о кошельке</h1>
       {error ? (
         <div className="text-red-500 mb-4">{error}</div>
       ) : (
@@ -177,41 +200,13 @@ export default function Home() {
             <span className="font-bold">Адрес Tonconnect:</span>{' '}
             {tonConnectAddress ? formatAddress(tonConnectAddress) : 'Не подключен'}
           </div>
-          <p>
-            <span className="font-bold">Воркчейн:</span>{' '}
-            {workchain !== null ? workchain : 'Загрузка...'}
-          </p>
-          <p>
+          {/* <p>
             <span className="font-bold">Баланс:</span>{' '}
             {balance ? `${balance} TON` : 'Загрузка...'}
-          </p>
-        </div>
-      )}
-      {/* <p>Send to address: {tonconnectAddress}</p> */}
+          </p> */}
+          </div>
+        )}
 
-      <div className="mt-4 space-y-4">
-        <div className="flex items-center space-x-2">
-          <input
-            type="number"
-            value={amount}
-            onChange={handleAmountChange}
-            step="0.01"
-            min="0"
-            max={balance}
-            className="border rounded p-2 w-32"
-            placeholder="Сумма TON"
-          />
-          <span className="text-gray-600">TON</span>
-          {error && <span className="text-red-500 text-sm">{error}</span>}
-        </div>
-
-        <button
-          onClick={sendTon}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Отправить {amount} TON
-        </button>
-        
         {transactionStatus && (
           <div className={`p-4 rounded ${
             transactionStatus.includes('успешно') 
