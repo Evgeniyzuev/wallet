@@ -7,7 +7,8 @@ import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { TonClient } from "@ton/ton";
 import { fromNano } from "@ton/core";
 import { internal } from "@ton/ton";
-import { useWallet } from './WalletContext';
+// import { useWallet } from './WalletContext';
+import { useTonConnectUI } from '@tonconnect/ui-react';
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -18,7 +19,29 @@ export default function Home() {
   const [error, setError] = useState<string>('');
   const [transactionStatus, setTransactionStatus] = useState<string>('');
   const [amount, setAmount] = useState<string>('0.05');
-  const { tonConnectAddress } = useWallet();
+  const [tonConnectAddress, setTonConnectAddress] = useState<string | null>(null);
+  const [tonConnectUI] = useTonConnectUI();
+
+  useEffect(() => {
+    const checkWalletConnection = async () => {
+      if (tonConnectUI.account?.address) {
+        setTonConnectAddress(tonConnectUI.account?.address);
+      } else {
+        setTonConnectAddress(null);
+      }
+    };
+
+    // checkWalletConnection();
+
+    // const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
+    //   if (wallet) {
+    //     handleWalletConnection(wallet.account.address);
+    //   } else {
+    //     handleWalletDisconnection();
+    //   }
+    // });
+
+  }, []);
 
   useEffect(() => {
     async function getWalletInfo() {
