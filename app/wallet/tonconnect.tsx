@@ -208,16 +208,48 @@ export default function TonConnect() {
   
 
   const startChecking = async (hash: string) => {
-    setTransactionStatus('pending');
-    try {
-      const response = await tonweb.getTransactions(destinationAddress);
-      const tx = response.find((tx: any) => tx.hash === hash);
-      if (tx) {
-        setTransactionStatus('confirmed');
+    setTransactionStatus('Инициализация транзакции...');
+    let attempts = 0;
+    const maxAttempts = 10;
+
+    const checkTransaction = async () => {
+      try {
+        const response = await tonweb.getTransactions(destinationAddress);
+        const tx = response.find((tx: any) => tx.hash === hash);
+        
+        if (tx) {
+          setTransactionStatus('Транзакция успешно подтверждена!');
+          // Calculate dollar amount and update user balance
+          if (tonPrice !== null) {
+            const dollarValue = parseFloat(tonAmount) * tonPrice;
+            await handleUpdateUser({
+              walletBalance: dollarValue
+            });
+          }
+          return true;
+        }
+        
+        return false;
+      } catch (error) {
+        console.error('Error checking transaction:', error);
+        return false;
       }
-    } catch (error) {
-      console.error('Error checking transaction:', error);
-      setTransactionStatus('failed');
+    };
+
+    while (attempts < maxAttempts) {
+      setTransactionStatus('Ожидание подтверждения транзакции...');
+      const isConfirmed = await checkTransaction();
+      
+      if (isConfirmed) {
+        break;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      attempts++;
+    }
+
+    if (attempts >= maxAttempts) {
+      setTransactionStatus('Ошибка: Транзакция не подтверждена вовремя');
     }
   };
 
