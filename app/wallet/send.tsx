@@ -109,27 +109,19 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-//   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-//     const newAmount = e.target.value;
-//     const numAmount = parseFloat(newAmount);
-//     const numBalance = parseFloat(balance);
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAmount = e.target.value;
+    const numAmount = parseFloat(newAmount);
+    const maxBalance = Math.min(user?.walletBalance || 0, parseFloat(balance));
     
-//     // Calculate max TON amount based on user's wallet balance
-//     const maxTonFromWallet = user?.walletBalance && tonPrice 
-//       ? (user.walletBalance / tonPrice)
-//       : 0;
-    
-//     // Use the smaller of the two limits
-//     const maxAmount = Math.min(numBalance, maxTonFromWallet);
-
-//     if (!isNaN(numAmount) && numAmount > maxAmount) {
-//       setError('Недостаточно средств на балансе');
-//       setAmount(maxAmount.toFixed(2)); // Set to maximum available amount
-//     } else {
-//       setError('');
-//       setAmount(newAmount);
-//     }
-//   };
+    if (!isNaN(numAmount) && numAmount > maxBalance) {
+      setError('Недостаточно средств на балансе');
+      setAmount(maxBalance.toString()); // Set to maximum available amount
+    } else {
+      setError('');
+      setAmount(newAmount);
+    }
+  };
 
   const sendTon = async () => {
     try {
@@ -242,7 +234,7 @@ export default function Home() {
           <input
             type="number"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={handleAmountChange}
             step="0.01"
             min="0"
             max={user?.walletBalance}
