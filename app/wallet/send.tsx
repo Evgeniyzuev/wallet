@@ -32,6 +32,7 @@ export default function Home() {
   const { user, handleUpdateUser } = useUser();
   const { tonPrice } = useTonPrice();
 //   const [maxAmount, setMaxAmount] = useState<number>(0);
+  const [isTransactionPending, setIsTransactionPending] = useState<boolean>(false);
 
   const handleWalletConnection = useCallback((address: string) => {
     setTonConnectAddress(address);
@@ -134,20 +135,19 @@ export default function Home() {
   };
 
   const sendTon = async () => {
+    let usdAmount = 0;
     try {
+      setIsTransactionPending(true);
       const numAmount = parseFloat(amount);
       if (isNaN(numAmount) || numAmount <= 0) {
         setError('Пожалуйста, введите корректную сумму');
         return;
       }
 
-
-
-      // Calculate USD amount
       if (!tonPrice) {
         throw new Error("TON price is not available");
       }
-      const usdAmount = numAmount * tonPrice;
+      usdAmount = numAmount * tonPrice;
 
       // Check if user has enough balance
       if (!user || usdAmount > (user.walletBalance)) {
@@ -214,8 +214,9 @@ export default function Home() {
       if (attempts >= maxAttempts) {
         // Transaction failed or timeout - restore the balance
         await handleUpdateUser({
-          walletBalance: previousBalance
+          walletBalance: usdAmount
         });
+        usdAmount = 0;
         throw new Error('Транзакция не подтверждена вовремя');
       }
 
@@ -226,11 +227,14 @@ export default function Home() {
       // Restore the balance in case of error
       if (user) {
         await handleUpdateUser({
-          walletBalance: user.walletBalance || 0
+          walletBalance: usdAmount
         });
+        usdAmount = 0;
       }
       setError(error instanceof Error ? error.message : 'Ошибка при отправке TON');
       console.error('Error sending TON:', error);
+    } finally {
+      setIsTransactionPending(false);
     }
   };
 
@@ -245,6 +249,7 @@ export default function Home() {
             type="number"
             value={amount}
             onChange={handleAmountChange}
+            disabled={isTransactionPending}
             step="0.01"
             min="0"
             placeholder="Enter amount"
@@ -252,9 +257,14 @@ export default function Home() {
           />
           <button
             onClick={sendTon}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            disabled={isTransactionPending}
+            className={`w-full ${
+              isTransactionPending 
+                ? 'bg-gray-500 cursor-not-allowed' 
+                : 'bg-blue-500 hover:bg-blue-600'
+            } text-white font-bold py-2 px-4 rounded`}
           >
-            Confirm
+            {isTransactionPending ? 'Processing...' : 'Confirm'}
           </button>
         </div>
 
