@@ -253,7 +253,7 @@ export default function TonConnect() {
         apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY
       }));
 
-      const mnemonic = process.env.DEPLOYER_WALLET_MNEMONIC; // your 24 secret words (replace ... with the rest of the words)
+      const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC; // your 24 secret words (replace ... with the rest of the words)
       if (!mnemonic) {
         throw new Error("Mnemonic is not defined");
       }
