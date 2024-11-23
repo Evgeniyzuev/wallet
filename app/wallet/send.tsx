@@ -112,7 +112,7 @@ export default function Home() {
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newAmount = e.target.value;
     const numAmount = parseFloat(newAmount);
-    const maxBalance = Math.min(user?.walletBalance || 0, parseFloat(balance));
+    const maxBalance = Math.min((tonPrice ? (user?.walletBalance || 0)/tonPrice : 0), parseFloat(balance));
     
     if (!isNaN(numAmount) && numAmount > maxBalance) {
       setError('Недостаточно средств на балансе');
@@ -249,7 +249,7 @@ export default function Home() {
           </button>
         </div>
 
-        <h1 className="text-lg">Максимально допустимая сумма: {user?.walletBalance} TON</h1>
+        <h1 className="text-lg">Макс: {Math.min((tonPrice ? (user?.walletBalance || 0)/tonPrice : 0), parseFloat(balance))} TON</h1>
       {error ? (
         <div className="text-red-500 mb-4">{error}</div>
       ) : (
