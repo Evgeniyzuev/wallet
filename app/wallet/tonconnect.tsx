@@ -7,9 +7,9 @@ import { Cell } from '@ton/core';
 import TonWeb from "tonweb";
 import { useTransactionStatus } from '../hooks/useTransactionStatus';
 import { useUser } from '../UserContext';
-import { mnemonicToWalletKey } from "@ton/crypto";
-import { TonClient, WalletContractV4, internal } from "@ton/ton";
-import { getHttpEndpoint } from '@orbs-network/ton-access';
+// import { mnemonicToWalletKey } from "@ton/crypto";
+// import { TonClient, WalletContractV4, internal } from "@ton/ton";
+// import { getHttpEndpoint } from '@orbs-network/ton-access';
 import { useTonPrice } from '../TonPriceContext';
 // import { useWallet } from './WalletContext';
 
@@ -57,7 +57,8 @@ export default function TonConnect() {
   const [tonAmount, setTonAmount] = useState('1');
   const [walletBalance, setWalletBalance] = useState<number>(0);
   const [transactionHash, setTransactionHash] = useState<string | null>(null);
-  const [transactionStatus, setTransactionStatus] = useState<string>('');
+  const { transactionStatus, startChecking } = useTransactionStatus();
+  // const [transactionStatus, setTransactionStatus] = useState<string>('');
   const { transactionAmount } = useTransactionStatus();
   // const [amountToWalletBalance, setAmountToWalletBalance] = useState<number>(0);
   const { user, handleUpdateUser } = useUser();
@@ -207,51 +208,48 @@ export default function TonConnect() {
 
   
 
-  const startChecking = async (hash: string) => {
-    setTransactionStatus('Инициализация транзакции...');
-    let attempts = 0;
-    const maxAttempts = 20;
+  // const startChecking = async (hash: string) => {
+  //   setTransactionStatus('Инициализация транзакции...');
+  //   let attempts = 0;
+  //   const maxAttempts = 20;
 
-    const checkTransaction = async () => {
-      try {
-        const response = await tonweb.getTransactions(destinationAddress);
-        const tx = response.find((tx: any) => tx.hash === hash);
+  //   const checkTransaction = async () => {
+  //     try {
+  //       const response = await tonweb.getTransactions(destinationAddress);
+  //       const tx = response.find((tx: any) => tx.hash === hash);
         
-        if (tx) {
-          setTransactionStatus('Транзакция успешно подтверждена!');
-          // Calculate dollar amount and update user balance
-          if (tonPrice !== null) {
-            const dollarValue = parseFloat(tonAmount) * tonPrice;
-            await handleUpdateUser({
-              walletBalance: dollarValue
-            });
-          }
-          return true;
-        }
+  //       if (tx) {
+  //         setTransactionStatus('Транзакция успешно подтверждена!');
+  //         // Calculate dollar amount and update user balance
+  //           await handleUpdateUser({
+  //             walletBalance:  dollarAmount
+  //           });
+  //         return true;
+  //       }
         
-        return false;
-      } catch (error) {
-        console.error('Error checking transaction:', error);
-        return false;
-      }
-    };
+  //       return false;
+  //     } catch (error) {
+  //       console.error('Error checking transaction:', error);
+  //       return false;
+  //     }
+  //   };
 
-    while (attempts < maxAttempts) {
-      setTransactionStatus('Ожидание подтверждения транзакции...');
-      const isConfirmed = await checkTransaction();
+  //   while (attempts < maxAttempts) {
+  //     setTransactionStatus('Ожидание подтверждения транзакции...');
+  //     const isConfirmed = await checkTransaction();
       
-      if (isConfirmed) {
-        break;
-      }
+  //     if (isConfirmed) {
+  //       break;
+  //     }
 
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      attempts++;
-    }
+  //     await new Promise(resolve => setTimeout(resolve, 3000));
+  //     attempts++;
+  //   }
 
-    if (attempts >= maxAttempts) {
-      setTransactionStatus('Ошибка: Транзакция не подтверждена вовремя');
-    }
-  };
+  //   if (attempts >= maxAttempts) {
+  //     setTransactionStatus('Ошибка: Транзакция не подтверждена вовремя');
+  //   }
+  // };
 
   const handleSendToncoin = async () => {
     try {
