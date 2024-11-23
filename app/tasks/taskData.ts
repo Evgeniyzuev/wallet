@@ -126,6 +126,36 @@ export const tasks: Task[] = [
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
+  },
+  {
+    taskId: 8,
+    title: 'Set your goals',
+    image: '/images/goals.jpg',
+    description: 'Set your personal goals in different areas of life',
+    reward: 1,
+    actionText: 'Set Goals',
+    action: () => {
+      window.open('/goals', '_blank');
+    },
+    secondActionText: 'Done',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
+  },
+  {
+    taskId: 9,
+    title: 'Calculate your path to $1M',
+    image: '/images/calculator.jpg',
+    description: 'Calculate how long it will take to reach $1,000,000 with AI core',
+    reward: 1,
+    actionText: 'Calculate',
+    action: () => {
+      window.open('https://t.me/WeAiBot_bot', '_blank');
+    },
+    secondActionText: 'Done',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
   }
 ];
 
