@@ -1,20 +1,20 @@
 import { createContext, useContext, useState } from 'react';
 
 interface WalletContextType {
-  tonConnectAddress: string | null;
-  setTonConnectAddress: (address: string | null) => void;
+  tonWalletAddress: string | null;
+  setTonWalletAddress: (address: string | null) => void;
 }
 
 const WalletContext = createContext<WalletContextType>({
-  tonConnectAddress: null,
-  setTonConnectAddress: () => {},
+  tonWalletAddress: null,
+  setTonWalletAddress: () => {},
 });
 
 export function WalletProvider({ children }: { children: React.ReactNode }) {
-  const [tonConnectAddress, setTonConnectAddress] = useState<string | null>(null);
+  const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
 
   return (
-    <WalletContext.Provider value={{ tonConnectAddress, setTonConnectAddress }}>
+    <WalletContext.Provider value={{ tonWalletAddress, setTonWalletAddress }}>
       {children}
     </WalletContext.Provider>
   );
