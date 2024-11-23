@@ -12,6 +12,30 @@ export default function Wallet() {
   const [amount, setAmount] = useState<string>('');
   // const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
+  const [tonPrice, setTonPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchTonPrice = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=the-open-network&vs_currencies=usd');
+        const data = await response.json();
+        setTonPrice(data['the-open-network'].usd);
+      } catch (error) {
+        console.error('Error fetching TON price:', error);
+      }
+    };
+
+    fetchTonPrice();
+    const interval = setInterval(fetchTonPrice, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calculate TON amount from USD balance
+  const getTonAmount = () => {
+    if (!tonPrice || !user?.walletBalance) return 0;
+    return user.walletBalance / tonPrice;
+  };
 
   const handleButtonClick = (action: string) => {
     setSelectedAction(action);
@@ -88,7 +112,13 @@ export default function Wallet() {
   return (
     <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
       <div className="text-center w-full max-w-lg px-4">
-        <p className="text-4xl text-bold mb-4 mt-4 ml-4">{Math.floor((user?.walletBalance || 0) * 100) / 100}$</p>
+        <div className="flex justify-between items-center mb-4 mt-4 ml-4">
+          <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0) * 100) / 100}$</p>
+          <p className="text-2xl text-gray-400">
+            {tonPrice ? `${getTonAmount().toFixed(2)} TON` : 'Loading...'}
+          </p>
+        </div>
+        
         
         <div className="grid grid-cols-3 gap-1 mb-8">
           <button 
@@ -142,7 +172,7 @@ export default function Wallet() {
 
         </div>
 
-        {(selectedAction === 'send' || selectedAction === 'upCore' || selectedAction === 'receive') && (
+        {( selectedAction === 'upCore' || selectedAction === 'receive') && (
           <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
             <h2 className="text-xl font-bold mb-4">
               {selectedAction}

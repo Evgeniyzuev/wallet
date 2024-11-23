@@ -327,93 +327,6 @@ export default function TonConnect() {
   //     throw error;
   //   }
   // };
-  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-  const handleSendTonBack = async () => {
-    try {
-      if (!tonWalletAddress) {
-        setError('Wallet address not available');
-        return;
-      }
-
-      const numAmount = parseFloat(tonAmount);
-      if (isNaN(numAmount) || numAmount <= 0) {
-        setError('Please enter a valid amount');
-        return;
-      }
-
-      setTransactionStatus('Initializing transaction...');
-      const mnemonic = process.env.NEXT_PUBLIC_DEPLOYER_WALLET_MNEMONIC;
-      if (!mnemonic) {
-        throw new Error("Mnemonic is not set");
-      }
-
-      const key = await mnemonicToWalletKey(mnemonic.split(" "));
-      const wallet = WalletContractV4.create({ publicKey: key.publicKey, workchain: 0 });
-      
-      const endpoint = await getHttpEndpoint({ network: "mainnet" });
-      const client = new TonClient({ endpoint });
-
-      // Check deployer wallet balance
-      const balance = await client.getBalance(wallet.address);
-      const balanceInTON = fromNano(balance);
-      
-      // Ensure sufficient balance
-      if (parseFloat(balanceInTON) < numAmount) {
-        throw new Error(`Insufficient balance in deployer wallet: ${balanceInTON} TON`);
-      }
-
-      const walletContract = client.open(wallet);
-      const seqno = await walletContract.getSeqno();
-      
-      setTransactionStatus('Sending transaction...');
-      
-      // Convert amount to nano TON
-      const valueInNano = toNano(numAmount);
-      
-      await walletContract.sendTransfer({
-        secretKey: key.secretKey,
-        seqno: seqno,
-        messages: [
-          internal({
-            to: tonWalletAddress,
-            value: valueInNano, // Use converted value
-            body: "Hello",
-            bounce: false,
-          })
-        ]
-      });
-
-      // Wait for confirmation
-      let currentSeqno = seqno;
-      let attempts = 0;
-      const maxAttempts = 10;
-      
-      while (currentSeqno == seqno && attempts < maxAttempts) {
-        setTransactionStatus(`Waiting for confirmation... Attempt ${attempts + 1}/${maxAttempts}`);
-        await sleep(1500);
-        currentSeqno = await walletContract.getSeqno();
-        attempts++;
-      }
-
-      if (attempts >= maxAttempts) {
-        throw new Error('Transaction confirmation timeout');
-      }
-
-      setTransactionStatus('Transaction confirmed successfully!');
-      setError(null); // Clear any previous errors
-      
-    } catch (error) {
-      console.error('Full error details:', {
-        error,
-        walletAddress: tonWalletAddress,
-        amount: tonAmount,
-        network: "mainnet"
-      });
-      setTransactionStatus('Transaction failed');
-      setError(error instanceof Error ? error.message : 'Error sending TON');
-    }
-  };
 
   // const handleIncreaseWalletBalance = useCallback((amount: number) => {
   //   if (user) {
@@ -428,16 +341,32 @@ export default function TonConnect() {
       {error && <p className="text-red-500">{error}</p>}
       {/* <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1> */}
       {/* вывод курса тона в долларах */}
-      {tonPrice !== null ? (
-        <p className="mb-1">TON Price: ${tonPrice.toFixed(2)}</p>
-      ) : (
-        <p className="mb-1">Loading TON Price...</p>
-      )}
+
       {tonWalletAddress ? (
         <div className="flex flex-col items-center">
+          <div className="mt-8 p-4 border border-gray-700 rounded-lg bg-gray-800">
+            <h2 className="text-xl font-bold mb-4">
+              Send TON
+            </h2>
+            <input
+              type="number"
+              value={tonAmount}
+              onChange={(e) => setTonAmount(e.target.value)}
+              placeholder="Enter amount"
+              className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+              min="0"
+              step="0.1"
+            />
+            <button
+              onClick={handleSendToncoin}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            >
+              Confirm
+            </button>
+          </div>
+
           <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
           {/* <p className="mb-4">Connected: {formatAddress(tonConnectAddress || 'loading...')}</p> */}
-
 
           <button
             onClick={handleWalletAction}
@@ -445,29 +374,11 @@ export default function TonConnect() {
           >
             Disconnect Wallet
           </button>
-          <div className="flex flex-col items-center mb-4">
-            <input
-              type="number"
-              value={tonAmount}
-              onChange={(e) => setTonAmount(e.target.value)}
-              className="w-60 text-black mb-2 p-2 border border-gray-300 rounded"
-              placeholder="Enter TON amount"
-              min="0"
-              step="0.1"
-            />
-            <button
-              onClick={handleSendToncoin}
-              className="bg-green-500 hover:bg-green-700 w-60 text-white font-bold py-2 px-4 rounded"
-            >
-              Send {tonAmount} TON
-            </button>
-          </div>
-          <button
-            onClick={handleSendTonBack}
-            className="bg-yellow-500 hover:bg-yellow-700 w-60 text-white font-bold py-2 px-4 rounded mt-2"
-          >
-            Send to Tonconnect Wallet {tonAmount} TON
-          </button>
+          {/* {tonPrice !== null ? (
+        <p className="mb-1">TON Price: ${tonPrice.toFixed(2)}</p>
+      ) : (
+            <p className="mb-1">Loading TON Price...</p>
+          )} */}
         </div>
       ) : (
         <button
