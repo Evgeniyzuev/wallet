@@ -263,7 +263,10 @@ export default function Home() {
           </button>
         </div>
 
-        <h1 className="text-lg">Макс: {user?.walletBalance},{balance},{tonPrice} TON</h1>
+        <h1 className="text-lg">Баланс Пользователя: {user?.walletBalance} USD</h1>
+        <h1 className="text-lg">Баланс Кошелька: {balance} TON</h1>
+        <h1 className="text-lg">Цена: {tonPrice} USD/TON</h1>
+        
       {error ? (
         <div className="text-red-500 mb-4">{error}</div>
       ) : (
