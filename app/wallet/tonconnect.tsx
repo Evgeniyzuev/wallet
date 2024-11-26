@@ -349,7 +349,7 @@ export default function TonConnect() {
       {error && <p className="text-red-500">{error}</p>}
 
       {tonWalletAddress ? (
-        <div className="text-center w-full max-w-screen-lg px-4">
+        <div className="text-center w-full">
           <div className="mt-0 p-4 border border-gray-700 rounded-lg bg-gray-800">
             <h2 className="text-xl font-bold mb-4">
               Receive TON
