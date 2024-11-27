@@ -130,7 +130,7 @@ export const tasks: Task[] = [
   {
     taskId: 8,
     title: 'Set your goals',
-    image: '/images/goals.jpg',
+    image: '/images/deal.jpg',
     description: 'Set your personal goals in different areas of life',
     reward: 1,
     actionText: 'Set Goals',
@@ -145,7 +145,7 @@ export const tasks: Task[] = [
   {
     taskId: 9,
     title: 'Calculate your path to $1M',
-    image: '/images/calculator.jpg',
+    image: '/images/deal.jpg',
     description: 'Calculate how long it will take to reach $1,000,000 with AI core',
     reward: 1,
     actionText: 'Calculate',

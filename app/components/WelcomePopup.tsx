@@ -27,7 +27,7 @@ export default function WelcomePopup({ onClose }: WelcomePopupProps) {
         <h2 className="text-2xl font-bold text-white mb-4">Welcome to WeAi! 👋</h2>
         <p className="text-gray-300 mb-6">
           Зарабатывай и расти вместе с Ai🚀<br/>
-          Сделай задания до 20 уровня🎯<br/> и достигни капитала 1,000,000$💰<br/><br/>
+          Сделай задания до 20 уровня🎯<br/> и достигни капитала 1,000,000$💵<br/><br/>
           Бот для связи: @WeAiBot_bot
         </p>
         <div className="flex justify-center">

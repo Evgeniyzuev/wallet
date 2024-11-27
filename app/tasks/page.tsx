@@ -125,6 +125,7 @@ export default function Home() {
           currentTask.secondAction(user, handleUpdateUser, setNotification, () => handleTaskCompletion(currentTask), setError);
         }}
         secondActionText={currentTask.secondActionText}
+        image={currentTask.image}
       />
       {/* <Navigation /> */}
       {/* display completed tasks ids */}

@@ -1,6 +1,5 @@
 import React from 'react';
 import Image from 'next/image';
-import core from '../images/core-xs.jpg';
 
 interface TaskPopupProps {
   isOpen: boolean;
@@ -12,6 +11,7 @@ interface TaskPopupProps {
   actionText?: string;
   onSecondAction: () => void;
   secondActionText: string;
+  image: string;
 }
 
 const TaskPopup: React.FC<TaskPopupProps> = ({
@@ -23,7 +23,8 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
   onAction,
   actionText,
   onSecondAction,
-  secondActionText
+  secondActionText,
+  image
 }) => {
   if (!isOpen) return null;
 
@@ -35,8 +36,8 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
             {/* <div className="w-20 h-20 bg-purple-500 rounded-lg mx-auto mb-3"></div> */}
           <div className="w-20 h-20 mx-auto mb-3">
             <Image
-              src={core}
-              alt="Core"
+              src={image}
+              alt={title}
               width={80}
               height={80}
               className="rounded-lg"
