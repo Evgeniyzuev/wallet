@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { UserProvider } from './UserContext';
 import { TonPriceProvider } from './TonPriceContext';
 import dynamic from 'next/dynamic';
+import { LanguageProvider } from './LanguageContext';
 
 const WelcomePopup = dynamic(() => import('./components/WelcomePopup'), {
   ssr: false
@@ -49,19 +50,21 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
       </head>
       <body>
-        <TonConnectUIProvider 
-          manifestUrl="https://blush-keen-constrictor-906.mypinata.cloud/ipfs/QmSBEGs7dqLGi5SAWGYfQpmp7uW8bWjy2KpiBiWSviWHRZ"
-          actionsConfiguration={{
-            twaReturnUrl: 'https://t.me/WeAiBot_bot/WeAi'
-          }}
-        >
-          <TonPriceProvider>
-            <UserProvider>
-              {showWelcomePopup && <WelcomePopup onClose={handleCloseWelcomePopup} />}
-              {children}
-            </UserProvider>
-          </TonPriceProvider>
-        </TonConnectUIProvider>
+        <LanguageProvider>
+          <TonConnectUIProvider 
+            manifestUrl="https://blush-keen-constrictor-906.mypinata.cloud/ipfs/QmSBEGs7dqLGi5SAWGYfQpmp7uW8bWjy2KpiBiWSviWHRZ"
+            actionsConfiguration={{
+              twaReturnUrl: 'https://t.me/WeAiBot_bot/WeAi'
+            }}
+          >
+            <TonPriceProvider>
+              <UserProvider>
+                {showWelcomePopup && <WelcomePopup onClose={handleCloseWelcomePopup} />}
+                {children}
+              </UserProvider>
+            </TonPriceProvider>
+          </TonConnectUIProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

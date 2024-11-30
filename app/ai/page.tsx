@@ -6,6 +6,7 @@ import aissistImage from '../images/aissist0.png';
 import coreImage from '../images/brain.jpg';
 import { INITIAL_SYSTEM_PROMPT } from '../constants/prompts';
 import { useUser } from '../UserContext';
+import { useLanguage } from '../LanguageContext';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';
@@ -14,6 +15,7 @@ interface Message {
 
 export default function AiPage() {
   const { user } = useUser();
+  const { language, setLanguage, t } = useLanguage();
   const [messages, setMessages] = useState<Message[]>(() => {
     if (typeof window !== 'undefined') {
       const savedMessages = localStorage.getItem('chatMessages');
@@ -26,12 +28,6 @@ export default function AiPage() {
   const [input, setInput] = useState('');
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [language, setLanguage] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('chatLanguage') || 'ru';
-    }
-    return 'ru';
-  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -77,10 +73,6 @@ export default function AiPage() {
   useEffect(() => {
     localStorage.setItem('chatMessages', JSON.stringify(messages));
   }, [messages]);
-
-  useEffect(() => {
-    localStorage.setItem('chatLanguage', language);
-  }, [language]);
 
   const handleSend = async () => {
     if (input.trim()) {
@@ -173,7 +165,7 @@ export default function AiPage() {
           {isSettingsOpen && (
             <div className="absolute w-48 top-10 right-0 bg-gray-800 p-4 rounded shadow-lg">
               <div className="flex items-center justify-between mb-4">
-              <button
+                <button
                   onClick={() => setLanguage('en')}
                   className={`
                     ${language === 'en' ? 'bg-blue-500 hover:bg-blue-700' : 'bg-gray-500 hover:bg-gray-700'}
@@ -191,7 +183,6 @@ export default function AiPage() {
                 >
                   RU
                 </button>
-
               </div>
               <button
                 onClick={() => {
@@ -200,7 +191,7 @@ export default function AiPage() {
                 }}
                 className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full"
               >
-                {language === 'ru' ? 'Очистить чат' : 'Clear Chat'}
+                {t('clear_chat')}
               </button>
             </div>
           )}
@@ -234,23 +225,16 @@ export default function AiPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             className="flex-grow border border-gray-300 rounded-l-lg p-2 bg-gray-700 text-white"
-            placeholder="Введите сообщение..."
+            placeholder={t('enter_message')}
           />
           <button
             onClick={handleSend}
             className="bg-blue-500 text-white rounded-r-lg p-2"
           >
-            Отправить
+            {t('send')}
           </button>
         </div>
       </div>
-      {/* <Navigation /> */}
-      {/* <button
-        onClick={clearChat}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mb-4"
-      >
-        Clear Chat
-      </button> */}
     </main>
   );
 }
