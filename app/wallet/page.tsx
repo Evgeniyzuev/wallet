@@ -90,6 +90,10 @@ export default function Wallet() {
             console.error('Insufficient balance');
             return;
           }
+          if (amountNumber <= 0) {
+            console.error('Negative amount');
+            return;
+          }
           result = await handleUpdateUser({
             walletBalance: -amountNumber,
             aicoreBalance: amountNumber
