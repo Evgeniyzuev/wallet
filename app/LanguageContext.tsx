@@ -1,3 +1,4 @@
+'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import WebApp from '@twa-dev/sdk';
 
