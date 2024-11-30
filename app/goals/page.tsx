@@ -1,3 +1,5 @@
+'use client';
+
 import { useLanguage } from '../LanguageContext';
 
 const goalTranslations = {
