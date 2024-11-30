@@ -3,14 +3,19 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import aissistImage from '../images/aissist0.png';
-import { useUser } from '../UserContext'; 
-import { skipDay } from '../utils/skipDay';
+import { useUserData } from '../hooks/useUserData'; 
+import DailyRewardPopup from '../components/DailyRewardPopup';
 
 
 export default function Core() {
-  const { user, handleUpdateUser } = useUser();
-  // const [isLoading, setIsLoading] = useState(true);
-
+  const { 
+    user, 
+    handleUpdateUser, 
+    showRewardPopup, 
+    setShowRewardPopup, 
+    rewardData 
+  } = useUserData();
+  
 
 
   const [dailyCoreRate] = useState(0.000633);
@@ -56,32 +61,6 @@ export default function Core() {
   const nextLevelThreshold = balanceRequiredForNextLevel[aicoreLevel];
   const progressPercentage = Math.min(100, ((user?.aicoreBalance || 0) / nextLevelThreshold) * 100);
 
-  // занети уровень в базу данных
-  // handleUpdateUser({
-  //   level: aicoreLevel - (user?.level || 0)
-  // });
-  
-  // useEffect(() => {
-  //   if (user) {
-  //     setIsLoading(false);
-  //   }
-  // }, [user]);
-
-  // const handleSkipDay = async () => {
-  //   if (!user) {
-  //     console.log('User data is still loading...');
-  //     return;
-  //   }
-
-  //   const result = await skipDay(user, handleUpdateUser);
-  //   if (!result.success) {
-  //     alert(result.error || 'An error occurred while skipping day');
-  //   }
-  // };
-
-  // if (isLoading) {
-  //   return <div>Loading...</div>;
-  // }
 
 
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
@@ -391,7 +370,7 @@ export default function Core() {
             })()
           }
         </div>
-        {/* <button onClick={handleSkipDay} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Skip 1 day</button> */}
+     
       </div>
 
       {/* Action buttons */}
@@ -457,6 +436,14 @@ export default function Core() {
           <span>min(-5%*lvl): {Math.max(0, minValue)}%</span >
         </div>
       </div>
+
+      <DailyRewardPopup
+        isOpen={showRewardPopup}
+        onClose={() => setShowRewardPopup(false)}
+        daysSkipped={rewardData.daysSkipped}
+        aicoreIncrease={rewardData.aicoreIncrease}
+        walletIncrease={rewardData.walletIncrease}
+      />
     </main>
   );
 }

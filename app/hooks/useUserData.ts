@@ -5,6 +5,7 @@ import WebApp from '@twa-dev/sdk';
 import { User } from '../UserContext';
 import { getDaysBetweenDates } from '../utils/dateDiff';
 import { skipDay } from '../utils/skipDay';
+import DailyRewardPopup from '../components/DailyRewardPopup';
 let cachedUser: any = null;
 
 const initialUser: User = {
@@ -25,6 +26,12 @@ export function useUserData() {
   const [user, setUser] = useState<User | null>(initialUser);
   const [error, setError] = useState<string | null>(null);
   const [startParam, setStartParam] = useState('');
+  const [showRewardPopup, setShowRewardPopup] = useState(false);
+  const [rewardData, setRewardData] = useState({
+    daysSkipped: 0,
+    aicoreIncrease: 0,
+    walletIncrease: 0
+  });
 
   const checkAndUpdateDate = async (userData: User) => {
     if (!userData) return;
@@ -46,6 +53,14 @@ export function useUserData() {
             totalAicoreIncrease += aicoreIncrease;
             totalWalletIncrease += walletIncrease;
           }
+
+          // Set reward data and show popup
+          setRewardData({
+            daysSkipped: daysDiff,
+            aicoreIncrease: totalAicoreIncrease,
+            walletIncrease: totalWalletIncrease
+          });
+          setShowRewardPopup(true);
 
           // Make a single update with the total increases
           await handleUpdateUser({
@@ -172,5 +187,8 @@ export function useUserData() {
     error,
     setError,
     handleUpdateUser,
+    showRewardPopup,
+    setShowRewardPopup,
+    rewardData
   };
 }
