@@ -1,6 +1,5 @@
 'use client'
 
-// import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import tasksIcon from '../images/icon-tasks.svg';
 import friendsIcon from '../images/icon-friends.svg';
@@ -8,12 +7,13 @@ import walletIcon from '../images/icon-wallet.svg';
 import coinsIcon from '../images/ph_coins-fill.svg';
 import messageIcon from '../images/icon-ai.svg'; 
 import coreIcon from '../images/icon-core.png';
-
+import { useLanguage } from '../LanguageContext';
 import React from 'react';
 
 export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
   const pathname = usePathname()
-
+  const { t } = useLanguage();
+  
   const navItems = [
     { href: 'home', label: 'Core', icon: <img src={coreIcon.src} alt="Core" className="w-6 h-6" /> },
     { href: 'ai', label: 'Ai', icon: <img src={messageIcon.src} alt="Ai" className="w-6 h-6" /> },
@@ -40,11 +40,11 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
               }`}
             >
               {item.icon}
-              {item.label}
+              {t(item.label as any)}
             </button>
           );
         })}
       </div>
     </div>
-  )
+  );
 }

@@ -11,7 +11,8 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 // Add this type definition
-type TranslationKey = 'send' | 'clear_chat' | 'enter_message' | 'wallet_balance';
+type TranslationKey = 'send' | 'clear_chat' | 'enter_message' | 'wallet_balance' | 
+  'Core' | 'Ai' | 'Wallet' | 'Tasks' | 'Frens' | 'Goals';
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState(() => {
@@ -48,14 +49,24 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       'clear_chat': 'Очистить чат',
       'enter_message': 'Введите сообщение...',
       'wallet_balance': 'Баланс кошелька',
-      // Add more translations
+      'Core': 'Ядро',
+      'Ai': 'Ии',
+      'Wallet': 'Кошелек',
+      'Tasks': 'Задачи',
+      'Frens': 'Друзья',
+      'Goals': 'Цели'
     },
     en: {
       'send': 'Send',
       'clear_chat': 'Clear Chat',
       'enter_message': 'Enter message...',
       'wallet_balance': 'Wallet Balance',
-      // Add more translations
+      'Core': 'Core',
+      'Ai': 'Ai',
+      'Wallet': 'Wallet',
+      'Tasks': 'Tasks',
+      'Frens': 'Frens',
+      'Goals': 'Goals'
     }
   };
 
