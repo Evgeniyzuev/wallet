@@ -223,11 +223,11 @@ export default function Core() {
       if (levelDifference > 0) {
         setShowLevelUpPopup(true);
         handleUpdateUser({
-          level: 1
+          level: aicoreLevel
         });
       }
     }
-  }, [aicoreLevel, user]);
+  }, [aicoreLevel, user, handleUpdateUser]);
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen p-2">
@@ -455,7 +455,7 @@ export default function Core() {
       <LevelUpPopup
         isOpen={showLevelUpPopup}
         onClose={() => setShowLevelUpPopup(false)}
-        newLevel={(user?.level || 0) + 1}
+        newLevel={aicoreLevel}
       />
     </main>
   );
