@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import aissistImage from '../images/aissist0.png';
+import { useUser } from '../UserContext'; 
 import { useUserData } from '../hooks/useUserData'; 
 import DailyRewardPopup from '../components/DailyRewardPopup';
 import LevelUpPopup from '../components/LevelUpPopup';
@@ -12,11 +13,13 @@ export default function Core() {
   const { 
     user, 
     handleUpdateUser, 
+  } = useUser();
+
+  const {
     showRewardPopup, 
     setShowRewardPopup, 
     rewardData 
   } = useUserData();
-  
 
 
   const [dailyCoreRate] = useState(0.000633);
