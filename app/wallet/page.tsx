@@ -7,6 +7,12 @@ import TonConnect from './tonconnect';
 import Send from './send';
 import { useTonPrice } from '../TonPriceContext';
 
+type Currency = {
+  code: string;
+  symbol: string;
+  rate: number; // Exchange rate from USD
+};
+
 export default function Wallet() {
   const { user, handleUpdateUser } = useUser();
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
@@ -14,6 +20,25 @@ export default function Wallet() {
   // const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
   const { tonPrice } = useTonPrice();
+  const [showCurrencySelector, setShowCurrencySelector] = useState(false);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('selectedCurrency') || 'USD';
+    }
+    return 'USD';
+  });
+  const [exchangeRates, setExchangeRates] = useState<Record<string, number>>({
+    RUB: 92.5,
+    CNY: 7.2,
+    INR: 83.2
+  });
+
+  const currencies: Record<string, Currency> = {
+    RUB: { code: 'RUB', symbol: '₽', rate: exchangeRates.RUB },
+    CNY: { code: 'CNY', symbol: '¥', rate: exchangeRates.CNY },
+    INR: { code: 'INR', symbol: '₹', rate: exchangeRates.INR }
+  };
 
   // Calculate TON amount from USD balance
   const getTonAmount = () => {
@@ -93,14 +118,79 @@ export default function Wallet() {
     }
   };
 
+  const formatBalance = (balance: number, currency: Currency) => {
+    const converted = balance * currency.rate;
+    return `${currency.symbol}${Math.floor(converted * 100) / 100}`;
+  };
+
+  useEffect(() => {
+    const fetchExchangeRates = async () => {
+      try {
+        const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+        const data = await response.json();
+        
+        setExchangeRates({
+          RUB: data.rates.RUB,
+          CNY: data.rates.CNY,
+          INR: data.rates.INR
+        });
+      } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+      }
+    };
+
+    fetchExchangeRates();
+    // Обновляем курсы каждые 60 минут
+    const interval = setInterval(fetchExchangeRates, 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
       <div className="text-center w-full max-w-lg px-4">
-        <div className="flex justify-between items-center mb-4 mt-4 ml-4">
-          <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0) * 100) / 100}$</p>
-          <p className="text-2xl text-gray-400">
-            {tonPrice ? `${getTonAmount().toFixed(2)} TON` : 'Loading...'}
-          </p>
+        <div className="flex flex-col">
+          <div className="flex justify-between items-center mb-4 mt-4 ml-4">
+            <div className="flex items-center">
+              <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0) * 100) / 100}$</p>
+              <button
+                onClick={() => setShowCurrencySelector(!showCurrencySelector)}
+                className="ml-2 text-2xl text-gray-400 hover:text-gray-300 focus:outline-none"
+              >
+                +
+              </button>
+            </div>
+            
+            <div className="text-2xl text-gray-400">
+              {selectedCurrency !== 'USD' && currencies[selectedCurrency] && 
+                formatBalance(user?.walletBalance || 0, currencies[selectedCurrency])
+              }
+            </div>
+            
+            <p className="text-2xl text-gray-400">
+              {tonPrice ? `${getTonAmount().toFixed(2)} TON` : 'Loading...'}
+            </p>
+          </div>
+          
+          {showCurrencySelector && (
+            <div className="absolute mt-16 ml-4 bg-gray-800 rounded-lg shadow-lg z-50">
+              {Object.entries(currencies).map(([code, currency]) => (
+                <button
+                  key={code}
+                  onClick={() => {
+                    setSelectedCurrency(code);
+                    setShowCurrencySelector(false);
+                    localStorage.setItem('selectedCurrency', code);
+                  }}
+                  className={`w-full px-4 py-2 text-left hover:bg-gray-700 ${
+                    selectedCurrency === code ? 'text-blue-400' : 'text-white'
+                  }`}
+                >
+                  {currency.code}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         
         
