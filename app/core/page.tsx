@@ -35,7 +35,7 @@ export default function Core() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
 
-  const previousLevelRef = useRef(user?.level); // Создаем реф для хранения предыдущего уровня
+  // const previousLevelRef = useRef(user?.level); // Создаем реф для хранения предыдущего уровня
 
   const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
@@ -213,20 +213,18 @@ export default function Core() {
   };
 
   const [showLevelUpPopup, setShowLevelUpPopup] = useState(false);
-  const [newLevel, setNewLevel] = useState(0);
+  // const [newLevel, setNewLevel] = useState(0);
 
   useEffect(() => {
     if (user) {
-      const newLevelValue = aicoreLevel - (user?.level || 0);
+      const levelDifference = aicoreLevel - (user?.level || 0);
       
       // Check if level has increased
-      if (previousLevelRef.current !== newLevelValue) {
-        setNewLevel(newLevelValue);
+      if (levelDifference > 0) {
         setShowLevelUpPopup(true);
         handleUpdateUser({
-          level: newLevelValue
+          level: 1
         });
-        previousLevelRef.current = newLevelValue;
       }
     }
   }, [aicoreLevel, user]);
@@ -457,7 +455,7 @@ export default function Core() {
       <LevelUpPopup
         isOpen={showLevelUpPopup}
         onClose={() => setShowLevelUpPopup(false)}
-        newLevel={newLevel}
+        newLevel={(user?.level || 0) + 1}
       />
     </main>
   );
