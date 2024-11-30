@@ -5,6 +5,7 @@ import Image from 'next/image';
 import aissistImage from '../images/aissist0.png';
 import { useUserData } from '../hooks/useUserData'; 
 import DailyRewardPopup from '../components/DailyRewardPopup';
+import LevelUpPopup from '../components/LevelUpPopup';
 
 
 export default function Core() {
@@ -208,19 +209,24 @@ export default function Core() {
     setTargetAmount(value ? parseInt(value) : 0);
   };
 
+  const [showLevelUpPopup, setShowLevelUpPopup] = useState(false);
+  const [newLevel, setNewLevel] = useState(0);
+
   useEffect(() => {
     if (user) {
-      const newLevel = aicoreLevel - (user?.level || 0);
+      const newLevelValue = aicoreLevel - (user?.level || 0);
       
-      // Проверяем, изменился ли уровень
-      if (previousLevelRef.current !== newLevel) {
+      // Check if level has increased
+      if (previousLevelRef.current !== newLevelValue) {
+        setNewLevel(newLevelValue);
+        setShowLevelUpPopup(true);
         handleUpdateUser({
-          level: newLevel
+          level: newLevelValue
         });
-        previousLevelRef.current = newLevel; // Обновляем реф на новый уровень
+        previousLevelRef.current = newLevelValue;
       }
     }
-  }, [aicoreLevel, user]); // Зависимости: уровень и пользователь
+  }, [aicoreLevel, user]);
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen p-2">
@@ -443,6 +449,12 @@ export default function Core() {
         daysSkipped={rewardData.daysSkipped}
         aicoreIncrease={rewardData.aicoreIncrease}
         walletIncrease={rewardData.walletIncrease}
+      />
+
+      <LevelUpPopup
+        isOpen={showLevelUpPopup}
+        onClose={() => setShowLevelUpPopup(false)}
+        newLevel={newLevel}
       />
     </main>
   );
