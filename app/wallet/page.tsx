@@ -161,38 +161,37 @@ export default function Wallet() {
               </button>
             </div>
             
-            <div className="text-2xl text-gray-400">
-              {selectedCurrency !== 'USD' && currencies[selectedCurrency] && 
-                formatBalance(user?.walletBalance || 0, currencies[selectedCurrency])
-              }
-            </div>
-            
             <p className="text-2xl text-gray-400">
               {tonPrice ? `${getTonAmount().toFixed(2)} TON` : 'Loading...'}
             </p>
           </div>
           
-          {showCurrencySelector && (
-            <div className="absolute mt-16 ml-4 bg-gray-800 rounded-lg shadow-lg z-50">
-              {Object.entries(currencies).map(([code, currency]) => (
-                <button
-                  key={code}
-                  onClick={() => {
-                    setSelectedCurrency(code);
-                    setShowCurrencySelector(false);
-                    localStorage.setItem('selectedCurrency', code);
-                  }}
-                  className={`w-full px-4 py-2 text-left hover:bg-gray-700 ${
-                    selectedCurrency === code ? 'text-blue-400' : 'text-white'
-                  }`}
-                >
-                  {currency.code}
-                </button>
-              ))}
+          {selectedCurrency !== 'USD' && currencies[selectedCurrency] && (
+            <div className="text-2xl text-gray-400 text-center -mt-2 mb-4">
+              {formatBalance(user?.walletBalance || 0, currencies[selectedCurrency])}
             </div>
           )}
         </div>
         
+        {showCurrencySelector && (
+          <div className="absolute mt-16 ml-4 bg-gray-800 rounded-lg shadow-lg z-50">
+            {Object.entries(currencies).map(([code, currency]) => (
+              <button
+                key={code}
+                onClick={() => {
+                  setSelectedCurrency(code);
+                  setShowCurrencySelector(false);
+                  localStorage.setItem('selectedCurrency', code);
+                }}
+                className={`w-full px-4 py-2 text-left hover:bg-gray-700 ${
+                  selectedCurrency === code ? 'text-blue-400' : 'text-white'
+                }`}
+              >
+                {currency.code}
+              </button>
+            ))}
+          </div>
+        )}
         
         <div className="grid grid-cols-3 gap-1 mb-8">
           <button 
