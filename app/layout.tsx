@@ -32,6 +32,7 @@ export default function RootLayout({
         WebApp.expand();
 
         const userExists = localStorage.getItem('userExists');
+        setShowInfoPopup(true);
         if (!userExists) {
           setShowWelcomePopup(true);
         }
@@ -43,7 +44,6 @@ export default function RootLayout({
 
   const handleCloseWelcomePopup = () => {
     setShowWelcomePopup(false);
-    setShowInfoPopup(true);
     localStorage.setItem('userExists', 'true');
   };
 
