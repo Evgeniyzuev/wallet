@@ -30,7 +30,7 @@ export default function Core() {
   const [targetAmount, setTargetAmount] = useState(0);
   const [daysToTarget, setDaysToTarget] = useState(0);
   const [plusStartCore, setPlusStartCore ] = useState(0);
-  const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(0); // Track input value
+  const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(Math.round(reinvestmentPart * 100));
   const [isSaved, setIsSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
