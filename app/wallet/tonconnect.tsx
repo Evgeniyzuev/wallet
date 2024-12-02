@@ -361,7 +361,7 @@ export default function TonConnect() {
               placeholder="Enter amount"
               className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
               min="0"
-              step="0.1"
+              step="0.01"
             />
             <button
               onClick={handleSendToncoin}

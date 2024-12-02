@@ -280,8 +280,8 @@ export default function Core() {
         <div className="text-lg font-semibold mb-1">
           
           <div className="flex justify-between text-sm mt-0">
-            <span>Wallet: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(2)}$/d</span>
-            <span>Core: {((user?.aicoreBalance || 0) * dailyCoreRate * (reinvestmentPart)).toFixed(2)}$/d</span>
+            <span>Wallet: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(6)}$/d</span>
+            <span>Core: {((user?.aicoreBalance || 0) * dailyCoreRate * (reinvestmentPart)).toFixed(6)}$/d</span>
           </div>
         </div>
 
