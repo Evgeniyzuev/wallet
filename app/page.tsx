@@ -1,16 +1,18 @@
 'use client'
 
 import { useState } from 'react';
-import Navigation from './components/Navigation';
+import dynamic from 'next/dynamic'
 import Core from './core/page';
 import AiPage from './ai/page';
 import Wallet from './wallet/page';
 import Tasks from './tasks/page';
 import Friends from './friends/page';
 import Goals from './goals/page';
-import { useUser } from './UserContext';
+// import { useUser } from './UserContext';
 
 type Page = 'core' | 'ai' | 'wallet' | 'tasks' | 'friends' | 'goals';
+
+const Navigation = dynamic(() => import('./components/Navigation'), { ssr: false })
 
 export default function MainPage() {
   const [currentPage, setCurrentPage] = useState<Page>('core');
