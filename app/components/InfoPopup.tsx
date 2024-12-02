@@ -6,6 +6,27 @@ interface InfoPopupProps {
 }
 
 export default function InfoPopup({ isOpen, onClose }: InfoPopupProps) {
+  const [canClose, setCanClose] = React.useState(true);
+  const [countdown, setCountdown] = React.useState(5);
+
+  const handleButtonClick = () => {
+    if (canClose) {
+      setCanClose(false);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            setCanClose(true);
+            return 5;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else if (countdown === 0) {
+      onClose();
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -25,10 +46,11 @@ export default function InfoPopup({ isOpen, onClose }: InfoPopupProps) {
         </p>
         <div className="flex justify-center">
           <button
-            onClick={onClose}
+            onClick={handleButtonClick}
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition-colors w-full"
+            disabled={!canClose && countdown > 0}
           >
-            OK
+            {canClose ? 'OK' : `Подождите ${countdown} сек`}
           </button>
         </div>
       </div>
