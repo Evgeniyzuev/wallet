@@ -28,7 +28,7 @@ export const tasks: Task[] = [
   {
     taskId: 2,
     title: 'Subscribe to the channel',
-    image: '/images/core-xs.jpg',
+    image: '/images/powercore.jpg',
     description: 'Subscribe to the WeAi channel',
     reward: 1,
     actionText: 'Subscribe',
@@ -84,7 +84,7 @@ export const tasks: Task[] = [
   {
     taskId: 5,
     title: 'Upgrade the core',
-    image: '/images/core-xs.jpg',
+    image: '/images/aichip.jpg',
     description: 'Upgrade the core',
     reward: 1,  
     actionText: 'Do it',

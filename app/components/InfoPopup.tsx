@@ -47,7 +47,7 @@ export default function InfoPopup({ isOpen, onClose }: InfoPopupProps) {
               type="checkbox"
               checked={dontShowAgain}
               onChange={(e) => setDontShowAgain(e.target.checked)}
-              className="form-checkbox h-5 w-5 rounded-full text-blue-500 transition duration-150 ease-in-out"
+              className="appearance-none h-5 w-5 rounded-full border-2 border-blue-500 checked:bg-blue-500 checked:border-transparent transition duration-150 ease-in-out"
             />
             <span>Больше не показывать</span>
           </label>
