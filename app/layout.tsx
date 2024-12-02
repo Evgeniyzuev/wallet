@@ -12,12 +12,17 @@ const WelcomePopup = dynamic(() => import('./components/WelcomePopup'), {
   ssr: false
 });
 
+const InfoPopup = dynamic(() => import('./components/InfoPopup'), {
+  ssr: false
+});
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  const [showInfoPopup, setShowInfoPopup] = useState(false);
 
   useEffect(() => {
     const initWebApp = async () => {
@@ -26,7 +31,6 @@ export default function RootLayout({
         WebApp.ready();
         WebApp.expand();
 
-        // Check if user exists in localStorage
         const userExists = localStorage.getItem('userExists');
         if (!userExists) {
           setShowWelcomePopup(true);
@@ -39,7 +43,12 @@ export default function RootLayout({
 
   const handleCloseWelcomePopup = () => {
     setShowWelcomePopup(false);
+    setShowInfoPopup(true);
     localStorage.setItem('userExists', 'true');
+  };
+
+  const handleCloseInfoPopup = () => {
+    setShowInfoPopup(false);
   };
 
   return (
@@ -60,6 +69,7 @@ export default function RootLayout({
             <TonPriceProvider>
               <UserProvider>
                 {showWelcomePopup && <WelcomePopup onClose={handleCloseWelcomePopup} />}
+                {showInfoPopup && <InfoPopup isOpen={showInfoPopup} onClose={handleCloseInfoPopup} />}
                 {children}
               </UserProvider>
             </TonPriceProvider>
