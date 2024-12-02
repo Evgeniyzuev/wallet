@@ -401,6 +401,7 @@ export default function Core() {
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Enter amount"
             className="text-black w-full p-2 mb-2 border border-gray-300 rounded"
+            min="0"
           />
           <button
             onClick={handleActionSubmit}

@@ -136,6 +136,12 @@ export function useUserData() {
   }) => {
     if (!user) return;
 
+    // Validate that level and aicoreBalance are only increased
+    if ((updates.level && updates.level < 0) || (updates.aicoreBalance && updates.aicoreBalance < 0)) {
+      console.error('Level and aicoreBalance can only be increased with positive values');
+      return { success: false, message: 'Invalid update: level and aicoreBalance must be positive' };
+    }
+
     try {
       const updatedFields = Object.entries(updates).reduce((acc, [key, value]) => {
         if (value !== undefined) {

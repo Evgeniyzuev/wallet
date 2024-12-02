@@ -68,42 +68,25 @@ export default function Wallet() {
     try {
       setIsTransactionInProgress(true); // Set the transaction in progress state
 
-      switch (selectedAction) {
-        case 'receive':
-          result = await handleUpdateUser({
-            walletBalance: amountNumber
-          });
-          break;
-        case 'send':
-          if (amountNumber > (user?.walletBalance || 0)) {
-            console.error('Insufficient balance');
-            return;
-          }
-
-          result = await handleUpdateUser({
-            walletBalance: -amountNumber
-          });
-          break;
-        case 'upCore':
-          // Handle topUpCore action handleIncreaseAicoreBalance
-          if (amountNumber > (user?.walletBalance || 0)) {
-            console.error('Insufficient balance');
-            return;
-          }
-          if (amountNumber <= 0) {
-            console.error('Negative amount');
-            return;
-          }
-          result = await handleUpdateUser({
-            walletBalance: -amountNumber,
-            aicoreBalance: amountNumber
-          });
-
-          console.log('Top Up Core action not implemented yet');
-          break;
-        default:
-          console.error('Unknown action');
+      if (selectedAction === 'upCore') {
+        // Handle topUpCore action handleIncreaseAicoreBalance
+        if (amountNumber > (user?.walletBalance || 0)) {
+          console.error('Insufficient balance');
           return;
+        }
+        if (amountNumber <= 0) {
+          console.error('Negative amount');
+          return;
+        }
+        result = await handleUpdateUser({
+          walletBalance: -amountNumber,
+          aicoreBalance: amountNumber
+        });
+
+        console.log('Top Up Core action not implemented yet');
+      } else {
+        console.error('Unknown action');
+        return;
       }
 
       if (result?.success) {
@@ -259,6 +242,7 @@ export default function Wallet() {
               onChange={(e) => setAmount(e.target.value)}
               placeholder="Enter amount"
               className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+              min="0" // Prevent negative values
             />
             <button
               onClick={handleActionSubmit}
