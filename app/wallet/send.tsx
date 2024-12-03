@@ -176,7 +176,7 @@ export default function Home() {
 
       const previousBalance = user.walletBalance || 0;
       await handleUpdateUser({
-        walletBalance: -usdAmount
+        walletBalance: -usdAmount-0.005
       });
 
       const currentBalance = await client.getBalance(wallet.address);
@@ -255,6 +255,9 @@ export default function Home() {
             placeholder="Enter amount"
             className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
           />
+          <div className="text-sm text-gray-400 mb-2">
+            Итого с комиссией сети: {(parseFloat(amount || '0') + 0.005).toFixed(3)} TON
+          </div>
           <button
             onClick={sendTon}
             disabled={isTransactionPending}

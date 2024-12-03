@@ -428,7 +428,8 @@ export default function Core() {
                 const value = Math.min(100, Math.max(0, parseInt(e.target.value))); // Ensure value is between 0 and 100
                 setReinvestmentSetupInput(value);
               }} 
-            /> %
+            /> % <br/>
+            <span className="text-xs">min(-5% * lvl): {Math.max(0, minValue)}%</span>
           </div>
           {(reinvestmentSetupInput >= minValue) && 
               <button 
@@ -441,10 +442,7 @@ export default function Core() {
             }
 
         </div>
-        <div className="flex justify-between text-sm mt-2">
-              <span> current: {user?.reinvestSetup}%</span>
-          <span>min(-5%*lvl): {Math.max(0, minValue)}%</span >
-        </div>
+
       </div>
 
       <DailyRewardPopup

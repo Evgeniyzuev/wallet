@@ -138,7 +138,7 @@ export default function Wallet() {
       <div className="text-center w-full max-w-lg px-4">
         <div className="flex flex-col">
           <div className="flex justify-between items-center mb-4 mt-4 ml-4">
-            <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0) * 100) / 100}$</p>
+            <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0)).toFixed(2)}$</p>
             <button
               onClick={() => setShowCurrencySelector(!showCurrencySelector)}
               className="text-2xl text-gray-400 hover:text-gray-300 focus:outline-none"

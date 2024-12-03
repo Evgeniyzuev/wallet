@@ -23,8 +23,8 @@ const DailyRewardPopup: React.FC<DailyRewardPopupProps> = ({
         <h2 className="text-xl font-bold text-white mb-4">Daily Rewards Accumulated</h2>
         <div className="text-gray-300 space-y-2 mb-6">
           <p>Days skipped: <span className="text-yellow-500 font-bold">{daysSkipped}</span></p>
-          <p>Core increase: <span className="text-green-500 font-bold">{aicoreIncrease.toFixed(2)}$</span></p>
-          <p>Wallet increase: <span className="text-blue-500 font-bold">{walletIncrease.toFixed(2)}$</span></p>
+          <p>Core increase: <span className="text-green-500 font-bold">{aicoreIncrease.toFixed(6)}$</span></p>
+          <p>Wallet increase: <span className="text-blue-500 font-bold">{walletIncrease.toFixed(6)}$</span></p>
         </div>
         <button
           onClick={onClose}
