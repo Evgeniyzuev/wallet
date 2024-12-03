@@ -39,7 +39,7 @@ export default function InfoPopup({ isOpen, onClose }: InfoPopupProps) {
           ✅ Бонусы за задания увеличивают ядро и доход<br/>
           <br/>
           🎯 Как быстро можно прокачать ядро до нужного дохода?<br/>
-          🚀 Сейчас узнаем!
+          🚀 Сделай задания чтобы узнать!
         </p>
         <div className="flex flex-col space-y-4">
           <label className="flex items-center space-x-2 text-white cursor-pointer">
