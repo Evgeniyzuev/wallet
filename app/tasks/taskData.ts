@@ -16,6 +16,7 @@ export const tasks: Task[] = [
     {
         taskId: 1,
         title: 'Желаемый размер дохода',
+        
         image: '/images/core-xs.jpg',
         description: 
         'Давайте сначала определим первую цель по доходу.<br/><br/>' +

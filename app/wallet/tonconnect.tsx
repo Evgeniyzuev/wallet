@@ -91,18 +91,30 @@ export default function TonConnect() {
     updateUserBalance();
   }, [transactionStatus, dollarAmount, handleUpdateUser]);
 
-  const handleWalletConnection = useCallback((address: string) => {
-    setTonWalletAddress(address);
-    // setTonConnectAddress(address);
-    console.log("Wallet connected successfully!");
-    setIsLoading(false);
+  const handleWalletConnection = useCallback(async (address: string) => {
+    try {
+      setTonWalletAddress(address);
+      console.log("Wallet connected successfully!");
+      setIsLoading(false);
+      setError(null); // Clear any previous errors
+    } catch (error) {
+      console.error("Wallet connection error:", error);
+      setError("Failed to connect wallet. Please try again.");
+      setIsLoading(false);
+    }
   }, []);
-
-  const handleWalletDisconnection = useCallback(() => {
-    setTonWalletAddress(null);
-    // setTonConnectAddress(null);
-    console.log("Wallet disconnected successfully!");
-    setIsLoading(false);
+  
+  const handleWalletDisconnection = useCallback(async () => {
+    try {
+      setTonWalletAddress(null);
+      console.log("Wallet disconnected successfully!");
+      setIsLoading(false);
+      setError(null);
+    } catch (error) {
+      console.error("Wallet disconnection error:", error);
+      setError("Failed to disconnect wallet. Please try again.");
+      setIsLoading(false);
+    }
   }, []);
 
 
@@ -125,34 +137,59 @@ export default function TonConnect() {
 
   useEffect(() => {
     const checkWalletConnection = async () => {
-      if (tonConnectUI.account?.address) {
-        handleWalletConnection(tonConnectUI.account?.address);
-      } else {
-        handleWalletDisconnection();
+      try {
+        if (tonConnectUI.account?.address) {
+          await handleWalletConnection(tonConnectUI.account?.address);
+        } else {
+          await handleWalletDisconnection();
+        }
+      } catch (error) {
+        console.error("Error checking wallet connection:", error);
+        setError("Failed to check wallet connection status.");
+        setIsLoading(false);
       }
     };
 
     checkWalletConnection();
 
-    const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
-      if (wallet) {
-        handleWalletConnection(wallet.account.address);
-      } else {
-        handleWalletDisconnection();
+    const unsubscribe = tonConnectUI.onStatusChange(async (wallet) => {
+      try {
+        if (wallet) {
+          await handleWalletConnection(wallet.account.address);
+        } else {
+          await handleWalletDisconnection();
+        }
+      } catch (error) {
+        console.error("Error handling wallet status change:", error);
+        setError("Failed to handle wallet connection change.");
+        setIsLoading(false);
       }
     });
 
     return () => {
-      unsubscribe();
+      try {
+        unsubscribe();
+      } catch (error) {
+        console.error("Error unsubscribing from wallet status:", error);
+      }
     };
   }, [tonConnectUI, handleWalletConnection, handleWalletDisconnection]);
 
   const handleWalletAction = async () => {
-    if (tonConnectUI.connected) {
+    try {
+      setError(null); // Clear any previous errors
       setIsLoading(true);
-      await tonConnectUI.disconnect();
-    } else {
-      await tonConnectUI.openModal();
+      
+      if (tonConnectUI.connected) {
+        await tonConnectUI.disconnect();
+      } else {
+        await tonConnectUI.openModal();
+      }
+    } catch (error) {
+      console.error("Error performing wallet action:", error);
+      setError("Failed to perform wallet action. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
