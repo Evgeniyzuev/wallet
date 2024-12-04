@@ -11,7 +11,6 @@ import { useUser } from '../UserContext';
 // import { TonClient, WalletContractV4, internal } from "@ton/ton";
 // import { getHttpEndpoint } from '@orbs-network/ton-access';
 import { useTonPrice } from '../TonPriceContext';
-// import { useWallet } from './WalletContext';
 
 
 
