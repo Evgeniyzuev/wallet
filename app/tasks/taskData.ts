@@ -15,9 +15,17 @@ export interface Task {
 export const tasks: Task[] = [
     {
         taskId: 1,
-        title: 'Open Bot',
+        title: 'Желаемый размер дохода',
         image: '/images/core-xs.jpg',
-        description: 'Open the bot press start',
+        description: 
+        'Давайте сначала определим первую цель по доходу.<br/><br/>' +
+        'Представьте, что вы каждое утро получаете определённую сумму денег.<br/><br/>' +
+        'Всегда. Независимо ни от чего.<br/><br/>' +
+        'Какая сумма сделает вашу жизнь хоть немного лучше?<br/><br/>' +
+        'Если сумма будет больше в 2 раза? А в 10 раз?<br/><br/>' +
+        'Если сумма будет больше в 2 раза? А в 10 раз?<br/><br/>' +
+        'Если сумма будет больше в 2 раза? А в 10 раз?<br/><br/>' +
+        'Что вы сможете сделать что давно хотели, но не было возможности?',
         reward: 1,
         secondActionText: 'Open Bot',   
         secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
