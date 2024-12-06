@@ -8,6 +8,7 @@ export interface Task {
   action?: () => void; // Make action optional
   secondActionText: string;
   secondAction: (user: any, handleUpdateUser: any, setNotification: any, setTaskCompleted: any, setError: any) => void;
+  isSecondActionEnabled?: () => boolean; // Add new optional property
 }
 
 
@@ -60,26 +61,30 @@ export const tasks: Task[] = [
 
             document.body.appendChild(modal);
 
-            // Add click handlers
+            // Update localStorage and remove modal
+            const handleSelection = (value: string) => {
+                localStorage.setItem('selectedDailyIncome', value);
+                modal.remove();
+            };
+
+            // Update click handlers to use handleSelection
             modal.querySelectorAll('button').forEach(button => {
                 button.addEventListener('click', () => {
                     const value = button.getAttribute('data-value');
                     if (value === '0') {
                         document.getElementById('customAmount')?.classList.remove('hidden');
-                    } else {
-                        localStorage.setItem('selectedDailyIncome', value || '');
-                        modal.remove();
+                    } else if (value) {
+                        handleSelection(value);
                     }
                 });
             });
 
-            // Handle custom amount input
+            // Update custom amount handler
             const customAmountInput = document.getElementById('customAmount') as HTMLInputElement;
             customAmountInput?.addEventListener('change', () => {
                 const customValue = customAmountInput.value;
                 if (customValue) {
-                    localStorage.setItem('selectedDailyIncome', customValue);
-                    modal.remove();
+                    handleSelection(customValue);
                 }
             });
 
@@ -105,7 +110,10 @@ export const tasks: Task[] = [
             await handleUpdateUser({
                 targetDailyIncome: parseFloat(selectedIncome)
             });
-        }
+        },
+        isSecondActionEnabled: () => {
+            return localStorage.getItem('selectedDailyIncome') !== null;
+        },
     },
   {
     taskId: 2,

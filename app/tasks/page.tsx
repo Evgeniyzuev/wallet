@@ -22,7 +22,8 @@ export default function Home() {
     actionText: '',
     action: () => {},
     secondActionText: '',
-    secondAction: () => {}
+    secondAction: () => {},
+    isSecondActionEnabled: () => true
   })
   const [isLoading, setIsLoading] = useState(true);
 
@@ -126,6 +127,7 @@ export default function Home() {
         }}
         secondActionText={currentTask.secondActionText}
         image={currentTask.image}
+        isSecondActionEnabled={currentTask.isSecondActionEnabled}
       />
       {/* <Navigation /> */}
       {/* display completed tasks ids */}

@@ -12,6 +12,7 @@ interface TaskPopupProps {
   onSecondAction: () => void;
   secondActionText: string;
   image: string;
+  isSecondActionEnabled?: () => boolean;
 }
 
 const TaskPopup: React.FC<TaskPopupProps> = ({
@@ -24,7 +25,8 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
   actionText,
   onSecondAction,
   secondActionText,
-  image
+  image,
+  isSecondActionEnabled
 }) => {
   if (!isOpen) return null;
 
@@ -62,7 +64,12 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
           )}
           <button
             onClick={onSecondAction}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg text-lg transition duration-300"
+            disabled={isSecondActionEnabled ? !isSecondActionEnabled() : false}
+            className={`flex-1 ${
+              isSecondActionEnabled && !isSecondActionEnabled() 
+                ? 'bg-gray-500 cursor-not-allowed' 
+                : 'bg-green-600 hover:bg-green-700'
+            } text-white py-3 rounded-lg text-lg transition duration-300`}
           >
             {secondActionText}
           </button>
