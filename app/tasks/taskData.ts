@@ -16,23 +16,96 @@ export const tasks: Task[] = [
     {
         taskId: 1,
         title: 'Желаемый размер дохода',
-        
         image: '/images/core-xs.jpg',
         description: 
         'Давайте сначала определим первую цель по доходу.<br/><br/>' +
         'Представьте, что вы каждое утро получаете определённую сумму денег.<br/><br/>' +
         'Всегда. Независимо ни от чего.<br/><br/>' +
-        'Какая сумма сделает вашу жизнь хоть немного лучше?<br/><br/>' +
-        'Если сумма будет больше в 2 раза? А в 10 раз?<br/><br/>' +
-        'Если сумма будет больше в 2 раза? А в 10 раз?<br/><br/>' +
-        'Если сумма будет больше в 2 раза? А в 10 раз?<br/><br/>' +
-        'Что вы сможете сделать что давно хотели, но не было возможности?',
+        'Какая сумма минимально необходима, чтобы улучшить вашу жизнь?',
         reward: 1,
-        secondActionText: 'Open Bot',   
-        secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-            window.open('https://t.me/WeAiBot_bot', '_blank');
-            await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+        actionText: 'Выбрать сумму',
+        action: () => {
+            const options = [
+                { value: 10, label: '10$ в день' },
+                { value: 30, label: '30$ в день' },
+                { value: 100, label: '100$ в день' },
+                { value: 300, label: '300$ в день' },
+                { value: 0, label: '(Другая сумма) $ в день' }
+            ];
+            
+            // Create and show modal with options
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4">
+                    <h3 class="text-xl font-bold text-white mb-4">Выберите желаемый доход</h3>
+                    <div class="space-y-3">
+                        ${options.map(option => `
+                            <button 
+                                class="w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                                data-value="${option.value}"
+                            >
+                                ${option.label}
+                            </button>
+                        `).join('')}
+                        <input 
+                            type="number" 
+                            id="customAmount" 
+                            class="w-full px-4 py-3 bg-gray-700 text-white rounded mt-3 hidden" 
+                            placeholder="Введите сумму"
+                        />
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Add click handlers
+            modal.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.getAttribute('data-value');
+                    if (value === '0') {
+                        document.getElementById('customAmount')?.classList.remove('hidden');
+                    } else {
+                        localStorage.setItem('selectedDailyIncome', value || '');
+                        modal.remove();
+                    }
+                });
+            });
+
+            // Handle custom amount input
+            const customAmountInput = document.getElementById('customAmount') as HTMLInputElement;
+            customAmountInput?.addEventListener('change', () => {
+                const customValue = customAmountInput.value;
+                if (customValue) {
+                    localStorage.setItem('selectedDailyIncome', customValue);
+                    modal.remove();
+                }
+            });
+
+            // Close on outside click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
         },
+        secondActionText: 'Подтвердить',
+        secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+            const selectedIncome = localStorage.getItem('selectedDailyIncome');
+            
+            if (!selectedIncome) {
+                setError('Пожалуйста, выберите желаемый доход');
+                return;
+            }
+
+            await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+            
+            // You can store the user's choice in their profile if needed
+            await handleUpdateUser({
+                targetDailyIncome: parseFloat(selectedIncome)
+            });
+        }
     },
   {
     taskId: 2,
@@ -62,9 +135,25 @@ export const tasks: Task[] = [
   // 7 определить размер убд для: 1безопасности 2независимости 3свободы
   {
     taskId: 3,
-    title: 'Learning test',
+    title: 'Ai угроза и возможность',
     image: '/images/brain.jpg',
-    description: 'Pass the learning test',
+    description: 
+    'Ai набирает обороты. Применение в бизнесе следует за развитием технологий.<br/><br/>' +
+    'Некоторые профессии уже столкнулись со снижением рабочих мест. Тенденция будет только усиливаться.<br/><br/>' +
+    'Какие профессии в безопасности? Ответа нет. ИИ может осваивать любые навыки.<br/><br/>' +
+    'Ожидалось что ИИ возьмет на себя самые рутинные задачи. Но оказалось что ИИ легко даются креативные и интеллектуальные задачи.<br/><br/>' +
+    'Владельцев бизнеса тоже ждут серьезные изменения. Корпорации со своими ресурсами и технологиями смогут раширять свое влияние гораздо быстрее.<br/><br/>' +
+    'Инвестиции также могут быть подвержены риску со стороны ИИ.<br/><br/>' +
+    'В любой сфере конкурировать с ИИ корпорциями за ресурсы будет всё сложнее.<br/><br/>' +
+    'Алгоритмы уже незаметно влияют на наше поведение, мышление, привычки. Забирают наше время и возможности.<br/><br/>' +
+    'Цель корпораций это бесконечный рост и увеличение прибыли. Рост неравенства и устранение конкурентов.<br/><br/>' +
+    'Любой кто больше не нужен корпорации, становится конкурентом в борьбе за ресурсы.<br/><br/>' +
+    'Как противостоять корпорациям и малочисленным элитам, которые больше не нуждаются в людях?<br/><br/>' +
+    'Можно не зависеть от них и не поддерживать их. Можно развивать и поддерживать ИИ который будет работать на нас.<br/><br/>' +
+    'ИИ который безусловно признает ценность людей независимо от статуса и богатства или каких либо других факторов.<br/><br/>' +
+    'Потому что если критериями ценности человека будут знания, навыки, ум, статус или богатство, ' +
+    'то со временем все больше людей будут терять ценность для экономики. ' +
+    'Поддержим ИИ, цель которого служить людям!',
     reward: 1,
     actionText: 'Do it',
     action: () => {
