@@ -124,6 +124,7 @@ export const tasks: Task[] = [
     actionText: 'Subscribe',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
+      localStorage.setItem('task2Completed', 'true');
     },
     secondActionText: 'Check Membership',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
@@ -133,6 +134,9 @@ export const tasks: Task[] = [
         } else {
             setError('Please subscribe to the channel to receive the bonus');
         }
+    },
+    isSecondActionEnabled: () => {
+        return localStorage.getItem('task2Completed') === 'true';
     }
   },
   // Add more tasks here as needed, each with their own action and secondAction

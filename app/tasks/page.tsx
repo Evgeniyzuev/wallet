@@ -76,10 +76,10 @@ export default function Home() {
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
-      <h1 className="text-4xl text-center mb-8">Tasks</h1> 
-      <div className="text-sm text-center text-yellow-300 flex-shrink-0">Completed tasks: {completedTasks.join(', ')}</div>
+      <h1 className="text-4xl text-center mb-8">Задания</h1> 
+      {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Выполненные задания: {completedTasks.join(', ')}</div> */}
       {/* display local tasks ids */}
-      <div className="text-sm text-center text-yellow-300 flex-shrink-0">Local tasks: {localTasks.map(task => task.taskId).join(', ')}</div>
+      {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Локальные задания: {localTasks.map(task => task.taskId).join(', ')}</div> */}
       <div className="flex flex-col items-center w-full px-4">
         {localTasks.map((task, index) => (
           <button 

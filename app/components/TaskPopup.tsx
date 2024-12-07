@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 
 interface TaskPopupProps {
@@ -28,6 +28,25 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
   image,
   isSecondActionEnabled
 }) => {
+  const [isEnabled, setIsEnabled] = useState(false);
+
+  useEffect(() => {
+    // Check initial state
+    if (isSecondActionEnabled) {
+      setIsEnabled(isSecondActionEnabled());
+    }
+
+    // Set up interval to check for changes
+    const intervalId = setInterval(() => {
+      if (isSecondActionEnabled) {
+        const currentState = isSecondActionEnabled();
+        setIsEnabled(currentState);
+      }
+    }, 100); // Check every 100ms
+
+    return () => clearInterval(intervalId);
+  }, [isSecondActionEnabled]);
+
   if (!isOpen) return null;
 
   return (
@@ -64,9 +83,9 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
           )}
           <button
             onClick={onSecondAction}
-            disabled={isSecondActionEnabled ? !isSecondActionEnabled() : false}
+            disabled={!isEnabled}
             className={`flex-1 ${
-              isSecondActionEnabled && !isSecondActionEnabled() 
+              !isEnabled
                 ? 'bg-gray-500 cursor-not-allowed' 
                 : 'bg-green-600 hover:bg-green-700'
             } text-white py-3 rounded-lg text-lg transition duration-300`}
