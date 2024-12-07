@@ -51,7 +51,7 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center">
-      <div className="bg-gray-800 bg-opacity-80 rounded-t-2xl p-6 w-full max-w-2xl h-[70vh] overflow-y-auto animate-slide-up text-white">
+      <div className="bg-gray-800 bg-opacity-80 rounded-t-2xl p-6 w-full max-w-2xl h-[100vh] overflow-y-auto animate-slide-up text-white">
         <button onClick={onClose} className="float-right text-gray-300 hover:text-white">&times;</button>
         <div className="flex items-center mb-2">
           <div className="w-20 h-20 mr-4">

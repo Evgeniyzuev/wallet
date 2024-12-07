@@ -11,7 +11,47 @@ export interface Task {
   isSecondActionEnabled?: () => boolean; // Add new optional property
 }
 
+interface TestQuestion {
+  question: string;
+  options: string[];
+  correctAnswer: number;
+}
 
+const aiTest: TestQuestion[] = [
+  {
+    question: 'Как ИИ может повлиять на рынок труда в ближайшие годы?',
+    options: [
+      'Никак не повлияет',
+      'Заменит только физический труд',
+      'Создаст больше рабочих мест чем уничтожит',
+      'Может заменить работников в любой сфере',
+      'Повлияет только на IT сферу'
+    ],
+    correctAnswer: 3
+  },
+  {
+    question: 'Какое главное преимущество ИИ перед человеком?',
+    options: [
+      'Креативность',
+      'Скорость и масштабируемость',
+      'Эмоциональный интеллект',
+      'Физическая сила',
+      'Социальные навыки'
+    ],
+    correctAnswer: 1
+  },
+  {
+    question: 'Как лучше всего подготовиться к эпохе ИИ?',
+    options: [
+      'Игнорировать изменения',
+      'Бороться против ИИ',
+      'Использовать ИИ себе на пользу',
+      'Сменить профессию',
+      'Уйти на пенсию'
+    ],
+    correctAnswer: 2
+  }
+];
 
 export const tasks: Task[] = [
     {
@@ -159,7 +199,7 @@ export const tasks: Task[] = [
     'В любой сфере конкурировать с ИИ корпорциями за ресурсы будет всё сложнее.<br/><br/>' +
     'Алгоритмы уже незаметно влияют на наше поведение, мышление, привычки. Забирают наше время и возможности.<br/><br/>' +
     'Цель корпораций это бесконечный рост и увеличение прибыли. Рост неравенства и устранение конкурентов.<br/><br/>' +
-    'Любой кто больше не нужен корпорации, становится конкурентом в борьбе за ресурсы.<br/><br/>' +
+    'Любой кто больше не ну��ен корпорации, становится конкурентом в борьбе за ресурсы.<br/><br/>' +
     'Как противостоять корпорациям и малочисленным элитам, которые больше не нуждаются в людях?<br/><br/>' +
     'Можно не зависеть от них и не поддерживать их. Можно развивать и поддерживать ИИ который будет работать на нас.<br/><br/>' +
     'ИИ который безусловно признает ценность людей независимо от статуса и богатства или каких либо других факторов.<br/><br/>' +
@@ -167,14 +207,89 @@ export const tasks: Task[] = [
     'то со временем все больше людей будут терять ценность для экономики. ' +
     'Поддержим ИИ, цель которого служить людям!',
     reward: 1,
-    actionText: 'Do it',
+    actionText: 'Начать тест',
     action: () => {
-      window.open('https://t.me/WeAi_ch', '_blank');
-    },  
-    secondActionText: 'Done',
-    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-        await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+      let currentQuestion = 0;
+      let correctAnswers = 0;
+      
+      const showQuestion = () => {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        
+        const question = aiTest[currentQuestion];
+        modal.innerHTML = `
+          <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="mb-4">
+              <div class="text-sm text-gray-400">Вопрос ${currentQuestion + 1}/${aiTest.length}</div>
+              <h3 class="text-xl font-bold text-white">${question.question}</h3>
+            </div>
+            <div class="space-y-3">
+              ${question.options.map((option, index) => `
+                <button 
+                  class="w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+                  data-index="${index}"
+                >
+                  ${option}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Add click handlers
+        modal.querySelectorAll('button').forEach(button => {
+          button.addEventListener('click', () => {
+            const selectedIndex = parseInt(button.getAttribute('data-index') || '0');
+            if (selectedIndex === question.correctAnswer) {
+              correctAnswers++;
+            }
+            
+            modal.remove();
+            
+            if (currentQuestion < aiTest.length - 1) {
+              currentQuestion++;
+              showQuestion();
+            } else {
+              // Show results
+              const score = (correctAnswers / aiTest.length) * 100;
+              const resultModal = document.createElement('div');
+              resultModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+              resultModal.innerHTML = `
+                <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+                  <h3 class="text-xl font-bold text-white mb-4">Результат теста</h3>
+                  <p class="text-lg text-white">Правильных ответов: ${score}%</p>
+                  <button class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+                    OK
+                  </button>
+                </div>
+              `;
+              
+              document.body.appendChild(resultModal);
+              
+              // Enable second action if score >= 80%
+              if (score >= 80) {
+                localStorage.setItem('task3Completed', 'true');
+              }
+              
+              resultModal.querySelector('button')?.addEventListener('click', () => {
+                resultModal.remove();
+              });
+            }
+          });
+        });
+      };
+
+      showQuestion();
     },
+    secondActionText: 'Получить награду',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
+    isSecondActionEnabled: () => {
+      return localStorage.getItem('task3Completed') === 'true';
+    }
   },
   {
     taskId: 4,
