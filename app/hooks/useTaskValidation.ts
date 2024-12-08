@@ -43,7 +43,7 @@ export const useTaskValidation = () => {
 
   const isTaskEnabled = (taskId: number) => {
     const rule = validationRules[taskId];
-    if (!rule) return true; // If no validation rule exists, task is enabled by default
+    if (!rule) return false; // If no validation rule exists, task is disabled by default
     return rule.validate();
   };
 
