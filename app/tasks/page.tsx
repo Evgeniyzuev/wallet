@@ -5,9 +5,11 @@ import TaskPopup from '../components/TaskPopup'
 import { tasks as initialTasks, Task } from './taskData'
 import Image from 'next/image'
 import { useUser } from '../UserContext';
+import { useTaskValidation } from '../hooks/useTaskValidation';
 
 export default function Home() {
   const { user, setUser, handleUpdateUser } = useUser();
+  const { isTaskEnabled, getTaskError } = useTaskValidation();
   const [error, setError] = useState<string | null>(null);
   const [notification, setNotification] = useState('')
   const [isPopupOpen, setIsPopupOpen] = useState(false)
@@ -22,8 +24,7 @@ export default function Home() {
     actionText: '',
     action: () => {},
     secondActionText: '',
-    secondAction: () => {},
-    isSecondActionEnabled: () => true
+    secondAction: () => {}
   })
   const [isLoading, setIsLoading] = useState(true);
 
@@ -127,7 +128,6 @@ export default function Home() {
         }}
         secondActionText={currentTask.secondActionText}
         image={currentTask.image}
-        isSecondActionEnabled={currentTask.isSecondActionEnabled}
       />
       {/* <Navigation /> */}
       {/* display completed tasks ids */}

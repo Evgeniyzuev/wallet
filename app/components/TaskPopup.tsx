@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useTaskValidation } from '../hooks/useTaskValidation';
+import Modal from './Modal';
 
 interface TaskPopupProps {
   isOpen: boolean;
@@ -12,10 +14,9 @@ interface TaskPopupProps {
   onSecondAction: () => void;
   secondActionText: string;
   image: string;
-  isSecondActionEnabled?: () => boolean;
 }
 
-const TaskPopup: React.FC<TaskPopupProps> = ({
+export default function TaskPopup({
   isOpen,
   onClose,
   title,
@@ -25,33 +26,20 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
   actionText,
   onSecondAction,
   secondActionText,
-  image,
-  isSecondActionEnabled
-}) => {
-  const [isEnabled, setIsEnabled] = useState(false);
-
-  useEffect(() => {
-    // Check initial state
-    if (isSecondActionEnabled) {
-      setIsEnabled(isSecondActionEnabled());
-    }
-
-    // Set up interval to check for changes
-    const intervalId = setInterval(() => {
-      if (isSecondActionEnabled) {
-        const currentState = isSecondActionEnabled();
-        setIsEnabled(currentState);
-      }
-    }, 100); // Check every 100ms
-
-    return () => clearInterval(intervalId);
-  }, [isSecondActionEnabled]);
-
-  if (!isOpen) return null;
+  image
+}: TaskPopupProps) {
+  const { isTaskEnabled } = useTaskValidation();
+  const taskId = title === 'Желаемый размер дохода' ? 2 : 
+                 title === 'Желаемые изменения' ? 1 : 
+                 title === 'Ai угроза и возможность' ? 3 :
+                 title === 'Subscribe to the channel' ? 4 :
+                 title === 'Прокачать ядро' ? 5 :
+                 title === 'Секретный код' ? 6 :
+                 title === 'Проверить ввод и вывод средств' ? 7 : 0;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center">
-      <div className="bg-gray-800 bg-opacity-80 rounded-t-2xl p-6 w-full max-w-2xl h-[100vh] overflow-y-auto animate-slide-up text-white">
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="bg-gray-800 bg-opacity-80 rounded-t-2xl p-4 w-full max-w-2xl h-[100vh] overflow-y-auto animate-slide-up text-white">
         <button onClick={onClose} className="float-right text-gray-300 hover:text-white">&times;</button>
         <div className="flex items-center mb-2">
           <div className="w-20 h-20 mr-4">
@@ -69,33 +57,31 @@ const TaskPopup: React.FC<TaskPopupProps> = ({
         </div>
         <h2 className="text-2xl font-bold mb-4">{title}</h2>
         <p 
-          className="text-gray-300 mb-6 whitespace-pre-wrap break-words"
+          className="text-white mb-6 whitespace-pre-wrap break-words text-lg leading-relaxed"
           dangerouslySetInnerHTML={{ __html: description }}
         />
-        <div className="flex space-x-4 mb-10">
+        <div className="mt-4 flex justify-between">
           {actionText && onAction && (
             <button
               onClick={onAction}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg text-lg transition duration-300"
+              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
             >
               {actionText}
             </button>
           )}
           <button
             onClick={onSecondAction}
-            disabled={!isEnabled}
-            className={`flex-1 ${
-              !isEnabled
-                ? 'bg-gray-500 cursor-not-allowed' 
-                : 'bg-green-600 hover:bg-green-700'
-            } text-white py-3 rounded-lg text-lg transition duration-300`}
+            disabled={!isTaskEnabled(taskId)}
+            className={`${
+              isTaskEnabled(taskId)
+                ? 'bg-green-500 hover:bg-green-600'
+                : 'bg-gray-500 cursor-not-allowed'
+            } text-white font-bold py-2 px-4 rounded`}
           >
             {secondActionText}
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
-};
-
-export default TaskPopup;
+}
