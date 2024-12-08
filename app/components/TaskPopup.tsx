@@ -29,6 +29,7 @@ export default function TaskPopup({
   image
 }: TaskPopupProps) {
   const { isTaskEnabled } = useTaskValidation();
+  const [isEnabled, setIsEnabled] = useState(false);
   const taskId = title === 'Желаемый размер дохода' ? 2 : 
                  title === 'Желаемые изменения' ? 1 : 
                  title === 'Ai угроза и возможность' ? 3 :
@@ -36,6 +37,18 @@ export default function TaskPopup({
                  title === 'Прокачать ядро' ? 5 :
                  title === 'Секретный код' ? 6 :
                  title === 'Проверить ввод и вывод средств' ? 7 : 0;
+
+  useEffect(() => {
+    const checkEnabled = () => {
+      setIsEnabled(isTaskEnabled(taskId));
+    };
+
+    checkEnabled();
+    // Set up interval to check periodically
+    const interval = setInterval(checkEnabled, 1000);
+
+    return () => clearInterval(interval);
+  }, [taskId, isTaskEnabled]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -71,9 +84,9 @@ export default function TaskPopup({
           )}
           <button
             onClick={onSecondAction}
-            disabled={!isTaskEnabled(taskId)}
+            disabled={!isEnabled}
             className={`${
-              isTaskEnabled(taskId)
+              isEnabled
                 ? 'bg-green-500 hover:bg-green-600'
                 : 'bg-gray-500 cursor-not-allowed'
             } text-white font-bold py-2 px-4 rounded`}
