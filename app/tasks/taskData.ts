@@ -1,6 +1,3 @@
-import { useRouter } from 'next/navigation';
-import { useUser } from '../UserContext';
-
 export interface Task {
   taskId: number;
   title: string;
@@ -8,7 +5,7 @@ export interface Task {
   description: string;
   reward: number;
   actionText?: string;
-  action?: () => void;
+  action?: (navigate: (path: string) => void) => void;
   secondActionText: string;
   secondAction: (user: any, handleUpdateUser: any, setNotification: any, setTaskCompleted: any, setError: any) => void;
 }
@@ -127,8 +124,8 @@ export const tasks: Task[] = [
       taskId: 1,
       title: 'Желаемые изменения',
       image: '/images/top_wallet.jpg',
-      description: 'Деньги могут изменить к лучшему качество жизни и самого человека.<br/><br/>' +
-      'Какие возможные изменения вызывают у вас эмоции?',
+      description: 'Деньги могут изменить человека к лучшему и повысить качество жизни.<br/><br/>' +
+      'Какие возможные изменения откликаются у вас и вызывают эмоции?',
       reward: 1,
       actionText: 'Выбрать изменения',
       action: () => {
@@ -203,10 +200,10 @@ export const tasks: Task[] = [
     },
     {
         taskId: 2,
-        title: 'Желаемый размер дохода',
+        title: 'Первая цель',
         image: '/images/core-xs.jpg',
         description: 
-        'Важно двигаться к цели шаг за шагом. Надежно и с ощутимыми результатами.<br/>Попытки достичь огромных целей одним прыжком связаны с большими рисками и разочарованием.<br/><br/>' +
+        'Важно двигаться к цели шаг за шагом. Надежно и с ощутимыми результатами.<br/>Попытки достичь больших целей одним прыжком связаны с большими рисками и разочарованием.<br/><br/>' +
         'Определим первую цель по доходу.<br/>' +
         'Цель небольшая, видимая и достижимая быстро. В то же время ощутимая и желаемая.<br/><br/>' +
 
@@ -407,22 +404,22 @@ export const tasks: Task[] = [
     },  
   {
     taskId: 4,
-    title: 'Subscribe to the channel',
+    title: 'Подписаться на канал',
     image: '/images/powercore.jpg',
-    description: 'Subscribe to the WeAi channel',
+    description: 'Подпишитесь на канал WeAi_ch',
     reward: 1,
-    actionText: 'Subscribe',
+    actionText: 'Подписаться',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
       localStorage.setItem('task2Completed', 'true');
     },
-    secondActionText: 'Check Membership',
+    secondActionText: 'Проверить подписку',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
         const isMember = await checkMembership(user, 'WeAi_ch', setError);
         if (isMember) {
           await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
         } else {
-            setError('Please subscribe to the channel to receive the bonus');
+            setError('Пожалуйста, подпишитесь на канал для получения награды');
         }
     }
   },
@@ -436,17 +433,12 @@ export const tasks: Task[] = [
     taskId: 5,
     title: 'Прокачать ядро',
     image: '/images/aichip.jpg',
-    description: 'Прокачать ядро до второго уровня',
+    description: 'Прокачать ядро до третьего уровня',
     reward: 1,  
-    actionText: 'Перейти в ядро',
-    action: () => {
-      const router = useRouter();
-      router.push('/core');
-    },
-    secondActionText: 'Done',
+    secondActionText: 'Готово',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      if (!user || user.level < 1) {
-        setError('This action requires level 1 or higher');
+      if (!user || user.level < 3) {
+        setError('Это действие требует уровня 3 или выше');
         return;
       }
       
@@ -455,22 +447,19 @@ export const tasks: Task[] = [
   },
   {
     taskId: 6,
-    title: 'Секретный код',
+    title: 'Пригласить реферала',
     image: '/images/cyber.png',
-    description: 'Узнать у ИИ ассистента секретный код. Код даст возможность получить улучшение в дальнейшем.',
+    description: 'Перейдите на вкладку друзья и нажмите кнопку "Пригласить", чтобы отправить приглашение контактам в телеграм.<br/><br/>' +
+    'Или копируйте реферальную ссылку и отправляйте ее где угодно. ' +
+    'Ниже можно увидеть своих рефералов.' +
+    'Условие выполнения: минимум 1 реферал приглашен.',
     reward: 1,
-    actionText: 'Do it',
-    action: () => {
-      const router = useRouter();
-      router.push('/core');
-    },
-    secondActionText: 'Done',
-    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      if (!user || user.level < 1) {
-        setError('This action requires level 1 or higher');
-        return;
-      }
-      
+    // actionText: 'Пригласить',
+    // action: () => {
+    //     window.open('/friends', '_blank');
+    // },
+    secondActionText: 'Готово',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {  
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     }
   },
@@ -478,19 +467,18 @@ export const tasks: Task[] = [
     taskId: 7,
     title: 'Проверить ввод и вывод средств',
     image: '/images/core-xs.jpg',
-    description: 'Пополнить кошелек на любую сумму. Условие выполнения баланс кошелька не меньше 1$.<br/><br/>' +
+    description: 'Перейти в кошелек и пополнить баланс на любую сумму. Условие выполнения баланс кошелька не меньше 1$.<br/><br/>' +
     'Для безопасного пополнения можно подключить телеграм кошелек с помощью tonconnect.<br/><br/>' +
     'Телеграм кошелек проще всего пополнить через P2P маркет. Обращайте внимание на рейтинг продавца и количество сделок.',
     reward: 1,
-    actionText: 'Do it',  
-    action: () => {
-      const router = useRouter();
-      router.push('/wallet');
-    },
-    secondActionText: 'Done',
+    // actionText: 'Сделать',  
+    // action: () => {
+    //     window.open('/wallet', '_blank');
+    // },
+    secondActionText: 'Готово',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
       if (!user || (user.walletBalance || 0) < 1) {
-        setError('Wallet balance must be at least 1$');
+        setError('Баланс кошелька должен быть не меньше 1$');
         return;
       }
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
@@ -498,45 +486,47 @@ export const tasks: Task[] = [
   },
   {
     taskId: 8,
-    title: 'Set your goals',
+    title: 'Рассчитать путь к $1M',
     image: '/images/deal.jpg',
-    description: 'Set your personal goals in different areas of life',
+    description: 'Рассчитайте, сколько времени потребуется для достижения $1,000,000 с помощью Aicore' +
+    '1. Перейти в ядро' +
+    '2. Выбрать цель' +
+    '3. Выбрать размер ежедневных наград за выполнение заданий' +
+    '4. Нажать кнопку "Рассчитать"',
     reward: 1,
-    actionText: 'Set Goals',
-    action: () => {
-      const router = useRouter();
-      router.push('/goals');
-    },
-    secondActionText: 'Done',
+    // actionText: 'Рассчитать',
+    // action: () => {
+    //     window.open('/goals', '_blank');
+    // },
+    secondActionText: 'Готово',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
   {
     taskId: 9,
-    title: 'Calculate your path to $1M',
+    title: 'Рассчитать путь к $1M',
     image: '/images/deal.jpg',
-    description: 'Calculate how long it will take to reach $1,000,000 with AI core',
+    description: 'Рассчитайте, сколько времени потребуется для достижения $1,000,000 с помощью Aicore',
     reward: 1,
-    actionText: 'Calculate',
-    action: () => {
-      const router = useRouter();
-      router.push('https://t.me/WeAiBot_bot');
-    },
-    secondActionText: 'Done',
+    // actionText: 'Рассчитать',
+    // action: () => {
+    //   window.open('https://t.me/WeAiBot_bot', '_blank');
+    // },
+    secondActionText: 'Готово',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   }
 ];
 
-export const handleSubscribe = async () => {
-  window.open('https://t.me/WeAi_ch', '_blank');
-};
+// export const handleSubscribe = async () => {
+//   window.open('https://t.me/WeAi_ch', '_blank');
+// };
 
 export const checkMembership = async (user: any, channelUsername: string,  setError: any) => {
   if (!user?.telegramId) {
-    setError('User not found');
+    setError('Пользователь не найден');
     return;
   }
   const response = await fetch('/api/check-membership', {
@@ -555,17 +545,17 @@ export const checkMembership = async (user: any, channelUsername: string,  setEr
     if (isMember) {
       return true
     } else {
-      setError('Please subscribe to the channel to receive the bonus');
+      setError('Пожалуйста, подпишитесь на канал для получения награды');
       return false
     }
   } else {
-    setError('Failed to check membership');
+    setError('Не удалось проверить подписку');
   }
 };
 
 export const completeTaskApi = async (telegramId: number, taskId: number) => {
     if (!telegramId) {
-        console.error('User or telegramId is undefined');
+        console.error('Пользователь или telegramId не определены');
         return false;
     }
     
@@ -599,7 +589,7 @@ const completeTask = async (
   setTaskCompleted(true);
   
   if (!user?.telegramId) {
-    setError('User not found');
+    setError('Пользователь не найден');
     return;
   }
 
@@ -619,8 +609,8 @@ const completeTask = async (
     const result2 = await completeTaskApi(user.telegramId, taskId);
 
   if (result?.success) {
-    setNotification(`Task completed! ${reward}$ added to your Aicore.`);
+    setNotification(`Задание выполнено! ${reward}$ добавлено в ваш Aicore.`);
   } else {
-    setError('Failed to increase Aicore balance');
+    setError('Не удалось увеличить баланс Aicore');
   }
 };

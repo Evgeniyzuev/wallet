@@ -6,6 +6,7 @@ import { tasks as initialTasks, Task } from './taskData'
 import Image from 'next/image'
 import { useUser } from '../UserContext';
 import { useTaskValidation } from '../hooks/useTaskValidation';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const { user, setUser, handleUpdateUser } = useUser();
@@ -27,6 +28,7 @@ export default function Home() {
     secondAction: () => {}
   })
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     if (user?.telegramId) {
@@ -121,7 +123,9 @@ export default function Home() {
         title={currentTask.title}
         description={currentTask.description}
         reward={currentTask.reward}
-        onAction={currentTask.action}
+        onAction={currentTask.action ? 
+          () => currentTask.action!((path) => router.push(path)) 
+          : undefined}
         actionText={currentTask.actionText}
         onSecondAction={() => {
           currentTask.secondAction(user, handleUpdateUser, setNotification, () => handleTaskCompletion(currentTask), setError);

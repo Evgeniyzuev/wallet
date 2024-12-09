@@ -39,8 +39,9 @@ export default function TaskPopup({
                  title === 'Проверить ввод и вывод средств' ? 7 : 0;
 
   useEffect(() => {
-    const checkEnabled = () => {
-      setIsEnabled(isTaskEnabled(taskId));
+    const checkEnabled = async () => {
+      const enabled = await isTaskEnabled(taskId);
+      setIsEnabled(enabled);
     };
 
     checkEnabled();
@@ -52,7 +53,7 @@ export default function TaskPopup({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="bg-gray-800 bg-opacity-80 rounded-t-2xl p-4 w-full max-w-2xl h-[100vh] overflow-y-auto animate-slide-up text-white">
+      <div className="bg-gray-800 bg-opacity-80 rounded-t-2xl p-4 w-full h-[100vh] overflow-y-auto animate-slide-up text-white">
         <button onClick={onClose} className="float-right text-gray-300 hover:text-white">&times;</button>
         <div className="flex items-center mb-2">
           <div className="w-20 h-20 mr-4">
