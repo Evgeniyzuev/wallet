@@ -6,12 +6,49 @@ import { useUser } from '../UserContext';
 import TonConnect from './tonconnect';
 import Send from './send';
 import { useTonPrice } from '../TonPriceContext';
+import { useLanguage } from '../LanguageContext';
 
 type Currency = {
   code: string;
   symbol: string;
   rate: number; // Exchange rate from USD
 };
+
+// Add translations object
+const translations = {
+  ru: {
+    send: 'Отправить',
+    receive: 'Получить',
+    upCore: 'В ядро',
+    scan: 'Скан',
+    exchange: 'Обмен',
+    buyTon: 'Купить TON',
+    enterAmount: 'Введите сумму',
+    confirm: 'Подтвердить',
+    loading: 'Загрузка...',
+    enableBiometrics: 'Включите биометрию',
+    forTransactions: 'для подтверждения транзакций',
+    insufficientBalance: 'Недостаточно средств',
+    negativeAmount: 'Отрицательная сумма',
+    invalidAmount: 'Неверная сумма'
+  },
+  en: {
+    send: 'Send',
+    receive: 'Receive',
+    upCore: 'Up Core',
+    scan: 'Scan',
+    exchange: 'Exchange',
+    buyTon: 'Buy TON',
+    enterAmount: 'Enter amount',
+    confirm: 'Confirm',
+    loading: 'Loading...',
+    enableBiometrics: 'Enable biometrics',
+    forTransactions: 'for transaction confirmation',
+    insufficientBalance: 'Insufficient balance',
+    negativeAmount: 'Negative amount',
+    invalidAmount: 'Invalid amount'
+  }
+}
 
 export default function Wallet() {
   const { user, handleUpdateUser } = useUser();
@@ -33,6 +70,8 @@ export default function Wallet() {
     CNY: 7.2,
     INR: 83.2
   });
+  const { language } = useLanguage();
+  const t = translations[language as keyof typeof translations] || translations.en;
 
   const currencies: Record<string, Currency> = {
     RUB: { code: 'RUB', symbol: '₽', rate: exchangeRates.RUB },
@@ -58,7 +97,7 @@ export default function Wallet() {
     }
 
     if (!amount || isNaN(Number(amount))) {
-      console.error('Invalid amount');
+      console.error(t.invalidAmount);
       return;
     }
 
@@ -71,11 +110,11 @@ export default function Wallet() {
       if (selectedAction === 'upCore') {
         // Handle topUpCore action handleIncreaseAicoreBalance
         if (amountNumber > (user?.walletBalance || 0)) {
-          console.error('Insufficient balance');
+          console.error(t.insufficientBalance);
           return;
         }
         if (amountNumber <= 0) {
-          console.error('Negative amount');
+          console.error(t.negativeAmount);
           return;
         }
         result = await handleUpdateUser({
@@ -146,7 +185,7 @@ export default function Wallet() {
               💱
             </button>
             <p className="text-2xl text-gray-400">
-              {tonPrice ? `${getTonAmount().toFixed(2)} TON` : 'Loading...'}
+              {tonPrice ? `${getTonAmount().toFixed(2)} TON` : t.loading}
             </p>
           </div>
           
@@ -185,7 +224,7 @@ export default function Wallet() {
             className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
           >
             <span className="text-2xl mb-2">↑</span>
-            <span className="text-sm">Send</span>
+            <span className="text-sm">{t.send}</span>
           </button>
 
           <button 
@@ -193,7 +232,7 @@ export default function Wallet() {
             className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
           >
             <span className="text-2xl mb-2">↓</span>
-            <span className="text-sm">Receive</span>
+            <span className="text-sm">{t.receive}</span>
           </button>
 
           <button 
@@ -201,7 +240,7 @@ export default function Wallet() {
             className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
           >
             <span className="text-2xl mb-2">↗</span>
-            <span className="text-sm">Up Core</span>
+            <span className="text-sm">{t.upCore}</span>
           </button>
 
           <button 
@@ -209,7 +248,7 @@ export default function Wallet() {
             className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
           >
             <span className="text-2xl mb-2">⟲</span>
-            <span className="text-sm">Scan</span>
+            <span className="text-sm">{t.scan}</span>
           </button>
 
           <button 
@@ -217,7 +256,7 @@ export default function Wallet() {
             className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
           >
             <span className="text-2xl mb-2">↑↓</span>
-            <span className="text-sm">Exchange</span>
+            <span className="text-sm">{t.exchange}</span>
           </button>
 
           <button 
@@ -225,7 +264,7 @@ export default function Wallet() {
             className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
           >
             <span className="text-2xl mb-2">$</span>
-            <span className="text-sm">Buy TON</span>
+            <span className="text-sm">{t.buyTon}</span>
           </button>
 
 
@@ -240,7 +279,7 @@ export default function Wallet() {
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              placeholder="Enter amount"
+              placeholder={t.enterAmount}
               className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
               min="0" // Prevent negative values
             />
@@ -248,7 +287,7 @@ export default function Wallet() {
               onClick={handleActionSubmit}
               className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
             >
-              Confirm
+              {t.confirm}
             </button>
           </div>
         )}
@@ -263,8 +302,8 @@ export default function Wallet() {
                 <span className="text-xl">👆</span>
               </div>
               <div className="flex flex-col items-start">
-                <span className="text-sm">Включите биометрию</span>
-                <span className="text-xs text-gray-400">для подтверждения транзакций</span>
+                <span className="text-sm">{t.enableBiometrics}</span>
+                <span className="text-xs text-gray-400">{t.forTransactions}</span>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">

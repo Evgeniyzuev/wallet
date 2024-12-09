@@ -515,9 +515,11 @@ export const tasks: Task[] = [
   },
   {
     taskId: 9,
-    title: 'Рассчитать путь к $1M',
+    title: 'Пополнить ядро',
     image: '/images/deal.jpg',
-    description: 'Рассчитайте, сколько времени потребуется для достижения $1,000,000 с помощью Aicore',
+    description: 'Пополнить ядро на любую сумму не меньше 1$.<br/><br/>' +
+    'Условие выполнения: <br/><br/>' +
+    '.<br/><br/>',
     reward: 1,
     // actionText: 'Рассчитать',
     // action: () => {
@@ -527,7 +529,68 @@ export const tasks: Task[] = [
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
-  }
+  },
+  {
+    taskId: 10,
+    title: 'Точка А',
+    image: '/images/deal.jpg',
+    description: 'Чем заниматься если вопрос денег решен?<br/><br/>' +
+    'ответить себе на вопросы: <br/><br/>' +
+    'Чем я занимаюсь сейчас?<br/>' +
+    'Хочу ли я сменить/найти новое дело?<br/>' +
+    'Что заряжает меня энергией?<br/>' +
+    'Чем я могу заниматься?<br/>' +
+    'Определить интересы?<br/>' +
+    'Выбрать интересное дело?<br/>' +
+    'Пройти профессиональное обучение?<br/><br/>',
+    reward: 1,
+    // actionText: 'Рассчитать',
+    // action: () => {
+    //   window.open('https://t.me/WeAiBot_bot', '_blank');
+    // },
+    secondActionText: 'Готово',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
+  },
+  {
+    taskId: 11,
+    title: 'личное знакомство',
+    image: '/images/deal.jpg',
+    description: 'Ядро не может уменьшаться, оно постоянно растет.<br/><br/>' +
+    'Ядро нельзя передать, отнять, украсть, потерять и т.д. <br/><br/>' +
+    'Если привязать его к человеку лично, то оно всегда будет с ним.<br/><br/>' +
+    'Пройти подтверждение личности. Это анонимно и безопасно.<br/><br/>' +
+    '<br/><br/>',
+    reward: 1,
+    // actionText: 'Рассчитать',
+    // action: () => {
+    //   window.open('https://t.me/WeAiBot_bot', '_blank');
+    // },
+    secondActionText: 'Готово',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
+  },
+  {
+    taskId: 12,
+    title: 'Создать канал в ТГ',
+    image: '/images/deal.jpg',
+    description: 'Постить мысли об WeAi и как ИИ изменит мир.<br/><br/>' +
+    'Личная трансформация и инсайты <br/><br/>' +
+    'Взаимоподписки.<br/><br/>',
+    reward: 1,
+    // actionText: 'Рассчитать',
+    // action: () => {
+    //   window.open('https://t.me/WeAiBot_bot', '_blank');
+    // },
+    secondActionText: 'Готово',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
+  },
+
+  
 ];
 
 // export const handleSubscribe = async () => {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { initUtils } from '@telegram-apps/sdk'
 import { useUser } from '../UserContext'; 
+import { useLanguage } from '../LanguageContext'
 
 interface ReferralSystemProps {
   userId: string
@@ -13,7 +14,39 @@ interface Referral {
   level: number;
 }
 
+const translations = {
+  ru: {
+    inviteFriend: 'Пригласить друга',
+    copyInviteLink: 'Скопировать ссылку',
+    showContacts: 'Показать контакты',
+    hideContacts: 'Скрыть контакты',
+    yourReferrer: 'Вас пригласил',
+    noReferrer: 'Нет реферера',
+    yourReferrals: 'Вы пригласили',
+    showMoreReferrals: 'Показать больше рефералов',
+    level: 'уровень',
+    inviteCopied: 'Пригласительная ссылка скопирована!',
+    shareText: 'Присоединяйтесь к нашему мини-приложению в Telegram!'
+  },
+  en: {
+    inviteFriend: 'Invite Friend',
+    copyInviteLink: 'Copy Invite Link',
+    showContacts: 'Show Contacts',
+    hideContacts: 'Hide Contacts',
+    yourReferrer: 'Your Referrer',
+    noReferrer: 'No referrer',
+    yourReferrals: 'Your Referrals',
+    showMoreReferrals: 'Show More Referrals',
+    level: 'level',
+    inviteCopied: 'Invite link copied to clipboard!',
+    shareText: 'Join me on this awesome Telegram mini app!'
+  }
+}
+
 const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
+  const { language } = useLanguage()
+  const t = translations[language as keyof typeof translations] || translations.en
+  
   const [referralIds, setReferralIds] = useState<number[]>([])
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [referrer, setReferrer] = useState<Referral | null>(null);
@@ -99,7 +132,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const handleInviteFriend = () => {
     const utils = initUtils()
     const inviteLink = `${INVITE_URL}?startapp=${userId}`
-    const shareText = `Join me on this awesome Telegram mini app!`
+    const shareText = t.shareText
     const fullUrl = `https://t.me/share/url?url=${encodeURIComponent(inviteLink)}&text=${encodeURIComponent(shareText)}`
     utils.openTelegramLink(fullUrl)
   }
@@ -107,7 +140,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
   const handleCopyLink = () => {
     const inviteLink = `${INVITE_URL}?startapp=${userId}`
     navigator.clipboard.writeText(inviteLink)
-    alert('Invite link copied to clipboard!')
+    alert(t.inviteCopied)
   }
 
   // const fetchReferrer = async () => {
@@ -137,13 +170,13 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
           onClick={handleInviteFriend}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
-          Invite Friend
+          {t.inviteFriend}
         </button>
         <button
           onClick={handleCopyLink}
           className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         >
-          Copy Invite Link
+          {t.copyInviteLink}
         </button>
       </div>
 
@@ -152,22 +185,20 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
           onClick={handleShowContacts}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
         >
-          {showContacts ? 'Hide Contacts' : 'Show Contacts'}
+          {showContacts ? t.hideContacts : t.showContacts}
         </button>
         {showContacts && (
           <>
             <div className="mt-8">
-            {/* показывать Имя и уровень реферера */}
-            <h2 className="text-xl font-bold mb-4">
-              Your Referrer: {referrer ? `${referrer.firstName} (level: ${referrer.level})` : "No referrer"}
-            </h2>
-
+              <h2 className="text-xl font-bold mb-4">
+                {t.yourReferrer}: {referrer ? `${referrer.firstName} (${t.level}: ${referrer.level})` : t.noReferrer}
+              </h2>
             </div>
-            <h2 className="text-2xl font-bold mb-4">Your Referrals:</h2>
+            <h2 className="text-2xl font-bold mb-4">{t.yourReferrals}:</h2>
             <ul>
               {referrals.map((referral, index) => (
                 <li key={index} className="bg-dark-blue p-2 mb-2 rounded">
-                  ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`} {referral.level ? `(level: ${referral.level})` : 'level: 0'}
+                  ID:{referral.telegramId} {referral.firstName ? `(${referral.firstName})` : `(${referral.username})`} ({t.level}: {referral.level || 0})
                 </li>
               ))}
             </ul>
@@ -176,7 +207,7 @@ const ReferralSystem: React.FC<ReferralSystemProps> = ({ userId }) => {
                 onClick={loadMoreReferrals}
                 className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mt-4"
               >
-                Show More Referrals
+                {t.showMoreReferrals}
               </button>
             )}
           </>
