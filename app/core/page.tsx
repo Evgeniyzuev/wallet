@@ -7,7 +7,50 @@ import { useUser } from '../UserContext';
 import { useUserData } from '../hooks/useUserData'; 
 import DailyRewardPopup from '../components/DailyRewardPopup';
 import LevelUpPopup from '../components/LevelUpPopup';
+import { useLanguage } from '../LanguageContext';
 
+const translations = {
+  ru: {
+    walletDaily: "Кошелёк",
+    coreDaily: "Ядро",
+    startCore: "Стартовое ядро $",
+    daily: "Ежедневный доход",
+    dailyRewards: "Ежедневные награды $/д",
+    coreInYears: "Ядро через лет",
+    goal: "Цель",
+    calculate: "Рассчитать",
+    timeToGoal: "Время до цели",
+    years: "лет",
+    days: "дней",
+    upCore: "Увеличить ядро",
+    confirmUpCore: "Подтвердить увеличение",
+    wallet: "Кошелёк",
+    enterAmount: "Введите сумму",
+    reinvest: "Реинвест",
+    save: "Сохранить",
+    minLevel: "мин(-5% * ур)"
+  },
+  en: {
+    walletDaily: "Wallet",
+    coreDaily: "Core",
+    startCore: "Start Core $",
+    daily: "Daily income",
+    dailyRewards: "Daily Rewards $/d",
+    coreInYears: "Core in years",
+    goal: "Goal",
+    calculate: "Calculate", 
+    timeToGoal: "Time to Goal",
+    years: "years",
+    days: "days",
+    upCore: "Up Core",
+    confirmUpCore: "Confirm Up Core",
+    wallet: "Wallet",
+    enterAmount: "Enter amount",
+    reinvest: "Reinvest",
+    save: "Save",
+    minLevel: "min(-5% * lvl)"
+  }
+};
 
 export default function Core() {
   const { 
@@ -21,6 +64,9 @@ export default function Core() {
     rewardData 
   } = useUserData();
 
+  const { language } = useLanguage();
+
+  const t = translations[language as keyof typeof translations] || translations.en;
 
   const [dailyCoreRate] = useState(0.000633);
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
@@ -158,10 +204,12 @@ export default function Core() {
       const days = Math.floor((minDays + maxDays) / 2);
       const currentAmount = (user.aicoreBalance + plusStartCore + dailyReward * days) * ((dailyCoreRate * reinvestmentPart + 1) ** days);
 
-
       // Base case: if the difference is small enough
       if (-2 < maxDays - minDays && maxDays - minDays < 2) {
         setDaysToTarget(days);
+        // Save values to localStorage
+        localStorage.setItem('calculatedDaysToTarget', days.toString());
+        localStorage.setItem('selectedDailyReward', dailyReward.toString());
         return;
       }
 
@@ -260,7 +308,7 @@ export default function Core() {
         <div className="mb-1">
           <label className="flex items-center justify-between mb-0">
             APY 26% 
-            <span>Reinvest</span>
+            <span>{t.reinvest}</span>
             <input
               type="number"
               value={Math.round(reinvestmentPart * 100)}
@@ -280,8 +328,8 @@ export default function Core() {
         <div className="text-lg font-semibold mb-1">
           
           <div className="flex justify-between text-sm mt-0">
-            <span>Wallet: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(6)}$/d</span>
-            <span>Core: {((user?.aicoreBalance || 0) * dailyCoreRate * (reinvestmentPart)).toFixed(6)}$/d</span>
+            <span>{t.walletDaily}: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(6)}$/d</span>
+            <span>{t.coreDaily}: {((user?.aicoreBalance || 0) * dailyCoreRate * (reinvestmentPart)).toFixed(6)}$/d</span>
           </div>
         </div>
 
@@ -289,7 +337,7 @@ export default function Core() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="block">
-              <span className="text-sm">Start Core $</span>
+              <span className="text-sm">{t.startCore}</span>
               <input
                 type="number"
                 value={plusStartCore}
@@ -300,7 +348,7 @@ export default function Core() {
           </div>
           <div className="space-y-2">
             <label className="block">
-              <span className="text-sm">Daily Rewards $/d</span>
+              <span className="text-sm">{t.dailyRewards}</span>
               <input
                 type="text"
                 value={dailyRewardInput}
@@ -334,7 +382,7 @@ export default function Core() {
       {/* Calculator section */}
       <div className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all p-2 mb-1">
         <div className="mb-1 flex items-center">
-          <span>Core in years</span>
+          <span>{t.coreInYears}</span>
           <input
             type="number"
             value={coreAfterXyears}
@@ -353,12 +401,12 @@ export default function Core() {
           </span>
         </div>
         <div className="flex items-center">
-          <span className="ml-0 text-white">Daily </span>
-          <span className="ml-2 text-yellow-500 font-bold">{(totalFutureValue * dailyCoreRate).toFixed(2)} $/d.</span>
+          <span className="ml-0 text-white">{t.daily}</span>
+          <span className="ml-2 text-yellow-500 font-bold">{(totalFutureValue * dailyCoreRate).toFixed(2)} $/d</span>
         </div>
 
         {<div className="mb-0 flex items-center">
-          <span className="mr-2">Goal</span>
+          <span className="mr-2">{t.goal}</span>
           <input
             type="text"
             value={targetAmount}
@@ -366,16 +414,18 @@ export default function Core() {
             className="w-32 h-6 p-1 border border-black text-black rounded"
           />
           <span className="ml-1">$</span>
-          <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 ml-4 rounded">Calculate</button>
+          <button onClick={calculateDaysToTarget} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-0 px-4 ml-4 rounded">
+            {t.calculate}
+          </button>
         </div> }
 
         <div className="mt-2 text-yellow-500">
-          Time to Goal: {
+          {t.timeToGoal}: {
             (() => {
               const years = Math.floor(daysToTarget / 365.25);
               const remainingDays = Math.floor(daysToTarget % 365.25);
 
-              return `${years} years ${remainingDays} days`;
+              return `${years} ${t.years} ${remainingDays} ${t.days}`;
             })()
           }
         </div>
@@ -388,18 +438,18 @@ export default function Core() {
         className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 
                    text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-200"
       >
-        Up Core
+        {t.upCore}
       </button>
 
       {/* Up Core modal */}
       {selectedAction === 'upCore' && (
         <div className="mt-1 bg-[#252a41] p-4 rounded-lg border border-gray-600">
-          <div className="mb-1 text-center">Wallet: {Math.floor((user?.walletBalance || 0) * 100) / 100} $</div>
+          <div className="mb-1 text-center">{t.wallet}: {Math.floor((user?.walletBalance || 0) * 100) / 100} $</div>
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            placeholder="Enter amount"
+            placeholder={t.enterAmount}
             className="text-black w-full p-2 mb-2 border border-gray-300 rounded"
             min="0"
           />
@@ -408,7 +458,7 @@ export default function Core() {
             disabled={isTransactionInProgress} // Disable button while transaction is in progress
             className="w-full bg-purple-500 hover:bg-purple-700 text-sm text-white font-bold py-2 px-4 rounded"
           >
-            Confirm Up Core
+            {t.confirmUpCore}
           </button>
         </div>
       )}
@@ -417,7 +467,7 @@ export default function Core() {
       <div className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all p-2 mb-1">
         <div className="flex justify-between">
           <div >
-            Reinvest
+            {t.reinvest}
             
             <input 
               type="number" 
@@ -429,7 +479,7 @@ export default function Core() {
                 setReinvestmentSetupInput(value);
               }} 
             /> % <br/>
-            <span className="text-xs">min(-5% * lvl): {Math.max(0, minValue)}%</span>
+            <span className="text-xs">{t.minLevel}: {Math.max(0, minValue)}%</span>
           </div>
           {(reinvestmentSetupInput >= minValue) && 
               <button 
@@ -437,7 +487,7 @@ export default function Core() {
               // disabled={reinvestmentSetupInput >= minValue}
               className={`py-0 px-4 rounded font-bold ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
             >
-              {isSaved ? '✔' : 'Save'}
+              {isSaved ? '✔' : t.save}
             </button>
             }
 

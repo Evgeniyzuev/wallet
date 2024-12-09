@@ -118,6 +118,7 @@ export default function Home() {
       {notification && <p className="text-green-500 mt-2">{notification}</p>}
       {error && <p className="text-red-500 mt-2">{error}</p>}
       <TaskPopup
+        taskId={currentTask.taskId}
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title={currentTask.title}

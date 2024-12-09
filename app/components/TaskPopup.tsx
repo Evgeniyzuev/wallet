@@ -4,6 +4,7 @@ import { useTaskValidation } from '../hooks/useTaskValidation';
 import Modal from './Modal';
 
 interface TaskPopupProps {
+  taskId: number;
   isOpen: boolean;
   onClose: () => void;
   title: string;
@@ -17,6 +18,7 @@ interface TaskPopupProps {
 }
 
 export default function TaskPopup({
+  taskId,
   isOpen,
   onClose,
   title,
@@ -30,13 +32,6 @@ export default function TaskPopup({
 }: TaskPopupProps) {
   const { isTaskEnabled } = useTaskValidation();
   const [isEnabled, setIsEnabled] = useState(false);
-  const taskId = title === 'Желаемый размер дохода' ? 2 : 
-                 title === 'Желаемые изменения' ? 1 : 
-                 title === 'Ai угроза и возможность' ? 3 :
-                 title === 'Subscribe to the channel' ? 4 :
-                 title === 'Прокачать ядро' ? 5 :
-                 title === 'Секретный код' ? 6 :
-                 title === 'Проверить ввод и вывод средств' ? 7 : 0;
 
   useEffect(() => {
     const checkEnabled = async () => {

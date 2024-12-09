@@ -57,6 +57,14 @@ export const useTaskValidation = () => {
     7: {
       validate: () => (user?.walletBalance || 0) >= 1,
       errorMessage: 'Wallet balance must be at least 1$'
+    },
+    8: {
+      validate: () => {
+        const daysToTarget = localStorage.getItem('calculatedDaysToTarget');
+        const dailyReward = localStorage.getItem('selectedDailyReward');
+        return daysToTarget !== null && dailyReward !== null;
+      },
+      errorMessage: 'Please calculate your path to $1M first'
     }
   };
 
