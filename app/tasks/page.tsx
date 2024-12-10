@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import TaskPopup from '../components/TaskPopup'
-import { tasks as initialTasks, Task } from './taskData'
+import { tasks as initialTasks, Task, permanentTasks } from './taskData'
 import Image from 'next/image'
 import { useUser } from '../UserContext';
 import { useTaskValidation } from '../hooks/useTaskValidation';
@@ -53,7 +53,7 @@ export default function Home() {
     // if (!isLoading) 
       {
       const filteredTasks = initialTasks.filter(task => !completedTasks.includes(task.taskId));
-      setLocalTasks(filteredTasks.slice(0, 10));
+      setLocalTasks(filteredTasks.slice(0, 8));
     }
   }, [completedTasks, isLoading]);
 
@@ -185,6 +185,50 @@ export default function Home() {
                 </span>
               </div>
 
+            </div>
+          </button>
+        ))}
+        
+        {/* Divider */}
+        <div className="w-full border-t border-gray-700 my-4"></div>
+        
+        {/* Permanent Tasks */}
+        {permanentTasks.map((task, index) => (
+          <button 
+            key={`permanent-${index}`}
+            onClick={() => {
+              if (task.action) {
+                task.action(router.push);
+              }
+              handleOpenPopup({
+                ...task,
+                reward: 0,
+                secondActionText: task.actionText || '',
+                secondAction: (user, handleUpdateUser, setNotification, setTaskCompleted, setError) => {
+                  if (task.action) {
+                    task.action(router.push);
+                  }
+                }
+              });
+            }}
+            className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all text-white font-bold py-1 px-1 mt-1 w-full"
+          >
+            <div className="flex items-center">
+              <div className="w-12 h-12 mr-2 flex-shrink-0">
+                <Image
+                  src={task.image}
+                  alt={task.title}
+                  width={48}
+                  height={48}
+                  className="rounded-md w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex-grow text-left">{task.title}</div>
+              <div className="text-sm text-right text-blue-300 flex-shrink-0">
+                <span className="inline-block px-3 py-1 bg-yellow-500 text-black rounded-full text-xs font-bold">
+                  START
+                </span>
+              </div>
             </div>
           </button>
         ))}

@@ -687,3 +687,36 @@ const completeTask = async (
     setError('Не удалось увеличить баланс Aicore');
   }
 };
+
+export interface PermanentTask {
+  taskId: number;
+  title: string;
+  image: string;
+  description: string;
+  actionText?: string;
+  action?: (navigate: (path: string) => void) => void;
+}
+
+export const permanentTasks: PermanentTask[] = [
+  {
+    taskId: -1,
+    title: 'Качать ядро',
+    image: '/images/powercore.jpg',
+    description: 'Пополните ядро на любую сумму.<br/><br/>' +
+    'Бонус +50% к сумме пополнения. До 5$.<br/><br/>',
+    // actionText: 'Пополнить',
+    // action: (navigate) => {
+    //   navigate('/core');
+    // }
+  },
+  {
+    taskId: -2,
+    title: 'Пригласить рефералов',
+    image: '/images/cyber.png',
+    description: 'Пригласите рефералов и получите 1$ за каждого.',
+    // actionText: 'Пополнить',
+    // action: (navigate) => {
+    //   navigate('/core');
+    // }
+  }
+];
