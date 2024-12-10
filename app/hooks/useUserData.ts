@@ -62,6 +62,16 @@ export function useUserData() {
           });
           setShowRewardPopup(true);
 
+          // Restore notification dots for tasks and core tabs
+          const storedUnvisited = localStorage.getItem('unvisitedPages');
+          const unvisitedPages = storedUnvisited ? JSON.parse(storedUnvisited) : {};
+          
+          // Set notifications for core and tasks
+          unvisitedPages.home = true; // core tab
+          unvisitedPages.tasks = true;
+          
+          localStorage.setItem('unvisitedPages', JSON.stringify(unvisitedPages));
+
           // Make a single update with the total increases
           await handleUpdateUser({
             aicoreBalance: totalAicoreIncrease,
