@@ -36,48 +36,53 @@ export function useUserData() {
   const checkAndUpdateDate = async (userData: User) => {
     if (!userData) return;
 
-    const today = new Date(new Date().setHours(0, 0, 0, 0))
-    
+    const today = new Date(new Date().setHours(0, 0, 0, 0));
     let lastLogin = userData.lastLoginDate ? new Date(userData.lastLoginDate) : new Date(new Date().setHours(0, 0, 0, 0));
-
     const daysDiff = getDaysBetweenDates(lastLogin, today);
     
     if (daysDiff > 0) {
       try {
-          let totalAicoreIncrease = 0;
-          let totalWalletIncrease = 0;
+        let totalAicoreIncrease = 0;
+        let totalWalletIncrease = 0;
 
-          // Calculate total increases for all missed days
-          for (let i = 0; i < daysDiff; i++) {
-            const { aicoreIncrease, walletIncrease } = skipDay(userData);
-            totalAicoreIncrease += aicoreIncrease;
-            totalWalletIncrease += walletIncrease;
-          }
+        // Get stored daily reward target
+        const storedDailyReward = localStorage.getItem('selectedDailyReward');
+        let dailyReward = storedDailyReward ? parseFloat(storedDailyReward) : 0;
 
-          // Set reward data and show popup
-          setRewardData({
-            daysSkipped: daysDiff,
-            aicoreIncrease: totalAicoreIncrease,
-            walletIncrease: totalWalletIncrease
-          });
-          setShowRewardPopup(true);
+        // Calculate total increases for all missed days
+        for (let i = 0; i < daysDiff; i++) {
+          const { aicoreIncrease, walletIncrease } = skipDay(userData);
+          totalAicoreIncrease += aicoreIncrease;
+          totalWalletIncrease += walletIncrease;
 
-          // Restore notification dots for tasks and core tabs
-          const storedUnvisited = localStorage.getItem('unvisitedPages');
-          const unvisitedPages = storedUnvisited ? JSON.parse(storedUnvisited) : {};
-          
-          // Set notifications for core and tasks
-          unvisitedPages.home = true; // core tab
-          unvisitedPages.tasks = true;
-          
-          localStorage.setItem('unvisitedPages', JSON.stringify(unvisitedPages));
+          // Compound daily reward target
+          dailyReward *= (1 + 0.000633);
+        }
 
-          // Make a single update with the total increases
-          await handleUpdateUser({
-            aicoreBalance: totalAicoreIncrease,
-            walletBalance: totalWalletIncrease,
-            lastLoginDate: today
-          });        
+        // Update stored daily reward with compounded value
+        localStorage.setItem('selectedDailyReward', dailyReward.toFixed(1));
+
+        // Set reward data and show popup
+        setRewardData({
+          daysSkipped: daysDiff,
+          aicoreIncrease: totalAicoreIncrease,
+          walletIncrease: totalWalletIncrease
+        });
+        setShowRewardPopup(true);
+
+        // Update notifications
+        const storedUnvisited = localStorage.getItem('unvisitedPages');
+        const unvisitedPages = storedUnvisited ? JSON.parse(storedUnvisited) : {};
+        unvisitedPages.home = true;
+        unvisitedPages.tasks = true;
+        localStorage.setItem('unvisitedPages', JSON.stringify(unvisitedPages));
+
+        // Update user data
+        await handleUpdateUser({
+          aicoreBalance: totalAicoreIncrease,
+          walletBalance: totalWalletIncrease,
+          lastLoginDate: today
+        });
 
       } catch (error) {
         console.error('Error updating login date:', error);
