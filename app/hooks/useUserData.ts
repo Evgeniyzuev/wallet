@@ -5,7 +5,7 @@ import WebApp from '@twa-dev/sdk';
 import { User } from '../UserContext';
 import { getDaysBetweenDates } from '../utils/dateDiff';
 import { skipDay } from '../utils/skipDay';
-import DailyRewardPopup from '../components/DailyRewardPopup';
+// import DailyRewardPopup from '../components/DailyRewardPopup';
 let cachedUser: any = null;
 
 const initialUser: User = {

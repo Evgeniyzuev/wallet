@@ -8,6 +8,13 @@ import { useUser } from '../UserContext';
 import { useTaskValidation } from '../hooks/useTaskValidation';
 import { useRouter } from 'next/navigation';
 
+interface DailyProgress {
+  completedTasks: number;
+  earnedRewards: number;
+  targetRewards: number;
+  date: string;
+}
+
 export default function Home() {
   const { user, setUser, handleUpdateUser } = useUser();
   const { isTaskEnabled, getTaskError } = useTaskValidation();
@@ -29,6 +36,12 @@ export default function Home() {
   })
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [dailyProgress, setDailyProgress] = useState<DailyProgress>({
+    completedTasks: 0,
+    earnedRewards: 0,
+    targetRewards: 0,
+    date: new Date().toDateString()
+  });
 
   useEffect(() => {
     if (user?.telegramId) {
@@ -44,6 +57,45 @@ export default function Home() {
     }
   }, [completedTasks, isLoading]);
 
+  useEffect(() => {
+    // Load daily progress from localStorage
+    const loadDailyProgress = () => {
+      const today = new Date().toDateString();
+      const storedProgress = localStorage.getItem('dailyProgress');
+      const targetReward = parseFloat(localStorage.getItem('selectedDailyReward') || '0');
+      
+      if (storedProgress) {
+        const progress: DailyProgress = JSON.parse(storedProgress);
+        
+        // Reset progress if it's a new day
+        if (progress.date !== today) {
+          const newProgress = {
+            completedTasks: 0,
+            earnedRewards: 0,
+            targetRewards: targetReward,
+            date: today
+          };
+          localStorage.setItem('dailyProgress', JSON.stringify(newProgress));
+          setDailyProgress(newProgress);
+        } else {
+          progress.targetRewards = targetReward;
+          setDailyProgress(progress);
+        }
+      } else {
+        const newProgress = {
+          completedTasks: 0,
+          earnedRewards: 0,
+          targetRewards: targetReward,
+          date: today
+        };
+        localStorage.setItem('dailyProgress', JSON.stringify(newProgress));
+        setDailyProgress(newProgress);
+      }
+    };
+
+    loadDailyProgress();
+  }, []);
+
   const handleOpenPopup = (task: Task) => {
     setCurrentTask(task);
     setIsPopupOpen(true);
@@ -52,6 +104,15 @@ export default function Home() {
   const handleTaskCompletion = (completedTask: Task) => {
     setLocalTasks(prevTasks => prevTasks.filter(task => task.taskId !== completedTask.taskId));
     setIsPopupOpen(false);
+
+    // Update daily progress
+    const newProgress = {
+      ...dailyProgress,
+      completedTasks: dailyProgress.completedTasks + 1,
+      earnedRewards: dailyProgress.earnedRewards + completedTask.reward
+    };
+    setDailyProgress(newProgress);
+    localStorage.setItem('dailyProgress', JSON.stringify(newProgress));
   };
 
   const fetchCompletedTasks = async () => {
@@ -79,10 +140,24 @@ export default function Home() {
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
-      <h1 className="text-4xl text-center mb-8">Задания</h1> 
-      {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Выполненные задания: {completedTasks.join(', ')}</div> */}
-      {/* display local tasks ids */}
-      {/* <div className="text-sm text-center text-yellow-300 flex-shrink-0">Локальные задания: {localTasks.map(task => task.taskId).join(', ')}</div> */}
+      <h1 className="text-4xl text-center mb-4">Задания</h1>
+      
+      {/* Daily Progress Bar */}
+      <div className="px-4 mb-4">
+        <div className="flex justify-between text-sm mb-1">
+          <span>Прогресс за день: {dailyProgress.completedTasks} заданий</span>
+          <span>{dailyProgress.earnedRewards}$ / {dailyProgress.targetRewards}$</span>
+        </div>
+        <div className="w-full bg-gray-700 rounded-full h-2.5">
+          <div 
+            className="bg-green-600 h-2.5 rounded-full transition-all duration-300"
+            style={{ 
+              width: `${Math.min(100, (dailyProgress.earnedRewards / dailyProgress.targetRewards) * 100)}%`
+            }}
+          />
+        </div>
+      </div>
+
       <div className="flex flex-col items-center w-full px-4">
         {localTasks.map((task, index) => (
           <button 
