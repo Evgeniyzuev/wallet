@@ -11,6 +11,14 @@ import { useLanguage } from '../LanguageContext';
 interface Message {
   role: 'user' | 'assistant' | 'system';
   content: string;
+  image?: {
+    mimeType: string;
+    data: string;
+  };
+}
+
+interface AiPageProps {
+  // существующие пропсы
 }
 
 export default function AiPage() {
@@ -29,6 +37,7 @@ export default function AiPage() {
   const [isAiTyping, setIsAiTyping] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [selectedModel, setSelectedModel] = useState<'groq' | 'gemini'>('groq');
 
   useEffect(() => {
     const initializeChat = async () => {
@@ -87,7 +96,8 @@ export default function AiPage() {
       };
 
       try {
-        const response = await fetch('/api/chat', {
+        const endpoint = selectedModel === 'groq' ? '/api/chat' : '/api/gemini';
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,7 +106,7 @@ export default function AiPage() {
         });
 
         if (!response.ok) {
-          throw new Error('Failed to get response from AI');
+          throw new Error(`Failed to get response from ${selectedModel} AI`);
         }
 
         const data = await response.json();
@@ -104,7 +114,10 @@ export default function AiPage() {
         setMessages(prevMessages => [...prevMessages, aiMessage]);
       } catch (error) {
         console.error('Error getting AI response:', error);
-        const errorMessage: Message = { role: 'assistant', content: "I'm sorry, I encountered an error. Please try again later." };
+        const errorMessage: Message = { 
+          role: 'assistant', 
+          content: "Произошла ошибка. Пожалуйста, попробуйте позже." 
+        };
         setMessages(prevMessages => [...prevMessages, errorMessage]);
       } finally {
         setIsAiTyping(false);
@@ -119,8 +132,10 @@ export default function AiPage() {
     setIsSettingsOpen(false);
 
     try {
+      const endpoint = selectedModel === 'groq' ? '/api/chat' : '/api/gemini';
       const userPrompt = `${INITIAL_SYSTEM_PROMPT} Обращайтесь к пользователю по имени: ${user?.firstName || 'пользователь'}. Уровень пользователя: ${user?.level || 0}. Используйте язык: ${language}.`;
-      const response = await fetch('/api/chat', {
+      
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,13 +153,64 @@ export default function AiPage() {
       localStorage.setItem('chatMessages', JSON.stringify([aiMessage]));
     } catch (error) {
       console.error('Error getting initial AI response:', error);
-      const errorMessage: Message = { role: 'assistant', content: "Извините, произошла ошибка при очистке чата. Пожалуйста, попробуйте еще раз." };
+      const errorMessage: Message = { 
+        role: 'assistant', 
+        content: "Извините, произошла ошибка при очистке чата. Пожалуйста, попробуйте еще раз." 
+      };
       setMessages([errorMessage]);
     } finally {
       setIsAiTyping(false);
     }
   };
 
+  const handleImageUpload = async (file: File) => {
+    try {
+      // Конвертируем файл в base64
+      const base64Data = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = (reader.result as string).split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+
+      const userMessage: Message = {
+        role: 'user',
+        content: 'Что изображено на этой картинке?',
+        image: {
+          mimeType: file.type,
+          data: base64Data
+        }
+      };
+
+      setMessages(prev => [...prev, userMessage]);
+      setIsAiTyping(true);
+
+      const response = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [userMessage] }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get response');
+
+      const data = await response.json();
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: data.content 
+      }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: 'Произошла ошибка при обработке изображения.' 
+      }]);
+    } finally {
+      setIsAiTyping(false);
+    }
+  };
 
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
@@ -184,6 +250,16 @@ export default function AiPage() {
                   RU
                 </button>
               </div>
+              <div className="flex items-center justify-end mb-4">
+                <select
+                  value={selectedModel}
+                  onChange={(e) => setSelectedModel(e.target.value as 'groq' | 'gemini')}
+                  className="bg-gray-700 text-white rounded px-3 py-1"
+                >
+                  <option value="groq">Groq</option>
+                  <option value="gemini">Gemini</option>
+                </select>
+              </div>
               <button
                 onClick={() => {
                   clearChat();
@@ -219,17 +295,30 @@ export default function AiPage() {
         <div ref={messagesEndRef} />
       </div>
       <div className="fixed bottom-8 left-0 right-0 p-4 mb-2">
-        <div className="flex max-w-screen-lg mx-auto">
+        <div className="flex max-w-screen-lg mx-auto gap-2">
+          <label
+            htmlFor="imageUpload"
+            className="bg-gray-700 hover:bg-gray-600 text-white rounded-lg p-2 cursor-pointer"
+          >
+            📷
+          </label>
+          <input
+            id="imageUpload"
+            type="file"
+            accept="image/*"
+            onChange={(e) => e.target.files?.[0] && handleImageUpload(e.target.files[0])}
+            className="hidden"
+          />
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className="flex-grow border border-gray-300 rounded-l-lg p-2 bg-gray-700 text-white"
+            className="flex-grow border border-gray-300 rounded-lg p-2 bg-gray-700 text-white"
             placeholder={t('enter_message')}
           />
           <button
             onClick={handleSend}
-            className="bg-blue-500 text-white rounded-r-lg p-2"
+            className="bg-blue-500 hover:bg-blue-700 text-white rounded-lg p-2"
           >
             {t('send')}
           </button>

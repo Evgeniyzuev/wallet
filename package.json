@@ -12,6 +12,7 @@
     "deploy": "node --loader ts-node/esm app/wallet/deploy.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@orbs-network/ton-access": "^2.3.3",
     "@prisma/client": "^5.19.1",
     "@telegram-apps/sdk": "^1.1.3",
