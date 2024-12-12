@@ -186,7 +186,7 @@ export default function TonConnect() {
       }
     } catch (error) {
       console.error("Error performing wallet action:", error);
-      setError("Failed to perform wallet action. Please try again.");
+      setError(error instanceof Error ? error.message : "Failed to connect wallet. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -381,9 +381,23 @@ export default function TonConnect() {
 
   return (
     <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
+      {error && (
+        <div className="w-full max-w-md bg-red-500 text-white px-4 py-3 rounded-lg mb-4 mt-4 flex items-center justify-between">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+            </svg>
+            <span>{error}</span>
+          </div>
+          <button 
+            onClick={() => setError(null)}
+            className="ml-auto pl-3 text-white hover:text-gray-200"
+          >
+            ×
+          </button>
+        </div>
+      )}
       
-      {error && <p className="text-red-500">{error}</p>}
-
       {tonWalletAddress ? (
         <div className="text-center w-full">
           <div className="mt-0 p-4 border border-gray-700 rounded-lg bg-gray-800">

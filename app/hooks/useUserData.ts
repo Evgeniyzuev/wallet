@@ -73,7 +73,6 @@ export function useUserData() {
         // Update notifications
         const storedUnvisited = localStorage.getItem('unvisitedPages');
         const unvisitedPages = storedUnvisited ? JSON.parse(storedUnvisited) : {};
-        unvisitedPages.home = true;
         unvisitedPages.tasks = true;
         localStorage.setItem('unvisitedPages', JSON.stringify(unvisitedPages));
 
