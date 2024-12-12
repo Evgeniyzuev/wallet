@@ -7,7 +7,6 @@ import TonConnect from './tonconnect';
 import Send from './send';
 import { useTonPrice } from '../TonPriceContext';
 import { useLanguage } from '../LanguageContext';
-import Connection from './connection';
 
 type Currency = {
   code: string;
@@ -293,8 +292,7 @@ export default function Wallet() {
           </div>
         )}
         
-        {/* {selectedAction === 'receive' && <TonConnect />} */}
-        {selectedAction === 'receive' && <Connection  />}
+        {selectedAction === 'receive' && <TonConnect />}
         {selectedAction === 'send' && <Send />}
 
         <div className="mt-8 p-4 bg-gray-800 rounded-lg">

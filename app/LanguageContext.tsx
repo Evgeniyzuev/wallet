@@ -10,73 +10,73 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-// Add this type definition
 type TranslationKey = 'send' | 'clear_chat' | 'enter_message' | 'wallet_balance' | 
   'Core' | 'Ai' | 'Wallet' | 'Tasks' | 'Frens' | 'Goals';
 
+const translations = {
+  ru: {
+    'send': 'Отправить',
+    'clear_chat': 'Очистить чат',
+    'enter_message': 'Введите сообщение...',
+    'wallet_balance': 'Баланс кошелька',
+    'Core': 'Ядро',
+    'Ai': 'Ии',
+    'Wallet': 'Кошелек',
+    'Tasks': 'Задачи',
+    'Frens': 'Друзья',
+    'Goals': 'Цели'
+  },
+  en: {
+    'send': 'Send',
+    'clear_chat': 'Clear Chat',
+    'enter_message': 'Enter message...',
+    'wallet_balance': 'Wallet Balance',
+    'Core': 'Core',
+    'Ai': 'Ai',
+    'Wallet': 'Wallet',
+    'Tasks': 'Tasks',
+    'Frens': 'Frens',
+    'Goals': 'Goals'
+  }
+};
+
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguage] = useState(() => {
-    if (typeof window !== 'undefined') {
-      // First check localStorage
-      const savedLanguage = localStorage.getItem('language');
-      if (savedLanguage) {
-        return savedLanguage;
-      }
-
-      // Then try to get language from Telegram WebApp
-      try {
-        const tg = WebApp;
-        const userLanguage = tg.initDataUnsafe?.user?.language_code;
-        
-        // Check if the language code is supported (ru or en)
-        if (userLanguage === 'ru') {
-          return 'ru';
-        }
-      } catch (error) {
-        console.error('Error getting Telegram language:', error);
-      }
-
-      // Default to English if nothing else is available
-      return 'en';
-    }
-    return 'en';
-  });
-
-  // Translation object
-  const translations = {
-    ru: {
-      'send': 'Отправить',
-      'clear_chat': 'Очистить чат',
-      'enter_message': 'Введите сообщение...',
-      'wallet_balance': 'Баланс кошелька',
-      'Core': 'Ядро',
-      'Ai': 'Ии',
-      'Wallet': 'Кошелек',
-      'Tasks': 'Задачи',
-      'Frens': 'Друзья',
-      'Goals': 'Цели'
-    },
-    en: {
-      'send': 'Send',
-      'clear_chat': 'Clear Chat',
-      'enter_message': 'Enter message...',
-      'wallet_balance': 'Wallet Balance',
-      'Core': 'Core',
-      'Ai': 'Ai',
-      'Wallet': 'Wallet',
-      'Tasks': 'Tasks',
-      'Frens': 'Frens',
-      'Goals': 'Goals'
-    }
-  };
+  const [language, setLanguage] = useState('en');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('language', language);
-  }, [language]);
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('language');
+      if (savedLanguage) {
+        setLanguage(savedLanguage);
+      } else {
+        try {
+          const tg = WebApp;
+          const userLanguage = tg.initDataUnsafe?.user?.language_code;
+          if (userLanguage === 'ru') {
+            setLanguage('ru');
+          }
+        } catch (error) {
+          console.error('Error getting Telegram language:', error);
+        }
+      }
+      setIsInitialized(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isInitialized && typeof window !== 'undefined') {
+      localStorage.setItem('language', language);
+    }
+  }, [language, isInitialized]);
 
   const t = (key: TranslationKey) => {
     return translations[language as keyof typeof translations]?.[key] || key;
   };
+
+  if (!isInitialized) {
+    return null;
+  }
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t }}>
