@@ -425,3 +425,134 @@ export default function TonConnect() {
     </main>
   );
 }
+
+export function Connection() {
+  const [tonConnectUI] = useTonConnectUI();
+  const [tonWalletAddress, setTonWalletAddress] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleWalletConnection = useCallback((address: string) => {
+    setTonWalletAddress(address);
+    console.log("Wallet connected successfully!");
+    setIsLoading(false);
+  }, []);
+
+  const handleWalletDisconnection = useCallback(() => {
+    setTonWalletAddress(null);
+    console.log("Wallet disconnected successfully!");
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const checkWalletConnection = async () => {
+      try {
+        if (tonConnectUI.account?.address) {
+          handleWalletConnection(tonConnectUI.account?.address);
+        } else {
+          handleWalletDisconnection();
+        }
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Failed to check wallet connection');
+        console.error('Wallet connection check error:', error);
+      }
+    };
+
+    checkWalletConnection();
+
+    const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
+      try {
+        if (wallet) {
+          handleWalletConnection(wallet.account.address);
+        } else {
+          handleWalletDisconnection();
+        }
+      } catch (error) {
+        setError(error instanceof Error ? error.message : 'Failed to handle wallet status change');
+        console.error('Wallet status change error:', error);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [tonConnectUI, handleWalletConnection, handleWalletDisconnection]);
+
+  const handleWalletAction = async () => {
+    try {
+      if (tonConnectUI.connected) {
+        setIsLoading(true);
+        await tonConnectUI.disconnect();
+      } else {
+        setIsLoading(true);
+        await tonConnectUI.openModal();
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to perform wallet action');
+      console.error('Wallet action error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatAddress = (address: string) => {
+    try {
+      const tempAddress = Address.parse(address).toString();
+      return `${tempAddress.slice(0, 4)}...${tempAddress.slice(-4)}`;
+    } catch (error) {
+      console.error('Error formatting address:', error);
+      return 'Invalid Address';
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center">
+        <div className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded">
+          Loading...
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      {error && (
+        <div className="w-full max-w-md bg-red-500 text-white px-4 py-3 rounded-lg mb-4">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
+            </svg>
+            <span>{error}</span>
+          </div>
+          <button 
+            onClick={() => setError(null)}
+            className="ml-auto pl-3 text-white hover:text-gray-200"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      
+      <h1 className="text-4xl font-bold mb-8">TON Connect Demo</h1>
+      {tonWalletAddress ? (
+        <div className="flex flex-col items-center">
+          <p className="mb-4">Connected: {formatAddress(tonWalletAddress)}</p>
+          <button
+            onClick={handleWalletAction}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Disconnect Wallet
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={handleWalletAction}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Connect TON Wallet
+        </button>
+      )}
+    </main>
+  );
+}
