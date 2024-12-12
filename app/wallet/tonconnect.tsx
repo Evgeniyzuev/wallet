@@ -90,103 +90,54 @@ export default function TonConnect() {
     updateUserBalance();
   }, [transactionStatus, dollarAmount, handleUpdateUser]);
 
-  const handleWalletConnection = useCallback(async (address: string) => {
-    try {
-      setTonWalletAddress(address);
-      console.log("Wallet connected successfully!");
-      setIsLoading(false);
-      setError(null); // Clear any previous errors
-    } catch (error) {
-      console.error("Wallet connection error:", error);
-      setError("Failed to connect wallet. Please try again.");
-      setIsLoading(false);
-    }
-  }, []);
-  
-  const handleWalletDisconnection = useCallback(async () => {
-    try {
-      setTonWalletAddress(null);
-      console.log("Wallet disconnected successfully!");
-      setIsLoading(false);
-      setError(null);
-    } catch (error) {
-      console.error("Wallet disconnection error:", error);
-      setError("Failed to disconnect wallet. Please try again.");
-      setIsLoading(false);
-    }
+  const handleWalletConnection = useCallback((address: string) => {
+    setTonWalletAddress(address);
+    console.log("Wallet connected successfully!");
+    setIsLoading(false);
   }, []);
 
-
-  // const myTransaction = {
-  //   // validUntil: Math.floor(Date.now() / 1000) + 360,
-  //   // messages: [
-  //   // {
-  //   // address: destinationAddress, // sender jetton wallet
-  //   // amount: toNano("2.2").toString(), // for commission fees, excess will be returned
-  //   // payload: body.toBoc().toString("base64") // payload with jetton transfer and comment body
-  //   validUntil: Math.floor(Date.now() / 1000) + 360,
-  //   messages: [
-  //     {
-  //       address: destinationAddress.toString(), // Your USDT jetton wallet address
-  //       amount: toNano(0.1).toString(), // feee
-  //       payload: body.toBoc().toString("base64"), // payload with jetton transfer and comment body
-  //   }
-  //   ]
-  //   }
+  const handleWalletDisconnection = useCallback(() => {
+    setTonWalletAddress(null);
+    console.log("Wallet disconnected successfully!");
+    setIsLoading(false);
+  }, []);
 
   useEffect(() => {
     const checkWalletConnection = async () => {
-      try {
-        if (tonConnectUI.account?.address) {
-          await handleWalletConnection(tonConnectUI.account?.address);
-        } else {
-          await handleWalletDisconnection();
-        }
-      } catch (error) {
-        console.error("Error checking wallet connection:", error);
-        setError("Failed to check wallet connection status.");
-        setIsLoading(false);
+      if (tonConnectUI.account?.address) {
+        handleWalletConnection(tonConnectUI.account.address);
+      } else {
+        handleWalletDisconnection();
       }
     };
 
     checkWalletConnection();
 
-    const unsubscribe = tonConnectUI.onStatusChange(async (wallet) => {
-      try {
-        if (wallet) {
-          await handleWalletConnection(wallet.account.address);
-        } else {
-          await handleWalletDisconnection();
-        }
-      } catch (error) {
-        console.error("Error handling wallet status change:", error);
-        setError("Failed to handle wallet connection change.");
-        setIsLoading(false);
+    const unsubscribe = tonConnectUI.onStatusChange((wallet) => {
+      if (wallet) {
+        handleWalletConnection(wallet.account.address);
+      } else {
+        handleWalletDisconnection();
       }
     });
 
     return () => {
-      try {
-        unsubscribe();
-      } catch (error) {
-        console.error("Error unsubscribing from wallet status:", error);
-      }
+      unsubscribe();
     };
   }, [tonConnectUI, handleWalletConnection, handleWalletDisconnection]);
 
   const handleWalletAction = async () => {
     try {
-      setError(null); // Clear any previous errors
-      setIsLoading(true);
-      
       if (tonConnectUI.connected) {
+        setIsLoading(true);
         await tonConnectUI.disconnect();
       } else {
+        setIsLoading(true);
         await tonConnectUI.openModal();
       }
     } catch (error) {
-      console.error("Error performing wallet action:", error);
-      setError(error instanceof Error ? error.message : "Failed to connect wallet. Please try again.");
+      setError(error instanceof Error ? error.message : 'Failed to connect wallet');
+      console.error('Wallet connection error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -382,7 +333,7 @@ export default function TonConnect() {
   return (
     <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
       {error && (
-        <div className="w-full max-w-md bg-red-500 text-white px-4 py-3 rounded-lg mb-4 mt-4 flex items-center justify-between">
+        <div className="w-full max-w-md bg-red-500 text-white px-4 py-3 rounded-lg mb-4 mt-4">
           <div className="flex items-center">
             <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
