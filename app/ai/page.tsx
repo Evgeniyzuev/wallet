@@ -105,18 +105,24 @@ export default function AiPage() {
           body: JSON.stringify({ messages: [...messages, systemMessage, userMessage] }),
         });
 
-        if (!response.ok) {
-          throw new Error(`Failed to get response from ${selectedModel} AI`);
-        }
-
         const data = await response.json();
-        const aiMessage: Message = { role: 'assistant', content: data.content };
-        setMessages(prevMessages => [...prevMessages, aiMessage]);
+        
+        // Если есть ошибка, показываем её в чате
+        if (data.error) {
+          const errorMessage: Message = { 
+            role: 'assistant', 
+            content: `Диагностическая информация:\n${data.error}\n${data.details || ''}`
+          };
+          setMessages(prevMessages => [...prevMessages, errorMessage]);
+        } else {
+          const aiMessage: Message = { role: 'assistant', content: data.content };
+          setMessages(prevMessages => [...prevMessages, aiMessage]);
+        }
       } catch (error) {
         console.error('Error getting AI response:', error);
         const errorMessage: Message = { 
           role: 'assistant', 
-          content: "Произошла ошибка. Пожалуйста, попробуйте позже." 
+          content: `Ошибка при отправке запроса:\n${error instanceof Error ? error.message : 'Неизвестная ошибка'}` 
         };
         setMessages(prevMessages => [...prevMessages, errorMessage]);
       } finally {
