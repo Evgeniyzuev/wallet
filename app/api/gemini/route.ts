@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     const model = lastMessage.image 
       ? genAI.getGenerativeModel({ model: "gemini-pro-vision" })
-      : genAI.getGenerativeModel({ model: "gemini-pro" });
+      : genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     if (lastMessage.image) {
       const result = await model.generateContent([
