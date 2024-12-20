@@ -69,7 +69,7 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
             <div className="relative">
               {item.icon}
               {unvisitedPages[item.href] && (
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full" />
               )}
             </div>
             {t(item.label as any)}

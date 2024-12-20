@@ -95,6 +95,8 @@ export function useUserData() {
     if (typeof window !== 'undefined') {
       const tg = WebApp;
       tg.ready();
+      tg.expand();
+      tg.disableVerticalSwipes();
 
       const initDataUnsafe = tg.initDataUnsafe || {};
       setStartParam(WebApp.initDataUnsafe.start_param || '');
