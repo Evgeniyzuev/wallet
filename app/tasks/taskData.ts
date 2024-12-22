@@ -2,7 +2,7 @@ export interface Task {
   taskId: number;
   title: string;
   image: string;
-  description: string;
+  description: string | ((user?: any) => string);
   reward: number;
   actionText?: string;
   action?: (navigate: (path: string) => void) => void;
@@ -120,6 +120,71 @@ const desiredChangesTest = [
 ];
 
 export const tasks: Task[] = [
+    {
+      taskId: -1,
+      title: 'Качать ядро',
+      image: '/images/powercore.jpg',
+      description: 'Пополните ядро на любую сумму.<br/><br/>' +
+      'Бонус +50% к сумме пополнения. До 5$.<br/><br/>',
+      reward: 0,
+      actionText: 'Пополнить',
+      action: () => {
+        window.open('/balance', '_blank');
+      },
+      secondActionText: 'OK',
+      secondAction: () => {}
+    },
+    {
+      taskId: -2,
+      title: 'Пригласить рефералов',
+      image: '/images/cyber.png',
+      description: () => {
+        const paidCount = localStorage.getItem('paidReferrals') || '0';
+        return `Пригласите рефералов и получите 1$ за каждого.<br/><br/>` +
+              `Оплаченные рефералы: ${paidCount}`;
+    },
+    reward: 1,
+    actionText: 'Пригласить',
+    action: () => {
+      window.open('/friends', '_blank');
+    },
+    secondActionText: 'Проверить рефералов',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      // await completeTask(-2, 1, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+      if (!user?.telegramId) {
+        setError('Пользователь не найден');
+        return;
+      }
+        try {
+        const response = await fetch('/api/check-referrals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            telegramId: user.telegramId
+          })
+        });
+        
+        if (response.ok) {
+          const { newReferrals, totalReferrals } = await response.json();
+          if (newReferrals > 0) {
+            localStorage.setItem('paidReferrals', totalReferrals.toString());
+            await handleUpdateUser({ 
+              aicoreBalance: { increment: newReferrals },
+              paidReferrals: totalReferrals
+            });
+            setNotification(`Получено ${newReferrals}$ за новых рефералов!`);
+          } else {
+            setNotification('Новых рефералов не найдено');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking referrals:', error);
+        setError('Ошибка при проверке рефералов');
+      }
+    }
+    },
     {
       taskId: 1,
       title: 'Желаемые изменения',
@@ -449,18 +514,23 @@ export const tasks: Task[] = [
     taskId: 6,
     title: 'Пригласить реферала',
     image: '/images/cyber.png',
-    description: 'Перейдите на вкладку друзья и нажмите кнопку "Пригласить", чтобы отправить приглашение контактам в телеграм.<br/><br/>' +
-    'Или копируйте реферальную ссылку и отправляйте ее где угодно. ' +
-    'Ниже можно увидеть своих рефералов.' +
-    'Условие выполнения: минимум 1 реферал приглашен.',
+    description: () => {
+      const paidCount = localStorage.getItem('paidReferrals') || '0';
+      return `Пригласите рефералов и получите 1$ за каждого.<br/><br/>` +
+             `Оплаченные рефералы: ${paidCount}`;
+    },
     reward: 1,
-    // actionText: 'Пригласить',
-    // action: () => {
-    //     window.open('/friends', '_blank');
-    // },
-    secondActionText: 'Готово',
-    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {  
-      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    actionText: 'Пригласить',
+    action: () => {
+      window.open('/friends', '_blank');
+    },
+    secondActionText: 'Проверить рефералов',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      if (!user?.telegramId) {
+        setError('Пользователь не найден');
+        return;
+      }
+      // ... rest of the check referrals logic ...
     }
   },
   {
@@ -589,7 +659,6 @@ export const tasks: Task[] = [
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
-
   
 ];
 
@@ -666,8 +735,6 @@ const completeTask = async (
     return;
   }
 
-  // Save to localStorage first
-
     const completedTasksStr = localStorage.getItem('completedTasks');
     const completedTasks = completedTasksStr ? JSON.parse(completedTasksStr) : [];
     
@@ -692,31 +759,15 @@ export interface PermanentTask {
   taskId: number;
   title: string;
   image: string;
-  description: string;
+  reward: number;
+  description: string | ((user?: any) => string);
   actionText?: string;
   action?: (navigate: (path: string) => void) => void;
+  secondActionText?: string;
+  secondAction?: (user: any, handleUpdateUser: any, setNotification: any, setTaskCompleted: any, setError: any) => void;
 }
 
-export const permanentTasks: PermanentTask[] = [
-  {
-    taskId: -1,
-    title: 'Качать ядро',
-    image: '/images/powercore.jpg',
-    description: 'Пополните ядро на любую сумму.<br/><br/>' +
-    'Бонус +50% к сумме пополнения. До 5$.<br/><br/>',
-    // actionText: 'Пополнить',
-    // action: (navigate) => {
-    //   navigate('/core');
-    // }
-  },
-  {
-    taskId: -2,
-    title: 'Пригласить рефералов',
-    image: '/images/cyber.png',
-    description: 'Пригласите рефералов и получите 1$ за каждого.',
-    // actionText: 'Пополнить',
-    // action: (navigate) => {
-    //   navigate('/core');
-    // }
-  }
-];
+// export const permanentTasks: PermanentTask[] = [
+ 
+// ];
+

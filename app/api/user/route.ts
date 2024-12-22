@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
                     reinvestSetup: 100,
                     aicoreBalance: 0,
                     walletBalance: 0,
-                    level: 0
+                    level: 0,
+                    paidReferrals: 0
                 }
             })
 

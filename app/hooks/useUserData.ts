@@ -19,7 +19,8 @@ const initialUser: User = {
   aicoreBalance: 0,
   walletBalance: 0,
   level: 0,
-  lastLoginDate: new Date()
+  lastLoginDate: new Date(),
+  paidReferrals: 0
 };
 
 export function useUserData() {

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import TaskPopup from '../components/TaskPopup'
-import { tasks as initialTasks, Task, permanentTasks } from './taskData'
+import { tasks as initialTasks, Task} from './taskData'
 import Image from 'next/image'
 import { useUser } from '../UserContext';
 import { useTaskValidation } from '../hooks/useTaskValidation';
@@ -53,7 +53,7 @@ export default function Home() {
     // if (!isLoading) 
       {
       const filteredTasks = initialTasks.filter(task => !completedTasks.includes(task.taskId));
-      setLocalTasks(filteredTasks.slice(0, 8));
+      setLocalTasks(filteredTasks.slice(0, 10));
     }
   }, [completedTasks, isLoading]);
 
@@ -138,6 +138,13 @@ export default function Home() {
     }
   };
 
+  const [regularTasks, permanentTasks] = useMemo(() => {
+    return [
+      localTasks.filter(task => task.taskId > 0),
+      localTasks.filter(task => task.taskId < 0)
+    ];
+  }, [localTasks]);
+
   return (
     <main className="bg-dark-blue text-white h-screen flex flex-col">
       <h1 className="text-4xl text-center mb-4">Задания</h1>
@@ -159,9 +166,10 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col items-center w-full px-4">
-        {localTasks.map((task, index) => (
+        {/* Regular Tasks */}
+        {regularTasks.map((task, index) => (
           <button 
-            key={index}
+            key={`regular-${index}`}
             onClick={() => handleOpenPopup(task)}
             className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all text-white font-bold py-1 px-1 mt-1 w-full"
           >
@@ -196,21 +204,7 @@ export default function Home() {
         {permanentTasks.map((task, index) => (
           <button 
             key={`permanent-${index}`}
-            onClick={() => {
-              if (task.action) {
-                task.action(router.push);
-              }
-              handleOpenPopup({
-                ...task,
-                reward: 0,
-                secondActionText: task.actionText || '',
-                secondAction: (user, handleUpdateUser, setNotification, setTaskCompleted, setError) => {
-                  if (task.action) {
-                    task.action(router.push);
-                  }
-                }
-              });
-            }}
+            onClick={() => handleOpenPopup(task)}
             className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all text-white font-bold py-1 px-1 mt-1 w-full"
           >
             <div className="flex items-center">
@@ -241,7 +235,7 @@ export default function Home() {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         title={currentTask.title}
-        description={currentTask.description}
+        description={typeof currentTask.description === 'function' ? currentTask.description(user) : currentTask.description}
         reward={currentTask.reward}
         onAction={currentTask.action ? 
           () => currentTask.action!((path) => router.push(path)) 

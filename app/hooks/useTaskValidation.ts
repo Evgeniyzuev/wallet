@@ -12,6 +12,14 @@ export const useTaskValidation = () => {
   const { user } = useUser();
 
   const validationRules: TaskValidationRules = {
+    '-2': {
+      validate: () => true,
+      errorMessage: ''
+    },
+    '-1': {
+      validate: () => true,
+      errorMessage: ''
+    },
     1: {
       validate: () => localStorage.getItem('task1Completed') === 'true',
       errorMessage: 'Please complete the desired changes survey first'

@@ -29,6 +29,7 @@ model User {
   contacts      Contact[] @relation("UserContacts")
   referrals     Contact[] @relation("UserReferrals")
   completedTasks CompletedTask[]
+  paidReferrals Int      @default(0)
 }
 
 model Contact {
