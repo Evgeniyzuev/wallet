@@ -8,40 +8,37 @@ import coinsIcon from '../images/ph_coins-fill.svg';
 import messageIcon from '../images/icon-ai.svg'; 
 import coreIcon from '../images/icon-core.png';
 import { useLanguage } from '../LanguageContext';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+
+// Определяем начальное состояние непосещенных страниц
+const initialUnvisitedPages = {
+  home: false,
+  ai: true,
+  wallet: false,
+  tasks: true,
+  friends: false,
+  goals: false
+};
 
 export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: string) => void }) {
   const pathname = usePathname()
   const { t } = useLanguage();
-  const [unvisitedPages, setUnvisitedPages] = useState<{ [key: string]: boolean }>({});
   
-  useEffect(() => {
-    // Load unvisited pages from localStorage on mount
-    const storedUnvisited = localStorage.getItem('unvisitedPages');
-    if (storedUnvisited) {
-      setUnvisitedPages(JSON.parse(storedUnvisited));
-    } else {
-      // Initialize all pages as unvisited if no stored data
-      const initial = {
-        home: true,
-        ai: true,
-        wallet: true,
-        tasks: true,
-        friends: true,
-        goals: true
-      };
-      setUnvisitedPages(initial);
-      localStorage.setItem('unvisitedPages', JSON.stringify(initial));
+  // Получаем состояние непосещенных страниц из localStorage или используем начальное состояние
+  const getUnvisitedPages = () => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('unvisitedPages');
+      return stored ? JSON.parse(stored) : initialUnvisitedPages;
     }
-  }, []);
+    return initialUnvisitedPages;
+  };
 
   const handlePageClick = (href: string) => {
-    // Mark page as visited
+    const currentUnvisited = getUnvisitedPages();
     const updatedPages = {
-      ...unvisitedPages,
+      ...currentUnvisited,
       [href]: false
     };
-    setUnvisitedPages(updatedPages);
     localStorage.setItem('unvisitedPages', JSON.stringify(updatedPages));
     setCurrentPage(href);
   };
@@ -54,6 +51,8 @@ export default function Navigation({ setCurrentPage }: { setCurrentPage: (page: 
     { href: 'friends', label: 'Frens', icon: <img src={friendsIcon.src} alt="Frens" className="w-6 h-6" /> },
     { href: 'goals', label: 'Goals', icon: <img src={tasksIcon.src} alt="Goals" className="w-6 h-6" /> },
   ];
+
+  const unvisitedPages = getUnvisitedPages();
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-[#252a41]">
