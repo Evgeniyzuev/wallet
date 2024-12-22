@@ -141,7 +141,7 @@ export const tasks: Task[] = [
       description: () => {
         const paidCount = localStorage.getItem('paidReferrals') || '0';
         return `Пригласите рефералов и получите 1$ за каждого.<br/><br/>` +
-              `Оплаченные рефералы: ${paidCount}`;
+              `Учтено рефералов: ${paidCount}`;
     },
     reward: 1,
     actionText: 'Пригласить',
