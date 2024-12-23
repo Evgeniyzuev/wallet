@@ -119,6 +119,59 @@ const desiredChangesTest = [
   }
 ];
 
+const desiredItemsTest = [
+  {
+    question: 'Какие покупки для дома вызывают у вас интерес?',
+    options: [
+      'Новая квартира',
+      'Загородный дом',
+      'Ремонт',
+      'Мебель',
+      'Бытовая техника'
+    ]
+  },
+  {
+    question: 'Какие личные покупки вас мотивируют?',
+    options: [
+      'Автомобиль',
+      'Смартфон',
+      'Ноутбук',
+      'Одежда и аксессуары',
+      'Спортивный инвентарь'
+    ]
+  },
+  {
+    question: 'Какие вложения в здоровье и красоту важны для вас?',
+    options: [
+      'Медицинские услуги',
+      'Фитнес и спорт',
+      'Косметические процедуры',
+      'Стоматология',
+      'Санаторий или спа'
+    ]
+  },
+  {
+    question: 'Какие развлечения и впечатления вас привлекают?',
+    options: [
+      'Путешествия',
+      'Концерты и фестивали',
+      'Рестораны',
+      'Хобби и увлечения',
+      'Развлекательные мероприятия'
+    ]
+  },
+  {
+    question: 'Какие важные жизненные события вы планируете?',
+    options: [
+      'Свадьба',
+      'Образование',
+      'Открытие бизнеса',
+      'Переезд в другой город/страну',
+      'Другое (свой вариант)'
+    ]
+  }
+];
+
 export const tasks: Task[] = [
     {
       taskId: -1,
@@ -373,7 +426,7 @@ export const tasks: Task[] = [
       description: 
       'Ai набирает обороты. Применение в бизнесе следует за развитием технологий.<br/><br/>' +
       'Некоторые профессии уже столкнулись со снижением рабочих мест. Тенденция будет только усиливаться.<br/><br/>' +
-      'К��кие профессии в безопасности? Ответа нет. ИИ может осваивать любые навыки.<br/><br/>' +
+      'Какие профессии в безопасности? Ответа нет. ИИ может осваивать любые навыки.<br/><br/>' +
       'Ожидалось что ИИ возьмет на себя самые рутинные задачи. Но оказалось что ИИ легко даются креативные и интеллектуальные задачи.<br/><br/>' +
       'Владельцев бизнеса тоже ждут серьезные изменения. Корпорации со своими ресурсами и технологиями смогут раширять свое влияние гораздо быстрее.<br/><br/>' +
       'Инвестиции также могут быть подвержены риску со стороны ИИ.<br/><br/>' +
@@ -495,7 +548,7 @@ export const tasks: Task[] = [
   // 4 пополнить кошелек
   // 5 качнуть ядро
   // 6 получить код у ассистента
-  // 7 определить размер убд для: 1безопасности 2независимости 3свобод��
+  // 7 определить размер убд для: 1безопасности 2независимости 3свободы
   {
     taskId: 5,
     title: 'Прокачать ядро',
@@ -661,7 +714,102 @@ export const tasks: Task[] = [
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
-  
+  {
+    taskId: 13,
+    title: 'Артефакты успеха',
+    image: '/images/deal.jpg',
+    description: 'Чтобы продолжать двигаться шаг за шагом, необходимо чувствовать результаты своих действий.' +
+    'Даже небольшие достижения дают энергию для движения вперед, если они по-настоящему важны для вас.<br/><br/>' +
+    'Когда мы обесцениваем результаты или не замечаем прогресс, со временем становится все сложнее двигаться к цели.<br/><br/>' +
+    'Наш мозг плохо реагирует на абстрактные цифры. Зато новые впечатления, желанные покупки и достижения - это осязаемые шаги вперед.<br/><br/>' +
+    'Получая реальные результаты, мозг понимает, что мы на верном пути. Это создает дополнительную энергию и мотивацию двигаться дальше.<br/><br/>' +
+    'Важно помнить два принципа:<br/>' +
+    '• Ограничивать награду - значит снижать свой потенциал<br/>' +
+    '• Награда без результата лишает мотивации<br/><br/>' +
+    'Деньги обретают ценность, когда они потрачены для достижения желаемого.<br/><br/>' +
+    'Прислушайтесь к себе - какие вещи вызывают у вас эмоциональный отклик? Что станет для вас значимым достижением?<br/><br/>' +
+    'Не ограничивайте себя, выбирайте всё что вам интересно. Для первой цели подойдет что-то простое и быстро достижимое. Главное не стоимость, а эмоциональное удовлетворение.<br/><br/>',
+    reward: 1,
+    actionText: 'Выбрать желания',
+    action: () => {
+      let currentQuestion = 0;
+      const userAnswers: number[][] = [];
+      
+      const showQuestion = () => {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        
+        const question = desiredItemsTest[currentQuestion];
+        modal.innerHTML = `
+          <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="mb-4">
+              <div class="text-sm text-gray-400">Вопрос ${currentQuestion + 1}/${desiredItemsTest.length}</div>
+              <h3 class="text-xl font-bold text-white">${question.question}</h3>
+            </div>
+            <div class="space-y-3">
+              ${question.options.map((option, index) => `
+                <label class="flex items-center space-x-2 cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    class="form-checkbox h-5 w-5 text-blue-500"
+                    data-index="${index}"
+                  >
+                  <span class="text-white">${option}</span>
+                </label>
+              `).join('')}
+              ${question.options[4] === 'Другое (свой вариант)' ? `
+                <input 
+                  type="text" 
+                  class="w-full px-4 py-2 bg-gray-700 text-white rounded mt-2"
+                  placeholder="Введите свой вариант"
+                  id="customOption"
+                >
+              ` : ''}
+            </div>
+            <button 
+              class="w-full mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            >
+              ${currentQuestion < desiredItemsTest.length - 1 ? 'Далее' : 'Завершить'}
+            </button>
+          </div>
+        `;
+
+        document.body.appendChild(modal);
+
+        // Handle checkbox selections and next button
+        const handleNext = () => {
+          const selectedIndexes = Array.from(modal.querySelectorAll('input[type="checkbox"]:checked'))
+            .map(checkbox => parseInt((checkbox as HTMLInputElement).getAttribute('data-index') || '0'));
+          
+          // Save custom option if present
+          const customOption = document.getElementById('customOption') as HTMLInputElement;
+          if (customOption?.value) {
+            localStorage.setItem(`customOption_${currentQuestion}`, customOption.value);
+          }
+          
+          userAnswers[currentQuestion] = selectedIndexes;
+          modal.remove();
+
+          if (currentQuestion < desiredItemsTest.length - 1) {
+            currentQuestion++;
+            showQuestion();
+          } else {
+            // Save answers to localStorage
+            localStorage.setItem('desiredItemsAnswers', JSON.stringify(userAnswers));
+            localStorage.setItem('task13Completed', 'true');
+          }
+        };
+
+        modal.querySelector('button')?.addEventListener('click', handleNext);
+      };
+
+      showQuestion();
+    },
+    secondActionText: 'Готово',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
+  },
 ];
 
 // export const handleSubscribe = async () => {
@@ -689,7 +837,7 @@ export const checkMembership = async (user: any, channelUsername: string,  setEr
     if (isMember) {
       return true
     } else {
-      setError('Пожалуйста, подпишитесь на ��анал для получения награды');
+      setError('Пожалуйста, подпишитесь на канал для получения награды');
       return false
     }
   } else {

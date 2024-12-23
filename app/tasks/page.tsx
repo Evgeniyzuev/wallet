@@ -111,7 +111,7 @@ export default function Home() {
       completedTasks: dailyProgress.completedTasks + 1,
       earnedRewards: dailyProgress.earnedRewards + completedTask.reward
     };
-    
+
     setDailyProgress(newProgress);
     localStorage.setItem('dailyProgress', JSON.stringify(newProgress));
   };

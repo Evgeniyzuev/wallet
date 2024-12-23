@@ -73,7 +73,11 @@ export const useTaskValidation = () => {
         return daysToTarget !== null && dailyReward !== null;
       },
       errorMessage: 'Please calculate your path to $1M first'
-    }
+    },
+    13: {
+      validate: () => localStorage.getItem('task13Completed') === 'true',
+      errorMessage: 'Please complete the desired items test first'
+    },
   };
 
   const isTaskEnabled = async (taskId: number) => {
