@@ -41,7 +41,7 @@ export const useTaskValidation = () => {
     },
     6: {
       validate: () => localStorage.getItem('task6Completed') === 'true',
-      errorMessage: 'Please complete the desired items test first'
+      errorMessage: 'Пополните ядро минимум на 1$'
     },
     7: {
       validate: () => (user?.walletBalance || 0) >= 1,
