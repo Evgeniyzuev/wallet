@@ -121,11 +121,11 @@ export default function Wallet() {
           walletBalance: -amountNumber,
           aicoreBalance: amountNumber
         });
-        if (result?.success) {
-          if (amountNumber >= 1) {
-            localStorage.setItem('task6Completed', 'true');
-          }
+
+        if (amountNumber >= 1) {
+          localStorage.setItem('task6Completed', 'true');
         }
+        
 
         console.log('Top Up Core action not implemented yet');
       } else {
