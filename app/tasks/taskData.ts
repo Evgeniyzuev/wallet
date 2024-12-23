@@ -579,13 +579,9 @@ export const tasks: Task[] = [
     action: () => {
       window.open('/friends', '_blank');
     },
-    secondActionText: 'Проверить рефералов',
+    secondActionText: 'Проверить',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      if (!user?.telegramId) {
-        setError('Пользователь не найден');
-        return;
-      }
-      // ... rest of the check referrals logic ...
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     }
   },
   {

@@ -54,7 +54,7 @@ export const useTaskValidation = () => {
             }
           });
           
-          return (userWithReferrals?.contacts.length || 0) >= 1;
+          return (userWithReferrals?.contacts.length || 0) > 0;
         } catch (error) {
           console.error('Error checking referrals:', error);
           return false;
