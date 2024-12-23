@@ -569,42 +569,19 @@ export const tasks: Task[] = [
   },
   {
     taskId: 6,
-    title: 'Пригласить реферала',
-    image: '/images/cyber.png',
-    description: () => {
-      return `На вкладке друзья можно отправлять приглашения. Получайте по 1$ за каждого зашедшего по вашей ссылке.<br/><br/>`
-    },
+    title: 'Пополнить ядро',
+    image: '/images/deal.jpg',
+    description: 'Пополнить ядро на любую сумму не меньше 1$ за один раз.<br/><br/>' +
+    '<br/><br/>',
     reward: 1,
-    actionText: 'Пригласить',
-    action: () => {
-      window.open('/friends', '_blank');
-    },
-    secondActionText: 'Проверить',
+    // actionText: 'Рассчитать',
+    // action: () => {
+    //   window.open('https://t.me/WeAiBot_bot', '_blank');
+    // },
+    secondActionText: 'Готово',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      if (!user?.telegramId) return false;
-        
-      try {
-        const userWithReferrals = await prisma.user.findUnique({
-          where: { telegramId: user.telegramId },
-          include: {
-            contacts: {
-              where: { isReferral: true }
-            }
-          }
-        });
-        
-        if ((userWithReferrals?.contacts.length || 0) > 0) {
-          await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
-        } else {
-          setError('Пожалуйста, пригласите рефералов');
-        }
-      } catch (error) {
-        console.error('Error checking referrals:', error);
-        return false;
-      }
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
-
-    
   },
   {
     taskId: 7,
@@ -656,23 +633,7 @@ export const tasks: Task[] = [
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
-  {
-    taskId: 9,
-    title: 'Пополнить ядро',
-    image: '/images/deal.jpg',
-    description: 'Пополнить ядро на любую сумму не меньше 1$.<br/><br/>' +
-    'Условие выполнения: <br/><br/>' +
-    '.<br/><br/>',
-    reward: 1,
-    // actionText: 'Рассчитать',
-    // action: () => {
-    //   window.open('https://t.me/WeAiBot_bot', '_blank');
-    // },
-    secondActionText: 'Готово',
-    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
-    },
-  },
+
   {
     taskId: 10,
     title: 'Точка А',

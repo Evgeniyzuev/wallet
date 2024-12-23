@@ -1,5 +1,5 @@
 import { useUser } from '../UserContext';
-  
+
 interface TaskValidationRules {
   [key: number]: {
     validate: () => Promise<boolean> | boolean;
@@ -40,7 +40,7 @@ export const useTaskValidation = () => {
       errorMessage: 'This action requires level 3 or higher'
     },
     6: {
-      validate: () => (true),
+      validate: () => localStorage.getItem('task6Completed') === 'true',
       errorMessage: 'Please complete the desired items test first'
     },
     7: {
