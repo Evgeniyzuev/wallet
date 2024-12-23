@@ -1,6 +1,5 @@
 import { useUser } from '../UserContext';
-import { prisma } from '@/lib/prisma';
-
+  
 interface TaskValidationRules {
   [key: number]: {
     validate: () => Promise<boolean> | boolean;
@@ -33,7 +32,7 @@ export const useTaskValidation = () => {
       errorMessage: 'Please complete the AI test first'
     },
     4: {
-      validate: () => localStorage.getItem('task2Completed') === 'true',
+      validate: () => localStorage.getItem('task4Completed') === 'true',
       errorMessage: 'Please subscribe to the channel first'
     },
     5: {
@@ -41,26 +40,8 @@ export const useTaskValidation = () => {
       errorMessage: 'This action requires level 3 or higher'
     },
     6: {
-      validate: async () => {
-        if (!user?.telegramId) return false;
-        
-        try {
-          const userWithReferrals = await prisma.user.findUnique({
-            where: { telegramId: user.telegramId },
-            include: {
-              contacts: {
-                where: { isReferral: true }
-              }
-            }
-          });
-          
-          return (userWithReferrals?.contacts.length || 0) > 0;
-        } catch (error) {
-          console.error('Error checking referrals:', error);
-          return false;
-        }
-      },
-      errorMessage: 'You need at least one referral to complete this task'
+      validate: () => (true),
+      errorMessage: 'Please complete the desired items test first'
     },
     7: {
       validate: () => (user?.walletBalance || 0) >= 1,

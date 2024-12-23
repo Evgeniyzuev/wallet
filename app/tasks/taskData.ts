@@ -1,3 +1,5 @@
+import { prisma } from "@/lib/prisma";
+
 export interface Task {
   taskId: number;
   title: string;
@@ -531,7 +533,7 @@ export const tasks: Task[] = [
     actionText: 'Подписаться',
     action: () => {
       window.open('https://t.me/WeAi_ch', '_blank');
-      localStorage.setItem('task2Completed', 'true');
+      localStorage.setItem('task4Completed', 'true');
     },
     secondActionText: 'Проверить подписку',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
@@ -570,9 +572,7 @@ export const tasks: Task[] = [
     title: 'Пригласить реферала',
     image: '/images/cyber.png',
     description: () => {
-      const paidCount = localStorage.getItem('paidReferrals') || '0';
-      return `Пригласите рефералов и получите 1$ за каждого.<br/><br/>` +
-             `Оплаченные рефералы: ${paidCount}`;
+      return `На вкладке друзья можно отправлять приглашения. Получайте по 1$ за каждого зашедшего по вашей ссылке.<br/><br/>`
     },
     reward: 1,
     actionText: 'Пригласить',
@@ -581,8 +581,30 @@ export const tasks: Task[] = [
     },
     secondActionText: 'Проверить',
     secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
-      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
-    }
+      if (!user?.telegramId) return false;
+        
+      try {
+        const userWithReferrals = await prisma.user.findUnique({
+          where: { telegramId: user.telegramId },
+          include: {
+            contacts: {
+              where: { isReferral: true }
+            }
+          }
+        });
+        
+        if ((userWithReferrals?.contacts.length || 0) > 0) {
+          await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+        } else {
+          setError('Пожалуйста, пригласите рефералов');
+        }
+      } catch (error) {
+        console.error('Error checking referrals:', error);
+        return false;
+      }
+    },
+
+    
   },
   {
     taskId: 7,
