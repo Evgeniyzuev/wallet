@@ -3,6 +3,7 @@
 import { useLanguage } from '../LanguageContext';
 import { useState } from 'react';
 import Roadmap from './Roadmap';
+import VisionBoard from '../goals/VisionBoard';
 
 const goalTranslations = {
   ru: ['🏋️ здоровье', '💑 отношения', '⏳ время', '🎯 цели', '💰 деньги', '💼 карьера', '🏠 дом', '🏖 путешествия', '🎨 хобби', '👪 семья', '🧠 навыки', '🏖 привычки', '💪 фитнес', '🏠 имущество', '💁‍♂️ персональное', '👨‍👩‍👦‍👦 социальное', '🗺 карта желаний', '🔮 рекомендации!'],
@@ -12,17 +13,19 @@ const goalTranslations = {
 const pageTitle = {
   ru: {
     goals: 'Цели',
-    roadmap: 'Дорожная карта'
+    roadmap: 'Дорожная карта',
+    visionBoard: 'Карта желаний'
   },
   en: {
     goals: 'Goals',
-    roadmap: 'Roadmap'
+    roadmap: 'Roadmap',
+    visionBoard: 'Vision board'
   }
 };
 
 export default function GoalsPage() {
   const { language } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'goals' | 'roadmap'>('goals');
+  const [activeTab, setActiveTab] = useState<'goals' | 'roadmap' | 'visionBoard'>('goals');
   const goals = goalTranslations[language as keyof typeof goalTranslations] || goalTranslations.en;
   const titles = pageTitle[language as keyof typeof pageTitle] || pageTitle.en;
 
@@ -37,6 +40,14 @@ export default function GoalsPage() {
             }`}
           >
             {titles.goals}
+          </button>
+          <button
+            onClick={() => setActiveTab('visionBoard')}
+            className={`px-4 py-2 rounded-lg transition-colors ${
+              activeTab === 'visionBoard' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            {titles.visionBoard}
           </button>
           <button
             onClick={() => setActiveTab('roadmap')}
@@ -59,6 +70,8 @@ export default function GoalsPage() {
             ))}
           </div>
         </div>
+      ) : activeTab === 'visionBoard' ? (
+        <VisionBoard />
       ) : (
         <Roadmap />
       )}

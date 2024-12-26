@@ -789,6 +789,27 @@ export const tasks: Task[] = [
       await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
     },
   },
+  {
+    taskId: 14,
+    title: 'Карта желаний',
+    image: '/images/map-72.jpg',
+    description: 'Карта желаний помогает уверенно двигаться прямо к своим целям.<br/><br/>' +
+    'Когда желаемое кажется недостижимым, мы испытываем боль и разочарование.<br/><' +
+    'Люди подавляют свои желания, чтобы избежать этих эмоций.<br/>' +
+    'Конечно, подавленные чувства не исчезают. В глубине души они постоянно давят на нас. Вызывают противоречия и раздражение.<br/>' +
+    'С запутанными чувствами и мыслями человек не совершает нужных действий чтобы идти к цели.<br/>' +
+    'Не иметь чего-то, желать и стремиться к этому - это нормально.<br/>' +
+    'Это не мешает быть благодарным и наслаждаться жизнью.<br/>' +
+    'Жизнь это процесс. Нужно всегда понимать к чему стремишься.<br/>' +
+    'Чем яснее видна цель, тем проще ее достичь.<br/><br/>' +
+    'На вкладке цели загружайте картинки своих желаний, которые по настоящему влияют на вас и откликаются в душе.<br/><br/>' +
+    'Заходите каждый день чтобы зарядиться энергией и настроить мысли на достижение цели.<br/><br/>',
+    reward: 1,
+    secondActionText: 'Готово',
+    secondAction: async function(user, handleUpdateUser, setNotification, setTaskCompleted, setError) {
+      await completeTask(this.taskId, this.reward, user, handleUpdateUser, setNotification, setTaskCompleted, setError);
+    },
+  }
 ];
 
 // export const handleSubscribe = async () => {
