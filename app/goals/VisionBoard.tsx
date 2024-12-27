@@ -33,45 +33,65 @@ const dbPromise = typeof window !== 'undefined'
     })
   : null;
 
-const saveData = async (items: VisionItem[], visibleSectors: string[]) => {
+const cleanupData = (data: { items: VisionItem[], sectors: string[], allSectors: string[] }) => {
+  // Удаляем дубликаты
+  const uniqueItems = data.items.filter((item, index, self) =>
+    index === self.findIndex((t) => t.id === item.id)
+  );
+
+  // Удаляем items с невалидными URL или отсутствующими обязательными полями
+  const validItems = uniqueItems.filter(item => 
+    item.id && 
+    item.imageUrl && 
+    item.sector && 
+    typeof item.imageUrl === 'string'
+  );
+
+  // Получаем список реально используемых секторов
+  const usedSectors = Array.from(new Set(validItems.map(item => item.sector)));
+
+  return {
+    items: validItems,
+    sectors: data.sectors.filter(s => s), // Удаляем пустые значения
+    allSectors: usedSectors // Обновляем список всех секторов
+  };
+};
+
+const saveData = async (items: VisionItem[], sectors: string[]) => {
   if (!dbPromise) return;
   const db = await dbPromise;
-  const currentData = await db.get('vision-items', 'vision-data');
-  const allSectors = currentData?.allSectors || visibleSectors;
   
-  const updatedAllSectors = Array.from(new Set([...allSectors, ...visibleSectors]));
+  // Очищаем данные перед сохранением
+  const cleanedData = cleanupData({ items, sectors, allSectors: sectors });
   
-  await db.put('vision-items', {
-    items,
-    sectors: visibleSectors,
-    allSectors: updatedAllSectors
-  }, 'vision-data');
+  await db.put('vision-items', cleanedData, 'vision-data');
 };
 
 const loadData = async () => {
-  if (!dbPromise) return { items: [], sectors: [
-    'доход', 
-    'самореализация', 
-    'семья', 
-    'здоровье', 
-    'богатство', 
-    'друзья', 
-    'любовь', 
-    'гармония'
-  ]};
+  if (!dbPromise) return { 
+    items: [], 
+    sectors: defaultSectors,
+    allSectors: defaultSectors 
+  };
   
   const db = await dbPromise;
   const data = await db.get('vision-items', 'vision-data');
-  return data || { items: [], sectors: [
-    'доход', 
-    'самореализация', 
-    'семья', 
-    'здоровье', 
-    'богатство', 
-    'друзья', 
-    'любовь', 
-    'гармония'
-  ]};
+  
+  if (!data) return {
+    items: [],
+    sectors: defaultSectors,
+    allSectors: defaultSectors
+  };
+
+  // Очищаем данные при загрузке
+  const cleanedData = cleanupData(data);
+  
+  // Если данные были очищены, сохраняем очищенную версию
+  if (JSON.stringify(cleanedData) !== JSON.stringify(data)) {
+    await saveData(cleanedData.items, cleanedData.sectors);
+  }
+
+  return cleanedData;
 };
 
 // Функция для сжатия изображения
@@ -114,6 +134,17 @@ const compressImage = async (file: File): Promise<string> => {
     reader.readAsDataURL(file);
   });
 };
+
+const defaultSectors = [
+  'доход', 
+  'самореализация', 
+  'семья', 
+  'здоровье', 
+  'богатство', 
+  'друзья', 
+  'любовь', 
+  'гармония'
+];
 
 export default function VisionBoard() {
   const [items, setItems] = useState<VisionItem[]>([]);
