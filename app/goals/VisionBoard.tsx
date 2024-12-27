@@ -9,6 +9,7 @@ interface VisionItem {
   imageUrl: string;
   caption: string;
   sector: string;
+  comment?: string;
 }
 
 interface VisionBoardDB extends DBSchema {
@@ -121,6 +122,9 @@ export default function VisionBoard() {
   ]);
   const [selectedSector, setSelectedSector] = useState(sectors[0]);
   const [newSector, setNewSector] = useState('');
+  const [selectedItem, setSelectedItem] = useState<VisionItem | null>(null);
+  const [editedCaption, setEditedCaption] = useState('');
+  const [editedComment, setEditedComment] = useState('');
 
   useEffect(() => {
     const loadSavedData = async () => {
@@ -172,6 +176,26 @@ export default function VisionBoard() {
       setItems(updatedItems);
       await saveData(updatedItems, updatedSectors);
     }
+  };
+
+  const handleItemClick = (item: VisionItem) => {
+    setSelectedItem(item);
+    setEditedCaption(item.caption);
+    setEditedComment(item.comment || '');
+  };
+
+  const handleSaveEdits = async () => {
+    if (!selectedItem) return;
+    
+    const updatedItems = items.map(item => 
+      item.id === selectedItem.id 
+        ? { ...item, caption: editedCaption, comment: editedComment }
+        : item
+    );
+    
+    setItems(updatedItems);
+    await saveData(updatedItems, sectors);
+    setSelectedItem(null);
   };
 
   return (
@@ -246,42 +270,37 @@ export default function VisionBoard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {sectors.map(sector => {
           const sectorItems = items.filter(item => item.sector === sector);
           if (sectorItems.length === 0) return null;
 
           return (
-            <div key={sector} className="bg-gray-800 p-4 rounded-lg">
-              <div className="flex justify-between items-center mb-3">
+            <div key={sector} className="bg-gray-800 p-0 rounded-lg">
+              <div className="flex justify-between items-center mb-3 px-4 pt-4">
                 <h3 className="text-lg font-bold text-blue-400">
                   {sector.charAt(0).toUpperCase() + sector.slice(1)}
                 </h3>
                 <button
                   onClick={() => handleDeleteSector(sector)}
-                  className="bg-red-500 text-white p-1 rounded-full hover:bg-red-600 text-sm"
+                  className="bg-red-500 text-white h-6 w-6 flex items-center justify-center rounded-full hover:bg-red-600 text-sm"
                 >
                   ×
                 </button>
               </div>
-              <div className="space-y-4">
+              <div className="grid grid-cols-3 gap-0.5">
                 {sectorItems.map(item => (
-                  <div key={item.id} className="relative">
-                    <div className="relative h-48 mb-2">
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.caption}
-                        fill
-                        className="rounded-lg object-cover"
-                      />
-                    </div>
-                    <p className="text-sm text-gray-300">{item.caption}</p>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
-                    >
-                      ×
-                    </button>
+                  <div 
+                    key={item.id} 
+                    className="relative aspect-square cursor-pointer"
+                    onClick={() => handleItemClick(item)}
+                  >
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.caption}
+                      fill
+                      className="object-cover"
+                    />
                   </div>
                 ))}
               </div>
@@ -289,6 +308,50 @@ export default function VisionBoard() {
           );
         })}
       </div>
+
+      {selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="relative aspect-square w-full">
+              <Image
+                src={selectedItem.imageUrl}
+                alt={selectedItem.caption}
+                fill
+                className="object-contain"
+              />
+            </div>
+            <div className="p-4 space-y-4">
+              <input
+                type="text"
+                value={editedCaption}
+                onChange={(e) => setEditedCaption(e.target.value)}
+                className="w-full p-2 rounded bg-gray-700 text-white"
+                placeholder="Описание"
+              />
+              <textarea
+                value={editedComment}
+                onChange={(e) => setEditedComment(e.target.value)}
+                className="w-full p-2 rounded bg-gray-700 text-white h-24"
+                placeholder="Комментарий"
+              />
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => setSelectedItem(null)}
+                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                >
+                  Отмена
+                </button>
+                <button
+                  onClick={handleSaveEdits}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Сохранить
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
