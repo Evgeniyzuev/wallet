@@ -199,7 +199,7 @@ export default function VisionBoard() {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-0">
       <div className="mb-8 bg-gray-800 p-4 rounded-lg">
         <h2 className="text-xl font-bold mb-4">Добавить новую цель</h2>
         
@@ -277,8 +277,8 @@ export default function VisionBoard() {
 
           return (
             <div key={sector} className="bg-gray-800 p-0 rounded-lg">
-              <div className="flex justify-between items-center mb-3 px-4 pt-4">
-                <h3 className="text-lg font-bold text-blue-400">
+              <div className="flex justify-between items-center mb-3 px-4 pt-2">
+                <h3 className="text-lg font-bold text-blue-400 text-center w-full">
                   {sector.charAt(0).toUpperCase() + sector.slice(1)}
                 </h3>
                 <button
@@ -335,6 +335,15 @@ export default function VisionBoard() {
                 placeholder="Комментарий"
               />
               <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => {
+                    handleDelete(selectedItem.id);
+                    setSelectedItem(null);
+                  }}
+                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                >
+                  Удалить
+                </button>
                 <button
                   onClick={() => setSelectedItem(null)}
                   className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
