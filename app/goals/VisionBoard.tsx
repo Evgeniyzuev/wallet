@@ -18,6 +18,7 @@ interface VisionBoardDB extends DBSchema {
     value: {
       items: VisionItem[];
       sectors: string[];
+      allSectors: string[];
     };
   };
 }
@@ -32,10 +33,19 @@ const dbPromise = typeof window !== 'undefined'
     })
   : null;
 
-const saveData = async (items: VisionItem[], sectors: string[]) => {
+const saveData = async (items: VisionItem[], visibleSectors: string[]) => {
   if (!dbPromise) return;
   const db = await dbPromise;
-  await db.put('vision-items', { items, sectors }, 'vision-data');
+  const currentData = await db.get('vision-items', 'vision-data');
+  const allSectors = currentData?.allSectors || visibleSectors;
+  
+  const updatedAllSectors = Array.from(new Set([...allSectors, ...visibleSectors]));
+  
+  await db.put('vision-items', {
+    items,
+    sectors: visibleSectors,
+    allSectors: updatedAllSectors
+  }, 'vision-data');
 };
 
 const loadData = async () => {
@@ -95,7 +105,7 @@ const compressImage = async (file: File): Promise<string> => {
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(img, 0, 0, width, height);
 
-        // Сжимаем качество до 0.7
+        //  Уменьшаем качество до 0.7
         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
         resolve(compressedDataUrl);
       };
@@ -168,15 +178,6 @@ export default function VisionBoard() {
     await saveData(updatedItems, sectors);
   };
 
-  const handleDeleteSector = async (sectorToDelete: string) => {
-    if (confirm(`Удалить сферу "${sectorToDelete}" и все связанные с ней картинки?`)) {
-      const updatedSectors = sectors.filter(s => s !== sectorToDelete);
-      const updatedItems = items.filter(item => item.sector !== sectorToDelete);
-      setSectors(updatedSectors);
-      setItems(updatedItems);
-      await saveData(updatedItems, updatedSectors);
-    }
-  };
 
   const handleItemClick = (item: VisionItem) => {
     setSelectedItem(item);
@@ -198,9 +199,17 @@ export default function VisionBoard() {
     setSelectedItem(null);
   };
 
+  const handleDeleteSector = async (sectorToDelete: string) => {
+    if (confirm(`Скрыть сферу "${sectorToDelete}" из списка?`)) {
+      const updatedSectors = sectors.filter(s => s !== sectorToDelete);
+      setSectors(updatedSectors);
+      await saveData(items, updatedSectors);
+    }
+  };
+
   return (
-    <div className="p-0">
-      <div className="mb-8 bg-gray-800 p-4 rounded-lg">
+    <div className="p-0 pb-20">
+      <div className="mb-4 bg-gray-800 p-4 rounded-lg">
         <h2 className="text-xl font-bold mb-4">Добавить новую цель</h2>
         
         <div className="mb-4">
@@ -260,6 +269,12 @@ export default function VisionBoard() {
             </button>
           </div>
         </div>
+        <button
+          onClick={() => handleDeleteSector(selectedSector)}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+        >
+          Удалить сферу
+        </button>
 
         <button
           onClick={handleUpload}
@@ -271,22 +286,18 @@ export default function VisionBoard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {sectors.map(sector => {
+        {Array.from(new Set(items.map(item => item.sector))).map(sector => {
           const sectorItems = items.filter(item => item.sector === sector);
           if (sectorItems.length === 0) return null;
 
           return (
-            <div key={sector} className="bg-gray-800 p-0 rounded-lg">
-              <div className="flex justify-between items-center mb-3 px-4 pt-2">
-                <h3 className="text-lg font-bold text-blue-400 text-center w-full">
-                  {sector.charAt(0).toUpperCase() + sector.slice(1)}
-                </h3>
-                <button
-                  onClick={() => handleDeleteSector(sector)}
-                  className="bg-red-500 text-white h-6 w-6 flex items-center justify-center rounded-full hover:bg-red-600 text-sm"
-                >
-                  ×
-                </button>
+            <div key={sector} className="bg-gray-800 p-0 rounded-lg w-full">
+              <div className="flex justify-between items-center mb-0 px-4 pt-0">
+                <div className="flex justify-center items-center w-full mb-0 px-4 pt-0">
+                  <h3 className="text-lg font-bold text-blue-400 text-center inline-block px-2 rounded-lg bg-black bg-opacity-50 mt-0 -mb-8 z-10">
+                    {sector.charAt(0).toUpperCase() + sector.slice(1)}
+                  </h3>
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-0.5">
                 {sectorItems.map(item => (
