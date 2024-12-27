@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { openDB, DBSchema } from 'idb';
@@ -19,21 +21,34 @@ interface VisionBoardDB extends DBSchema {
   };
 }
 
-const dbPromise = openDB<VisionBoardDB>('vision-board-db', 1, {
-  upgrade(db) {
-    // Создаем хранилище объектов, если его еще нет
-    if (!db.objectStoreNames.contains('vision-items')) {
-      db.createObjectStore('vision-items');
-    }
-  },
-});
+const dbPromise = typeof window !== 'undefined' 
+  ? openDB<VisionBoardDB>('vision-board-db', 1, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains('vision-items')) {
+          db.createObjectStore('vision-items');
+        }
+      },
+    })
+  : null;
 
 const saveData = async (items: VisionItem[], sectors: string[]) => {
+  if (!dbPromise) return;
   const db = await dbPromise;
   await db.put('vision-items', { items, sectors }, 'vision-data');
 };
 
 const loadData = async () => {
+  if (!dbPromise) return { items: [], sectors: [
+    'доход', 
+    'самореализация', 
+    'семья', 
+    'здоровье', 
+    'богатство', 
+    'друзья', 
+    'любовь', 
+    'гармония'
+  ]};
+  
   const db = await dbPromise;
   const data = await db.get('vision-items', 'vision-data');
   return data || { items: [], sectors: [
