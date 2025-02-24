@@ -76,7 +76,7 @@ export default function Core() {
   const [targetAmount, setTargetAmount] = useState(0);
   const [daysToTarget, setDaysToTarget] = useState(0);
   const [plusStartCore, setPlusStartCore ] = useState(0);
-  const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(Math.round(reinvestmentPart * 100));
+  const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(user?.reinvestSetup || 100);
   const [isSaved, setIsSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
@@ -278,6 +278,12 @@ export default function Core() {
       }
     }
   }, [aicoreLevel, user, handleUpdateUser]);
+
+  useEffect(() => {
+    if (user?.reinvestSetup !== undefined) {
+      setReinvestmentSetupInput(user.reinvestSetup);
+    }
+  }, [user?.reinvestSetup]);
 
   return (
     <main className="bg-[#1c2033] text-white min-h-screen p-2">
