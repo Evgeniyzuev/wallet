@@ -70,13 +70,13 @@ export default function Core() {
 
   const [dailyCoreRate] = useState(0.000633);
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
-  const [reinvestmentPart, setReinvestmentPart] = useState(1);
+  const [reinvestmentPart, setReinvestmentPart] = useState(user?.reinvestSetup ? user.reinvestSetup / 100 : 1);
   const [dailyReward, setDailyReward] = useState(1);
   const [dailyRewardInput, setDailyRewardInput] = useState('1');
   const [targetAmount, setTargetAmount] = useState(0);
   const [daysToTarget, setDaysToTarget] = useState(0);
   const [plusStartCore, setPlusStartCore ] = useState(0);
-  const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState<number>(user?.reinvestSetup || 100);
+  const [reinvestmentSetupInput, setReinvestmentSetupInput] = useState(user?.reinvestSetup || 100);
   const [isSaved, setIsSaved] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
@@ -281,6 +281,7 @@ export default function Core() {
 
   useEffect(() => {
     if (user?.reinvestSetup !== undefined) {
+      setReinvestmentPart(user.reinvestSetup / 100);
       setReinvestmentSetupInput(user.reinvestSetup);
     }
   }, [user?.reinvestSetup]);
