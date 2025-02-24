@@ -70,7 +70,7 @@ export default function Core() {
 
   const [dailyCoreRate] = useState(0.000633);
   const [coreAfterXyears, setCoreAfterXyears] = useState(30);
-  const [reinvestmentPart, setReinvestmentPart] = useState(user?.reinvestSetup ? user.reinvestSetup / 100 : 1);
+  // const [reinvestmentPart, setReinvestmentPart] = useState(user?.reinvestSetup ? user.reinvestSetup / 100 : 1);
   const [dailyReward, setDailyReward] = useState(1);
   const [dailyRewardInput, setDailyRewardInput] = useState('1');
   const [targetAmount, setTargetAmount] = useState(0);
@@ -83,10 +83,10 @@ export default function Core() {
 
   // const previousLevelRef = useRef(user?.level); // Создаем реф для хранения предыдущего уровня
 
-  const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
-    setReinvestmentPart(value / 100);
-  };
+  // const handleReinvestmentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
+  //   setReinvestmentPart(value / 100);
+  // };
   const handleDailyRewardChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     if (!isNaN(value) && value >= 0 && value <= 999) {
@@ -202,7 +202,7 @@ export default function Core() {
 
     const recursiveCalculate = (minDays: number, maxDays: number) => {
       const days = Math.floor((minDays + maxDays) / 2);
-      const currentAmount = (user.aicoreBalance + plusStartCore + dailyReward * days) * ((dailyCoreRate * reinvestmentPart + 1) ** days);
+      const currentAmount = (user.aicoreBalance + plusStartCore + dailyReward * days) * ((dailyCoreRate * (user?.reinvestSetup || 100) + 1) ** days);
 
       // Base case: if the difference is small enough
       if (-2 < maxDays - minDays && maxDays - minDays < 2) {
@@ -244,7 +244,7 @@ export default function Core() {
   }, []);
 
   const totalFutureValue = ((((user?.aicoreBalance || 0) + plusStartCore) + dailyReward * 365.25 * coreAfterXyears) * 
-    ((dailyCoreRate * reinvestmentPart + 1) ** 365.25) ** coreAfterXyears);
+    ((dailyCoreRate * (user?.reinvestSetup || 100) + 1) ** 365.25) ** coreAfterXyears);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Удаляем все нецифровые символы
@@ -281,7 +281,7 @@ export default function Core() {
 
   useEffect(() => {
     if (user?.reinvestSetup !== undefined) {
-      setReinvestmentPart(user.reinvestSetup / 100);
+      // setReinvestmentPart(user.reinvestSetup / 100);
       setReinvestmentSetupInput(user.reinvestSetup);
     }
   }, [user?.reinvestSetup]);
@@ -316,19 +316,19 @@ export default function Core() {
           <label className="flex items-center justify-between mb-0">
             APY 26% 
             <span>{t.reinvest}</span>
-            <input
+            {/* <input
               type="number"
               value={user?.reinvestSetup || 100}
               onChange={handleReinvestmentChange}
               className="w-16 h-6 text-black rounded text-center"
               min="0"
               max="100"
-            />
+            /> */}
           </label>
           <div className="w-full h-2 bg-gray-200 rounded-full">
             <div
               className="h-full bg-green-500 rounded-full"
-              style={{ width: `${reinvestmentPart * 100}%` }}
+              style={{ width: `${(user?.reinvestSetup || 100) * 100}%` }}
             />
           </div>
         </div>
