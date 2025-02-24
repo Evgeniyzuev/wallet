@@ -318,7 +318,7 @@ export default function Core() {
             <span>{t.reinvest}</span>
             <input
               type="number"
-              value={Math.round(reinvestmentPart * 100)}
+              value={user?.reinvestSetup || 100}
               onChange={handleReinvestmentChange}
               className="w-16 h-6 text-black rounded text-center"
               min="0"
@@ -335,8 +335,8 @@ export default function Core() {
         <div className="text-lg font-semibold mb-1">
           
           <div className="flex justify-between text-sm mt-0">
-            <span>{t.walletDaily}: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - reinvestmentPart)).toFixed(6)}$/d</span>
-            <span>{t.coreDaily}: {((user?.aicoreBalance || 0) * dailyCoreRate * (reinvestmentPart)).toFixed(6)}$/d</span>
+            <span>{t.walletDaily}: {((user?.aicoreBalance || 0) * dailyCoreRate * (1 - (user?.reinvestSetup || 100) / 100)).toFixed(6)}$/d</span>
+            <span>{t.coreDaily}: {((user?.aicoreBalance || 0) * dailyCoreRate * ((user?.reinvestSetup || 100) / 100)).toFixed(6)}$/d</span>
           </div>
         </div>
 
@@ -478,17 +478,17 @@ export default function Core() {
             
             <input 
               type="number" 
-              value={reinvestmentSetupInput} 
-              ref={inputRef} // Attach ref to the input
+              value={user?.reinvestSetup || 100}
+              ref={inputRef}
               className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
               onChange={(e) => {
-                const value = Math.min(100, Math.max(0, parseInt(e.target.value))); // Ensure value is between 0 and 100
-                setReinvestmentSetupInput(value);
+                const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
+                handleUpdateUser({ reinvestSetup: value });
               }} 
             /> % <br/>
             <span className="text-xs">{t.minLevel}: {Math.max(0, minValue)}%</span>
           </div>
-          {(reinvestmentSetupInput >= minValue) && 
+          {((user?.reinvestSetup || 100) >= minValue) && 
               <button 
               onClick={handleSaveReinvestSetup}
               // disabled={reinvestmentSetupInput >= minValue}
