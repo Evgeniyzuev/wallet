@@ -15,7 +15,7 @@ const initialUser: User = {
   username: '',
   firstName: '',
   lastName: '',
-  reinvestSetup: 90,
+  reinvestSetup: 100,
   aicoreBalance: 0,
   walletBalance: 0,
   level: 0,

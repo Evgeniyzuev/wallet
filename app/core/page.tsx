@@ -244,7 +244,7 @@ export default function Core() {
   }, []);
 
   const totalFutureValue = ((((user?.aicoreBalance || 0) + plusStartCore) + dailyReward * 365.25 * coreAfterXyears) * 
-    ((dailyCoreRate * (user?.reinvestSetup || 100) + 1) ** 365.25) ** coreAfterXyears);
+    ((dailyCoreRate * (user?.reinvestSetup || 100)/100 + 1) ** 365.25) ** coreAfterXyears);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Удаляем все нецифровые символы
@@ -478,12 +478,12 @@ export default function Core() {
             
             <input 
               type="number" 
-              value={user?.reinvestSetup || 100}
+              value={reinvestmentSetupInput}
               ref={inputRef}
               className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
               onChange={(e) => {
                 const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                handleUpdateUser({ reinvestSetup: value });
+                setReinvestmentSetupInput(value);
               }} 
             /> % <br/>
             <span className="text-xs">{t.minLevel}: {Math.max(0, minValue)}%</span>
