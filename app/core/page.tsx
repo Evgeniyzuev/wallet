@@ -315,7 +315,7 @@ export default function Core() {
         <div className="mb-1">
           <label className="flex items-center justify-between mb-0">
             APY 26% 
-            <span>{t.reinvest}</span>
+            <span>{t.reinvest} ({user?.reinvestSetup || 100}%)</span>
             {/* <input
               type="number"
               value={user?.reinvestSetup || 100}
@@ -328,7 +328,7 @@ export default function Core() {
           <div className="w-full h-2 bg-gray-200 rounded-full">
             <div
               className="h-full bg-green-500 rounded-full"
-              style={{ width: `${(user?.reinvestSetup || 100) * 100}%` }}
+              style={{ width: `${(user?.reinvestSetup || 100)}%` }}
             />
           </div>
         </div>
