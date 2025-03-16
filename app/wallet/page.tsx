@@ -165,7 +165,7 @@ export default function Wallet() {
 
   const formatBalance = (balance: number, currency: Currency) => {
     const converted = balance * currency.rate;
-    return `${currency.symbol}${Math.floor(converted * 100) / 100}`;
+    return `${currency.symbol}${converted.toFixed(2)}`;
   };
 
   useEffect(() => {
@@ -235,7 +235,7 @@ export default function Wallet() {
         <div className="flex flex-col">
           <div className="flex justify-between items-center mb-4 mt-4 ml-4">
             <div>
-              <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0)).toFixed(2)}$</p>
+              <p className="text-4xl text-bold">{Number((user?.walletBalance || 0)).toFixed(2)}$</p>
               <p className="text-xl text-gray-400">USDT: ${usdtBalance}</p>
             </div>
             <button

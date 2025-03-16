@@ -107,6 +107,9 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
         return;
       }
 
+      // Format amount to 2 decimal places
+      const formattedAmount = Number(amount).toFixed(2);
+
       try {
         // Validate address by attempting to parse it
         Address.parse(recipientAddress);
@@ -119,7 +122,7 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
       const body = beginCell()
         .storeUint(0xf8a7ea5, 32) // op transfer
         .storeUint(0, 64) // queryId
-        .storeCoins(toNano(amount)) // amount in smallest units
+        .storeCoins(toNano(formattedAmount)) // amount in smallest units with proper formatting
         .storeAddress(Address.parse(recipientAddress))
         .storeAddress(Address.parse(recipientAddress)) // response address
         .storeBit(0) // no custom payload
@@ -162,9 +165,12 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
         return;
       }
 
+      // Format amount to 2 decimal places
+      const formattedAmount = Number(amount).toFixed(2);
+      
       // For receive, we're just showing the address where USDT should be sent
       // No actual transaction is performed here
-      console.log(`Request to receive ${amount} USDT at address ${USDT_WALLET_ADDRESS}`);
+      console.log(`Request to receive ${formattedAmount} USDT at address ${USDT_WALLET_ADDRESS}`);
       
       // In a real app, you might want to generate a QR code or create a payment link
     } catch (error) {
