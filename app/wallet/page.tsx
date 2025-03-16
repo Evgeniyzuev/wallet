@@ -8,6 +8,10 @@ import Send from './send';
 import JettonTransfer from './jetton';
 import { useTonPrice } from '../TonPriceContext';
 import { useLanguage } from '../LanguageContext';
+import TonWeb from 'tonweb';
+
+// USDT Jetton wallet address
+const USDT_WALLET_ADDRESS = "UQDLvW6egkiYfJ1lryrOQrwe6B0VZuaLpwKudD0cGK-udBpA";
 
 type Currency = {
   code: string;
@@ -187,6 +191,44 @@ export default function Wallet() {
     return () => clearInterval(interval);
   }, []);
 
+  // Fetch USDT balance
+  useEffect(() => {
+    const fetchUsdtBalance = async () => {
+      try {
+        // Initialize TonWeb
+        const tonweb = new TonWeb(new TonWeb.HttpProvider('https://toncenter.com/api/v2/jsonRPC', {
+          apiKey: process.env.NEXT_PUBLIC_MAINNET_TONCENTER_API_KEY
+        }));
+        
+        // Get Jetton wallet info
+        const response = await fetch(`https://tonapi.io/v2/accounts/${USDT_WALLET_ADDRESS}/jettons`);
+        const data = await response.json();
+        
+        if (data && data.balances && data.balances.length > 0) {
+          // Find USDT balance (assuming it's in the list)
+          const usdtInfo = data.balances.find((item: any) => 
+            item.jetton.name === "Tether USD" || 
+            item.jetton.symbol === "USDT"
+          );
+          
+          if (usdtInfo) {
+            // USDT has 6 decimals
+            const balance = Number(usdtInfo.balance) / 1000000;
+            setUsdtBalance(balance.toFixed(2));
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching USDT balance:', error);
+      }
+    };
+
+    fetchUsdtBalance();
+    // Refresh balance every 60 seconds
+    const interval = setInterval(fetchUsdtBalance, 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <main className="bg-dark-blue text-white flex flex-col items-center min-h-screen">
       <div className="text-center w-full max-w-lg px-4">
@@ -194,7 +236,7 @@ export default function Wallet() {
           <div className="flex justify-between items-center mb-4 mt-4 ml-4">
             <div>
               <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0)).toFixed(2)}$</p>
-              <p className="text-xl text-gray-400">USDT: {usdtBalance}</p>
+              <p className="text-xl text-gray-400">USDT: ${usdtBalance}</p>
             </div>
             <button
               onClick={() => setShowCurrencySelector(!showCurrencySelector)}

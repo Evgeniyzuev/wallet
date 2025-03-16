@@ -6,6 +6,7 @@ import { useUser } from '../UserContext';
 import { useLanguage } from '../LanguageContext';
 
 const USDT_MASTER_CONTRACT = "EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA"; // TON USDT Master Contract
+const USDT_WALLET_ADDRESS = "UQDLvW6egkiYfJ1lryrOQrwe6B0VZuaLpwKudD0cGK-udBpA"; // Specific USDT wallet address
 
 interface JettonTransferProps {
   action: 'sendUsdt' | 'receiveUsdt';
@@ -14,38 +15,49 @@ interface JettonTransferProps {
 export default function JettonTransfer({ action }: JettonTransferProps) {
   const [tonConnectUI] = useTonConnectUI();
   const [amount, setAmount] = useState('');
-  const [recipientAddress, setRecipientAddress] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState(USDT_WALLET_ADDRESS); // Default to the specific address
   const { transactionStatus, startChecking } = useTransactionStatus();
   const { user } = useUser();
   const { language } = useLanguage();
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const translations = {
     ru: {
       enterAmount: 'Введите сумму USDT',
-      enterAddress: 'Введите адрес получателя',
+      enterAddress: 'Адрес получателя',
       yourAddress: 'Ваш адрес для получения USDT',
+      fixedAddress: 'Фиксированный адрес для USDT',
       send: 'Отправить',
       receive: 'Получить',
       processing: 'Обработка...',
       insufficientBalance: 'Недостаточно средств',
       invalidAmount: 'Неверная сумма',
-      invalidAddress: 'Неверный адрес'
+      invalidAddress: 'Неверный адрес',
+      addressCopied: 'Адрес скопирован'
     },
     en: {
       enterAmount: 'Enter USDT amount',
-      enterAddress: 'Enter recipient address',
+      enterAddress: 'Recipient address',
       yourAddress: 'Your address for receiving USDT',
+      fixedAddress: 'Fixed USDT address',
       send: 'Send',
       receive: 'Receive',
       processing: 'Processing...',
       insufficientBalance: 'Insufficient balance',
       invalidAmount: 'Invalid amount',
-      invalidAddress: 'Invalid address'
+      invalidAddress: 'Invalid address',
+      addressCopied: 'Address copied'
     }
   };
 
   const t = translations[language as keyof typeof translations] || translations.en;
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(USDT_WALLET_ADDRESS);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const sendJetton = async () => {
     if (!tonConnectUI.connected) {
@@ -124,13 +136,16 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
             min="0"
             step="0.01"
           />
-          <input
-            type="text"
-            value={recipientAddress}
-            onChange={(e) => setRecipientAddress(e.target.value)}
-            placeholder={t.enterAddress}
-            className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
-          />
+          <div className="mb-2">
+            <label className="block text-sm text-gray-400 mb-1">{t.enterAddress}</label>
+            <input
+              type="text"
+              value={recipientAddress}
+              readOnly
+              className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white opacity-75"
+            />
+            <p className="text-xs text-gray-500 mt-1">{t.fixedAddress}</p>
+          </div>
           <button
             onClick={sendJetton}
             className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
@@ -141,9 +156,22 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
       ) : (
         <div className="text-center">
           <p className="mb-2 text-gray-400">{t.yourAddress}</p>
-          <p className="font-mono bg-gray-700 p-3 rounded break-all">
-            {tonConnectUI.account?.address ? formatAddress(tonConnectUI.account.address) : t.processing}
-          </p>
+          <div className="relative">
+            <p className="font-mono bg-gray-700 p-3 rounded break-all">
+              {USDT_WALLET_ADDRESS}
+            </p>
+            <button 
+              onClick={copyToClipboard}
+              className="absolute top-2 right-2 bg-gray-600 hover:bg-gray-500 text-white p-1 rounded"
+            >
+              {copied ? '✓' : '📋'}
+            </button>
+            {copied && (
+              <div className="absolute -top-8 right-0 bg-green-800 text-white px-2 py-1 rounded text-sm">
+                {t.addressCopied}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
