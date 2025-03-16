@@ -21,6 +21,7 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
   const { language } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const translations = {
     ru: {
@@ -34,7 +35,11 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
       insufficientBalance: 'Недостаточно средств',
       invalidAmount: 'Неверная сумма',
       invalidAddress: 'Неверный адрес',
-      addressCopied: 'Адрес скопирован'
+      addressCopied: 'Адрес скопирован',
+      connectWallet: 'Подключить кошелек',
+      disconnectWallet: 'Отключить кошелек',
+      loading: 'Загрузка...',
+      connected: 'Подключено'
     },
     en: {
       enterAmount: 'Enter USDT amount',
@@ -47,7 +52,11 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
       insufficientBalance: 'Insufficient balance',
       invalidAmount: 'Invalid amount',
       invalidAddress: 'Invalid address',
-      addressCopied: 'Address copied'
+      addressCopied: 'Address copied',
+      connectWallet: 'Connect Wallet',
+      disconnectWallet: 'Disconnect Wallet',
+      loading: 'Loading...',
+      connected: 'Connected'
     }
   };
 
@@ -57,6 +66,33 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
     navigator.clipboard.writeText(USDT_WALLET_ADDRESS);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleWalletAction = async () => {
+    try {
+      if (tonConnectUI.connected) {
+        setIsLoading(true);
+        await tonConnectUI.disconnect();
+      } else {
+        setIsLoading(true);
+        await tonConnectUI.openModal();
+      }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to connect wallet');
+      console.error('Wallet connection error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatAddress = (address: string) => {
+    if (!address) return '';
+    try {
+      const tempAddress = Address.parse(address).toString();
+      return `${tempAddress.slice(0, 4)}...${tempAddress.slice(-4)}`;
+    } catch {
+      return `${address.slice(0, 4)}...${address.slice(-4)}`;
+    }
   };
 
   const sendJetton = async () => {
@@ -114,10 +150,38 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
     }
   };
 
-  const formatAddress = (address: string) => {
-    if (!address) return '';
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  const receiveJetton = async () => {
+    if (!tonConnectUI.connected) {
+      setError("Wallet not connected");
+      return;
+    }
+
+    try {
+      if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
+        setError(t.invalidAmount);
+        return;
+      }
+
+      // For receive, we're just showing the address where USDT should be sent
+      // No actual transaction is performed here
+      console.log(`Request to receive ${amount} USDT at address ${USDT_WALLET_ADDRESS}`);
+      
+      // In a real app, you might want to generate a QR code or create a payment link
+    } catch (error) {
+      console.error("Error in receive flow:", error);
+      setError(error instanceof Error ? error.message : 'Operation failed');
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center">
+        <div className="bg-gray-800 text-white font-bold py-2 px-4 rounded">
+          {t.loading}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-0 p-4 border border-gray-700 rounded-lg bg-gray-800">
@@ -125,54 +189,92 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
         {action === 'sendUsdt' ? 'Send USDT' : 'Receive USDT'}
       </h2>
 
-      {action === 'sendUsdt' ? (
+      {tonConnectUI.connected ? (
         <>
-          <input
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder={t.enterAmount}
-            className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
-            min="0"
-            step="0.01"
-          />
-          <div className="mb-2">
-            <label className="block text-sm text-gray-400 mb-1">{t.enterAddress}</label>
-            <input
-              type="text"
-              value={recipientAddress}
-              readOnly
-              className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white opacity-75"
-            />
-            <p className="text-xs text-gray-500 mt-1">{t.fixedAddress}</p>
-          </div>
+          {action === 'sendUsdt' ? (
+            <>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder={t.enterAmount}
+                className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+                min="0"
+                step="0.01"
+              />
+              <div className="mb-2">
+                <label className="block text-sm text-gray-400 mb-1">{t.enterAddress}</label>
+                <input
+                  type="text"
+                  value={recipientAddress}
+                  readOnly
+                  className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white opacity-75"
+                />
+                <p className="text-xs text-gray-500 mt-1">{t.fixedAddress}</p>
+              </div>
+              <button
+                onClick={sendJetton}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              >
+                {t.send}
+              </button>
+            </>
+          ) : (
+            <>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder={t.enterAmount}
+                className="w-full p-2 mb-2 bg-gray-700 border border-gray-600 rounded text-white"
+                min="0"
+                step="0.01"
+              />
+              <div className="mb-2">
+                <label className="block text-sm text-gray-400 mb-1">{t.enterAddress}</label>
+                <input
+                  type="text"
+                  value={USDT_WALLET_ADDRESS}
+                  readOnly
+                  className="w-full p-2 bg-gray-700 border border-gray-600 rounded text-white opacity-75"
+                />
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-gray-500 mt-1">{t.fixedAddress}</p>
+                  <button 
+                    onClick={copyToClipboard}
+                    className="text-xs bg-gray-600 hover:bg-gray-500 text-white p-1 rounded mt-1"
+                  >
+                    {copied ? '✓' : '📋'}
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={receiveJetton}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+              >
+                {t.receive}
+              </button>
+            </>
+          )}
+
+          <p className="mt-4 text-center text-sm text-gray-400">
+            {t.connected}: {formatAddress(tonConnectUI.account?.address || '')}
+          </p>
+          
           <button
-            onClick={sendJetton}
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            onClick={handleWalletAction}
+            className="mt-2 w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
           >
-            {t.send}
+            {t.disconnectWallet}
           </button>
         </>
       ) : (
-        <div className="text-center">
-          <p className="mb-2 text-gray-400">{t.yourAddress}</p>
-          <div className="relative">
-            <p className="font-mono bg-gray-700 p-3 rounded break-all">
-              {USDT_WALLET_ADDRESS}
-            </p>
-            <button 
-              onClick={copyToClipboard}
-              className="absolute top-2 right-2 bg-gray-600 hover:bg-gray-500 text-white p-1 rounded"
-            >
-              {copied ? '✓' : '📋'}
-            </button>
-            {copied && (
-              <div className="absolute -top-8 right-0 bg-green-800 text-white px-2 py-1 rounded text-sm">
-                {t.addressCopied}
-              </div>
-            )}
-          </div>
-        </div>
+        <button
+          onClick={handleWalletAction}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+        >
+          {t.connectWallet}
+        </button>
       )}
 
       {error && (
