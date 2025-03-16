@@ -5,6 +5,7 @@ import { useUser } from '../UserContext';
 // import ReceivePopup from '../components/ReceivePopup';
 import TonConnect from './tonconnect';
 import Send from './send';
+import JettonTransfer from './jetton';
 import { useTonPrice } from '../TonPriceContext';
 import { useLanguage } from '../LanguageContext';
 
@@ -30,7 +31,11 @@ const translations = {
     forTransactions: 'для подтверждения транзакций',
     insufficientBalance: 'Недостаточно средств',
     negativeAmount: 'Отрицательная сумма',
-    invalidAmount: 'Неверная сумма'
+    invalidAmount: 'Неверная сумма',
+    sendTon: 'Отправить TON',
+    sendUsdt: 'Отправить USDT',
+    receiveTon: 'Получить TON',
+    receiveUsdt: 'Получить USDT'
   },
   en: {
     send: 'Send',
@@ -46,7 +51,11 @@ const translations = {
     forTransactions: 'for transaction confirmation',
     insufficientBalance: 'Insufficient balance',
     negativeAmount: 'Negative amount',
-    invalidAmount: 'Invalid amount'
+    invalidAmount: 'Invalid amount',
+    sendTon: 'Send TON',
+    sendUsdt: 'Send USDT',
+    receiveTon: 'Receive TON',
+    receiveUsdt: 'Receive USDT'
   }
 }
 
@@ -72,6 +81,7 @@ export default function Wallet() {
   });
   const { language } = useLanguage();
   const t = translations[language as keyof typeof translations] || translations.en;
+  const [usdtBalance, setUsdtBalance] = useState<string>('0');
 
   const currencies: Record<string, Currency> = {
     RUB: { code: 'RUB', symbol: '₽', rate: exchangeRates.RUB },
@@ -182,7 +192,10 @@ export default function Wallet() {
       <div className="text-center w-full max-w-lg px-4">
         <div className="flex flex-col">
           <div className="flex justify-between items-center mb-4 mt-4 ml-4">
-            <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0)).toFixed(2)}$</p>
+            <div>
+              <p className="text-4xl text-bold">{Math.floor((user?.walletBalance || 0)).toFixed(2)}$</p>
+              <p className="text-xl text-gray-400">USDT: {usdtBalance}</p>
+            </div>
             <button
               onClick={() => setShowCurrencySelector(!showCurrencySelector)}
               className="text-2xl text-gray-400 hover:text-gray-300 focus:outline-none"
@@ -224,21 +237,41 @@ export default function Wallet() {
        
         
         <div className="grid grid-cols-3 gap-1 mb-8">
-          <button 
-            onClick={() => handleButtonClick('send')}
-            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
-          >
-            <span className="text-2xl mb-2">↑</span>
-            <span className="text-sm">{t.send}</span>
-          </button>
+          <div className="col-span-3 grid grid-cols-2 gap-1 mb-1">
+            <button 
+              onClick={() => handleButtonClick('sendTon')}
+              className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+            >
+              <span className="text-2xl mb-2">↑</span>
+              <span className="text-sm">{t.sendTon}</span>
+            </button>
 
-          <button 
-            onClick={() => handleButtonClick('receive')}
-            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
-          >
-            <span className="text-2xl mb-2">↓</span>
-            <span className="text-sm">{t.receive}</span>
-          </button>
+            <button 
+              onClick={() => handleButtonClick('sendUsdt')}
+              className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+            >
+              <span className="text-2xl mb-2">↑</span>
+              <span className="text-sm">{t.sendUsdt}</span>
+            </button>
+          </div>
+
+          <div className="col-span-3 grid grid-cols-2 gap-1 mb-1">
+            <button 
+              onClick={() => handleButtonClick('receiveTon')}
+              className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+            >
+              <span className="text-2xl mb-2">↓</span>
+              <span className="text-sm">{t.receiveTon}</span>
+            </button>
+
+            <button 
+              onClick={() => handleButtonClick('receiveUsdt')}
+              className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
+            >
+              <span className="text-2xl mb-2">↓</span>
+              <span className="text-sm">{t.receiveUsdt}</span>
+            </button>
+          </div>
 
           <button 
             onClick={() => handleButtonClick('upCore')}
@@ -297,8 +330,9 @@ export default function Wallet() {
           </div>
         )}
         
-        {selectedAction === 'receive' && <TonConnect />}
-        {selectedAction === 'send' && <Send />}
+        {selectedAction === 'receiveTon' && <TonConnect />}
+        {selectedAction === 'sendTon' && <Send />}
+        {(selectedAction === 'sendUsdt' || selectedAction === 'receiveUsdt') && <JettonTransfer action={selectedAction} />}
 
         <div className="mt-8 p-4 bg-gray-800 rounded-lg">
           <div className="flex items-center justify-between">
