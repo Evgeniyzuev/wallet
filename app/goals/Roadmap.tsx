@@ -21,22 +21,17 @@ const roadmapTranslations = {
     //   },
       {
         name: 'Внутренние транзакции',
-        date: 'январь 2025',
+        date: '2025',
         description: 'Возможность переводить средства контактам.<br/> Возможность создавать счета на оплату.<br/> История всех операций пользователя.<br/> Блокчейн.<br/> Чеки.'
       },
       {
         name: 'ИИ-ассистент по целям',
-        date: 'февраль 2025',
+        date: '2025',
         description: 'Обучение ИИ-ассистента выполнять цели пользователя.<br/> Декомпозиция цели на задачи.<br/> Использование лучших практик.<br/> Нетворкинг. Создание связей. <br/> Менеджмент ресурсов.'
       },
       {
-        name: 'Миллион пользователей',
-        date: 'март 2025',
-        description: 'Набор пользователей. <br/> Награды за привлечение рефералов.'
-      },
-      {
         name: 'Доходы от партнерских программ',
-        date: 'март 2025',
+        date: '2025',
         description: '100% доходов получают пользователи.'
       },
       {
@@ -57,22 +52,17 @@ const roadmapTranslations = {
     items: [
       {
         name: 'Internal Transactions',
-        date: 'January 2025',
+        date: '2025',
         description: 'Ability to transfer funds to contacts.<br/> Ability to create invoices.<br/> User transaction history.<br/> Blockchain.<br/> Receipts.'
       },
       {
         name: 'AI Assistant for Goals',
-        date: 'February 2025',
+        date: '2025',
         description: 'Training the AI assistant to achieve user goals.<br/> Decomposition of goals into tasks.<br/> Use of best practices.<br/> Networking. Creating connections.<br/> Resource management.'
       },
       {
-        name: 'Million users',
-        date: 'March 2025',
-        description: 'User base.<br/> Rewards for referrals.'
-      },
-      {
         name: 'Income from partner programs',
-        date: 'March 2025',
+        date: '2025',
         description: '100% of income goes to users.'
       },
       {
