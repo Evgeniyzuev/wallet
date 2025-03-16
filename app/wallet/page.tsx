@@ -6,7 +6,7 @@ import { useUser } from '../UserContext';
 import TonConnect from './tonconnect';
 import Send from './send';
 import JettonTransfer from './jetton';
-import { useTonPrice } from '../TonPriceContext';
+// import { useTonPrice } from '../TonPriceContext';
 import { useLanguage } from '../LanguageContext';
 import TonWeb from 'tonweb';
 
@@ -69,7 +69,7 @@ export default function Wallet() {
   const [amount, setAmount] = useState<string>('');
   // const [isReceivePopupOpen, setIsReceivePopupOpen] = useState(false);
   const [isTransactionInProgress, setIsTransactionInProgress] = useState(false);
-  const { tonPrice } = useTonPrice();
+  // const { tonPrice } = useTonPrice();
   const [showCurrencySelector, setShowCurrencySelector] = useState(false);
   const [selectedCurrency, setSelectedCurrency] = useState<string>(() => {
     // Initialize from localStorage if available
@@ -86,6 +86,11 @@ export default function Wallet() {
   const { language } = useLanguage();
   const t = translations[language as keyof typeof translations] || translations.en;
   const [usdtBalance, setUsdtBalance] = useState<string>('0');
+  const [cryptoRates, setCryptoRates] = useState<Record<string, number>>({
+    TON: 0,
+    USDT: 1 // USDT обычно привязан к доллару (1:1)
+  });
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const currencies: Record<string, Currency> = {
     RUB: { code: 'RUB', symbol: '₽', rate: exchangeRates.RUB },
@@ -93,10 +98,10 @@ export default function Wallet() {
     INR: { code: 'INR', symbol: '₹', rate: exchangeRates.INR }
   };
 
-  // Calculate TON amount from USD balance
+  // Calculate TON amount from USD balance using actual exchange rate
   const getTonAmount = () => {
-    if (!tonPrice || !user?.walletBalance) return 0;
-    return user.walletBalance / tonPrice;
+    if (!cryptoRates.TON || !user?.walletBalance) return 0;
+    return user.walletBalance / cryptoRates.TON;
   };
 
   const handleButtonClick = (action: string) => {
@@ -168,9 +173,11 @@ export default function Wallet() {
     return `${currency.symbol}${converted.toFixed(2)}`;
   };
 
+  // Fetch exchange rates from API
   useEffect(() => {
     const fetchExchangeRates = async () => {
       try {
+        // Fetch fiat currency exchange rates
         const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const data = await response.json();
         
@@ -179,14 +186,32 @@ export default function Wallet() {
           CNY: data.rates.CNY,
           INR: data.rates.INR
         });
+
+        // Fetch crypto exchange rates from CoinGecko
+        const cryptoResponse = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=the-open-network,tether&vs_currencies=usd'
+        );
+        const cryptoData = await cryptoResponse.json();
+        
+        setCryptoRates({
+          TON: cryptoData['the-open-network']?.usd || 0,
+          USDT: cryptoData['tether']?.usd || 1
+        });
+
+        setLastUpdated(new Date());
+
+        console.log('Crypto rates updated:', {
+          TON: cryptoData['the-open-network']?.usd,
+          USDT: cryptoData['tether']?.usd
+        });
       } catch (error) {
         console.error('Error fetching exchange rates:', error);
       }
     };
 
     fetchExchangeRates();
-    // Обновляем курсы каждые 60 минут
-    const interval = setInterval(fetchExchangeRates, 60 * 60 * 1000);
+    // Обновляем курсы каждые 5 минут для криптовалют
+    const interval = setInterval(fetchExchangeRates, 5 * 60 * 1000);
     
     return () => clearInterval(interval);
   }, []);
@@ -237,6 +262,9 @@ export default function Wallet() {
             <div>
               <p className="text-4xl text-bold">{Number((user?.walletBalance || 0)).toFixed(2)}$</p>
               <p className="text-xl text-gray-400">USDT: ${usdtBalance}</p>
+              {cryptoRates.TON > 0 && (
+                <p className="text-xs text-gray-500">TON: ${cryptoRates.TON.toFixed(2)}</p>
+              )}
             </div>
             <button
               onClick={() => setShowCurrencySelector(!showCurrencySelector)}
@@ -244,9 +272,16 @@ export default function Wallet() {
             >
               💱
             </button>
-            <p className="text-2xl text-gray-400">
-              {tonPrice ? `${getTonAmount().toFixed(2)} TON` : t.loading}
-            </p>
+            <div className="text-right">
+              <p className="text-2xl text-gray-400">
+                {cryptoRates.TON ? `${getTonAmount().toFixed(2)} TON` : t.loading}
+              </p>
+              {lastUpdated && (
+                <p className="text-xs text-gray-500">
+                  {lastUpdated.toLocaleTimeString()}
+                </p>
+              )}
+            </div>
           </div>
           
           {selectedCurrency !== 'USD' && currencies[selectedCurrency] && (

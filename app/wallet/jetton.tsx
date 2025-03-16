@@ -22,6 +22,8 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [exchangeRate, setExchangeRate] = useState<number | null>(null);
+  const [tonUsdRate, setTonUsdRate] = useState<number | null>(null);
 
   const translations = {
     ru: {
@@ -39,7 +41,9 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
       connectWallet: 'Подключить кошелек',
       disconnectWallet: 'Отключить кошелек',
       loading: 'Загрузка...',
-      connected: 'Подключено'
+      connected: 'Подключено',
+      currentRate: 'Текущий курс',
+      equivalent: 'Эквивалент'
     },
     en: {
       enterAmount: 'Enter USDT amount',
@@ -56,11 +60,49 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
       connectWallet: 'Connect Wallet',
       disconnectWallet: 'Disconnect Wallet',
       loading: 'Loading...',
-      connected: 'Connected'
+      connected: 'Connected',
+      currentRate: 'Current rate',
+      equivalent: 'Equivalent'
     }
   };
 
   const t = translations[language as keyof typeof translations] || translations.en;
+
+  // Fetch current exchange rates
+  useEffect(() => {
+    const fetchExchangeRates = async () => {
+      try {
+        const response = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=the-open-network,tether&vs_currencies=usd'
+        );
+        const data = await response.json();
+        
+        if (data['the-open-network'] && data['tether']) {
+          const tonRate = data['the-open-network'].usd;
+          const usdtRate = data['tether'].usd;
+          
+          // Calculate TON/USDT rate
+          const tonToUsdt = tonRate / usdtRate;
+          setExchangeRate(tonToUsdt);
+          setTonUsdRate(tonRate);
+          
+          console.log('Exchange rates updated:', {
+            'TON/USD': tonRate,
+            'USDT/USD': usdtRate,
+            'TON/USDT': tonToUsdt
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching exchange rates:', error);
+      }
+    };
+
+    fetchExchangeRates();
+    // Update rates every 5 minutes
+    const interval = setInterval(fetchExchangeRates, 5 * 60 * 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(USDT_WALLET_ADDRESS);
@@ -93,6 +135,13 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
     } catch {
       return `${address.slice(0, 4)}...${address.slice(-4)}`;
     }
+  };
+
+  // Calculate TON equivalent of USDT amount
+  const calculateTonEquivalent = () => {
+    if (!exchangeRate || !amount || isNaN(Number(amount))) return null;
+    const amountNum = Number(amount);
+    return (amountNum / exchangeRate).toFixed(4);
   };
 
   const sendJetton = async () => {
@@ -189,6 +238,8 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
     );
   }
 
+  const tonEquivalent = calculateTonEquivalent();
+
   return (
     <div className="mt-0 p-4 border border-gray-700 rounded-lg bg-gray-800">
       <h2 className="text-xl font-bold mb-4">
@@ -208,6 +259,11 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
                 min="0"
                 step="0.01"
               />
+              {tonEquivalent && tonUsdRate && (
+                <div className="mb-2 text-xs text-gray-400">
+                  {t.equivalent}: {tonEquivalent} TON (${tonUsdRate.toFixed(2)}/TON)
+                </div>
+              )}
               <div className="mb-2">
                 <label className="block text-sm text-gray-400 mb-1">{t.enterAddress}</label>
                 <input
@@ -236,6 +292,11 @@ export default function JettonTransfer({ action }: JettonTransferProps) {
                 min="0"
                 step="0.01"
               />
+              {tonEquivalent && tonUsdRate && (
+                <div className="mb-2 text-xs text-gray-400">
+                  {t.equivalent}: {tonEquivalent} TON (${tonUsdRate.toFixed(2)}/TON)
+                </div>
+              )}
               <div className="mb-2">
                 <label className="block text-sm text-gray-400 mb-1">{t.enterAddress}</label>
                 <input
