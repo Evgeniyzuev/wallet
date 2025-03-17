@@ -31,7 +31,7 @@ export default function GoalsPage() {
   const titles = pageTitle[language as keyof typeof pageTitle] || pageTitle.en;
 
   return (
-    <main className="bg-dark-blue text-white min-h-screen flex flex-col p-0">
+    <main className={`${activeTab === 'visionBoard' ? 'bg-white' : 'bg-dark-blue'} text-white min-h-screen flex flex-col p-0`}>
       <div className="flex justify-center">
         <div className="flex space-x-2 bg-gray-800 rounded-lg p-0.5">
           <button
@@ -81,7 +81,7 @@ export default function GoalsPage() {
           </div>
         </div>
       ) : activeTab === 'visionBoard' ? (
-        <VisionBoard showAddForm={false} />
+        <VisionBoard />
       ) : activeTab === 'addGoal' ? (
         <AddGoal />
       ) : (

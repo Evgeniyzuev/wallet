@@ -129,7 +129,7 @@ const defaultSectors = [
   'гармония'
 ];
 
-export default function VisionBoard({ showAddForm = true }: { showAddForm?: boolean }) {
+export default function VisionBoard() {
   const [items, setItems] = useState<VisionItem[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
@@ -222,167 +222,79 @@ export default function VisionBoard({ showAddForm = true }: { showAddForm?: bool
   };
 
   return (
-    <div className="container mx-auto p-4">
-      {showAddForm && (
-        <div className="mb-4 bg-gray-800 p-4 rounded-lg">
-          <h2 className="text-xl font-bold mb-4">Добавить новую цель</h2>
-          
-          <div className="mb-4">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileSelect}
-              className="mb-2 text-sm text-gray-300"
+    <div className="bg-white text-gray-800 min-h-screen">
+      {/* Instagram-like grid layout */}
+      <div className="grid grid-cols-3 gap-1">
+        {/* Show all items in a single grid, grouped by sectors with headers */}
+        {items.map(item => (
+          <div 
+            key={item.id} 
+            className="relative aspect-square cursor-pointer border-b border-r border-gray-100"
+            onClick={() => handleItemClick(item)}
+          >
+            <div className="absolute top-0 left-0 bg-black bg-opacity-50 text-white text-xs px-2 py-0.5 z-10">
+              {item.sector}
+            </div>
+            <Image
+              src={item.imageUrl}
+              alt={item.caption}
+              fill
+              className="object-cover"
             />
           </div>
-
-          <div className="mb-4">
-            <input
-              type="text"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Описание цели"
-              className="w-full p-2 rounded bg-gray-700 text-white"
-            />
-          </div>
-
-          <div className="mb-4">
-            <select
-              value={selectedSector}
-              onChange={(e) => setSelectedSector(e.target.value)}
-              className="w-full p-2 rounded bg-gray-700 text-white"
-            >
-              {sectors.map(sector => (
-                <option key={sector} value={sector}>
-                  {sector.charAt(0).toUpperCase() + sector.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="mb-4">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newSector}
-                onChange={(e) => setNewSector(e.target.value)}
-                placeholder="Новая сфера"
-                className="flex-1 p-2 rounded bg-gray-700 text-white"
-              />
-              <button
-                onClick={async () => {
-                  if (newSector.trim()) {
-                    const updatedSectors = [...sectors, newSector.trim()];
-                    setSectors(updatedSectors);
-                    await saveData(items, updatedSectors);
-                    setNewSector('');
-                  }
-                }}
-                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-              >
-                +
-              </button>
-            </div>
-          </div>
-          <button
-            onClick={() => handleDeleteSector(selectedSector)}
-            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-          >
-            Удалить сферу
-          </button>
-
-          <button
-            onClick={handleUpload}
-            disabled={!selectedFile || !caption}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-          >
-            Добавить
-          </button>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-4">
-        {Array.from(new Set(items.map(item => item.sector))).map(sector => {
-          const sectorItems = items.filter(item => item.sector === sector);
-          if (sectorItems.length === 0) return null;
-
-          return (
-            <div key={sector} className="bg-gray-800 p-0 rounded-lg w-full">
-              <div className="flex justify-between items-center mb-0 px-4 pt-0">
-                <div className="flex justify-center items-center w-full mb-0 px-4 pt-0">
-                  <h3 className="text-lg font-bold text-blue-400 text-center inline-block px-2 rounded-lg bg-black bg-opacity-50 mt-0 -mb-8 z-10">
-                    {sector.charAt(0).toUpperCase() + sector.slice(1)}
-                  </h3>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-0.5">
-                {sectorItems.map(item => (
-                  <div 
-                    key={item.id} 
-                    className="relative aspect-square cursor-pointer"
-                    onClick={() => handleItemClick(item)}
-                  >
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.caption}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+        ))}
       </div>
 
       {selectedItem && (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-800 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="relative aspect-square w-full">
-              <Image
-                src={selectedItem.imageUrl}
-                alt={selectedItem.caption}
-                fill
-                className="object-contain"
-              />
-            </div>
-            <div className="p-4 space-y-4">
-              <input
-                type="text"
-                value={editedCaption}
-                onChange={(e) => setEditedCaption(e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white"
-                placeholder="Описание"
-              />
-              <textarea
-                value={editedComment}
-                onChange={(e) => setEditedComment(e.target.value)}
-                className="w-full p-2 rounded bg-gray-700 text-white h-24"
-                placeholder="Комментарий"
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => {
-                    handleDelete(selectedItem.id);
-                    setSelectedItem(null);
-                  }}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Удалить
-                </button>
-                <button
-                  onClick={() => setSelectedItem(null)}
-                  className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
-                >
-                  Отмена
-                </button>
-                <button
-                  onClick={handleSaveEdits}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-                >
-                  Сохранить
-                </button>
+          <div className="bg-white rounded-lg max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex flex-col md:flex-row">
+              <div className="relative aspect-square w-full md:w-1/2">
+                <Image
+                  src={selectedItem.imageUrl}
+                  alt={selectedItem.caption}
+                  fill
+                  className="object-contain"
+                />
+              </div>
+              <div className="p-4 space-y-4 md:w-1/2">
+                <div className="text-sm text-gray-500">{selectedItem.sector}</div>
+                <input
+                  type="text"
+                  value={editedCaption}
+                  onChange={(e) => setEditedCaption(e.target.value)}
+                  className="w-full p-2 rounded border border-gray-300 text-gray-800"
+                  placeholder="Описание"
+                />
+                <textarea
+                  value={editedComment}
+                  onChange={(e) => setEditedComment(e.target.value)}
+                  className="w-full p-2 rounded border border-gray-300 text-gray-800 h-24"
+                  placeholder="Комментарий"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => {
+                      handleDelete(selectedItem.id);
+                      setSelectedItem(null);
+                    }}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Удалить
+                  </button>
+                  <button
+                    onClick={() => setSelectedItem(null)}
+                    className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+                  >
+                    Отмена
+                  </button>
+                  <button
+                    onClick={handleSaveEdits}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Сохранить
+                  </button>
+                </div>
               </div>
             </div>
           </div>
