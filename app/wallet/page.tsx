@@ -372,15 +372,6 @@ export default function Wallet() {
             <span className="text-sm">{t.exchange}</span>
           </button>
 
-          <button 
-            onClick={() => handleButtonClick('buy')}
-            className="flex flex-col items-center justify-center p-4 rounded-lg bg-gray-800 hover:bg-gray-700 transition-all"
-          >
-            <span className="text-2xl mb-2">$</span>
-            <span className="text-sm">{t.buyTon}</span>
-          </button>
-
-
         </div>
 
         {( selectedAction === 'upCore') && (
