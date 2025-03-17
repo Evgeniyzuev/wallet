@@ -93,6 +93,7 @@ export default function Wallet() {
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const currencies: Record<string, Currency> = {
+    USD: { code: 'USD', symbol: '$', rate: 1 },
     RUB: { code: 'RUB', symbol: '₽', rate: exchangeRates.RUB },
     CNY: { code: 'CNY', symbol: '¥', rate: exchangeRates.CNY },
     INR: { code: 'INR', symbol: '₹', rate: exchangeRates.INR }
@@ -260,8 +261,11 @@ export default function Wallet() {
         <div className="flex flex-col">
           <div className="flex justify-between items-center mb-4 mt-4 ml-4">
             <div>
-              <p className="text-4xl text-bold">{Number((user?.walletBalance || 0)).toFixed(2)}$</p>
-
+              <p className="text-4xl text-bold">
+                {selectedCurrency === 'USD' 
+                  ? `$${Number((user?.walletBalance || 0)).toFixed(2)}`
+                  : formatBalance(user?.walletBalance || 0, currencies[selectedCurrency])}
+              </p>
             </div>
             <button
               onClick={() => setShowCurrencySelector(!showCurrencySelector)}
@@ -284,12 +288,6 @@ export default function Wallet() {
             </div>
           </div>
           
-          {selectedCurrency !== 'USD' && currencies[selectedCurrency] && (
-            <div className="text-2xl text-gray-400 text-center -mt-2 mb-4">
-              {formatBalance(user?.walletBalance || 0, currencies[selectedCurrency])}
-            </div>
-          )}
-
            {showCurrencySelector && (
           <div className="absolute mt-0 ml-4 bg-gray-800 rounded-lg shadow-lg z-50">
             {Object.entries(currencies).map(([code, currency]) => (
