@@ -261,10 +261,7 @@ export default function Wallet() {
           <div className="flex justify-between items-center mb-4 mt-4 ml-4">
             <div>
               <p className="text-4xl text-bold">{Number((user?.walletBalance || 0)).toFixed(2)}$</p>
-              <p className="text-xl text-gray-400">USDT: ${usdtBalance}</p>
-              {cryptoRates.TON > 0 && (
-                <p className="text-xs text-gray-500">TON: ${cryptoRates.TON.toFixed(2)}</p>
-              )}
+
             </div>
             <button
               onClick={() => setShowCurrencySelector(!showCurrencySelector)}
@@ -273,9 +270,12 @@ export default function Wallet() {
               💱
             </button>
             <div className="text-right">
-              <p className="text-2xl text-gray-400">
+              {cryptoRates.TON > 0 && (
+                <p className="text-xs text-gray-500">TON: ${cryptoRates.TON.toFixed(2)}</p>
+              )}
+              {/* <p className="text-2xl text-gray-400">
                 {cryptoRates.TON ? `${getTonAmount().toFixed(2)} TON` : t.loading}
-              </p>
+              </p> */}
               {lastUpdated && (
                 <p className="text-xs text-gray-500">
                   {lastUpdated.toLocaleTimeString()}
