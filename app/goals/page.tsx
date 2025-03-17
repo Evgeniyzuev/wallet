@@ -4,6 +4,7 @@ import { useLanguage } from '../LanguageContext';
 import { useState } from 'react';
 import Roadmap from './Roadmap';
 import VisionBoard from '../goals/VisionBoard';
+import AddGoal from './AddGoal';
 
 const goalTranslations = {
   ru: ['🏋️ здоровье', '💑 отношения', '⏳ время', '🎯 цели', '💰 деньги', '💼 карьера', '🏠 дом', '✈️ путешествия', '🎨 хобби', '👪 семья', '🧠 навыки', '🧘‍♀️ привычки', '💪 фитнес', '🏠 имущество', '💁‍♂️ персональное', '👨‍👩‍👦‍👦 социальное', '🌐 карта желаний', '🔮 рекомендации!'],
@@ -25,38 +26,47 @@ const pageTitle = {
 
 export default function GoalsPage() {
   const { language } = useLanguage();
-  const [activeTab, setActiveTab] = useState<'goals' | 'roadmap' | 'visionBoard'>('goals');
+  const [activeTab, setActiveTab] = useState<'goals' | 'roadmap' | 'visionBoard' | 'addGoal'>('goals');
   const goals = goalTranslations[language as keyof typeof goalTranslations] || goalTranslations.en;
   const titles = pageTitle[language as keyof typeof pageTitle] || pageTitle.en;
 
   return (
     <main className="bg-dark-blue text-white min-h-screen flex flex-col p-0">
-      <div className="flex justify-center mb-8">
-        <div className="flex space-x-4 bg-gray-800 rounded-lg p-1">
-          <button
-            onClick={() => setActiveTab('goals')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeTab === 'goals' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'
-            }`}
-          >
-            {titles.goals}
-          </button>
+      <div className="flex justify-center">
+        <div className="flex space-x-2 bg-gray-800 rounded-lg p-0.5">
           <button
             onClick={() => setActiveTab('visionBoard')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
               activeTab === 'visionBoard' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'
             }`}
           >
             {titles.visionBoard}
           </button>
           <button
+            onClick={() => setActiveTab('addGoal')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+              activeTab === 'addGoal' ? 'bg-green-500 text-white' : 'bg-green-500 text-white hover:bg-green-600'
+            }`}
+          >
+            +
+          </button>
+          <button
+            onClick={() => setActiveTab('goals')}
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+              activeTab === 'goals' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'
+            }`}
+          >
+            {titles.goals}
+          </button>
+          <button
             onClick={() => setActiveTab('roadmap')}
-            className={`px-4 py-2 rounded-lg transition-colors ${
+            className={`px-3 py-1 rounded-lg text-sm transition-colors ${
               activeTab === 'roadmap' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-700'
             }`}
           >
             {titles.roadmap}
           </button>
+
         </div>
       </div>
 
@@ -71,7 +81,9 @@ export default function GoalsPage() {
           </div>
         </div>
       ) : activeTab === 'visionBoard' ? (
-        <VisionBoard />
+        <VisionBoard showAddForm={false} />
+      ) : activeTab === 'addGoal' ? (
+        <AddGoal />
       ) : (
         <Roadmap />
       )}

@@ -129,7 +129,7 @@ const defaultSectors = [
   'гармония'
 ];
 
-export default function VisionBoard() {
+export default function VisionBoard({ showAddForm = true }: { showAddForm?: boolean }) {
   const [items, setItems] = useState<VisionItem[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [caption, setCaption] = useState('');
@@ -222,82 +222,84 @@ export default function VisionBoard() {
   };
 
   return (
-    <div className="p-0 pb-20">
-      <div className="mb-4 bg-gray-800 p-4 rounded-lg">
-        <h2 className="text-xl font-bold mb-4">Добавить новую цель</h2>
-        
-        <div className="mb-4">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileSelect}
-            className="mb-2 text-sm text-gray-300"
-          />
-        </div>
+    <div className="container mx-auto p-4">
+      {showAddForm && (
+        <div className="mb-4 bg-gray-800 p-4 rounded-lg">
+          <h2 className="text-xl font-bold mb-4">Добавить новую цель</h2>
+          
+          <div className="mb-4">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileSelect}
+              className="mb-2 text-sm text-gray-300"
+            />
+          </div>
 
-        <div className="mb-4">
-          <input
-            type="text"
-            value={caption}
-            onChange={(e) => setCaption(e.target.value)}
-            placeholder="Описание цели"
-            className="w-full p-2 rounded bg-gray-700 text-white"
-          />
-        </div>
-
-        <div className="mb-4">
-          <select
-            value={selectedSector}
-            onChange={(e) => setSelectedSector(e.target.value)}
-            className="w-full p-2 rounded bg-gray-700 text-white"
-          >
-            {sectors.map(sector => (
-              <option key={sector} value={sector}>
-                {sector.charAt(0).toUpperCase() + sector.slice(1)}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <div className="flex gap-2">
+          <div className="mb-4">
             <input
               type="text"
-              value={newSector}
-              onChange={(e) => setNewSector(e.target.value)}
-              placeholder="Новая сфера"
-              className="flex-1 p-2 rounded bg-gray-700 text-white"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="Описание цели"
+              className="w-full p-2 rounded bg-gray-700 text-white"
             />
-            <button
-              onClick={async () => {
-                if (newSector.trim()) {
-                  const updatedSectors = [...sectors, newSector.trim()];
-                  setSectors(updatedSectors);
-                  await saveData(items, updatedSectors);
-                  setNewSector('');
-                }
-              }}
-              className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
-            >
-              +
-            </button>
           </div>
-        </div>
-        <button
-          onClick={() => handleDeleteSector(selectedSector)}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
-        >
-          Удалить сферу
-        </button>
 
-        <button
-          onClick={handleUpload}
-          disabled={!selectedFile || !caption}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
-        >
-          Добавить
-        </button>
-      </div>
+          <div className="mb-4">
+            <select
+              value={selectedSector}
+              onChange={(e) => setSelectedSector(e.target.value)}
+              className="w-full p-2 rounded bg-gray-700 text-white"
+            >
+              {sectors.map(sector => (
+                <option key={sector} value={sector}>
+                  {sector.charAt(0).toUpperCase() + sector.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newSector}
+                onChange={(e) => setNewSector(e.target.value)}
+                placeholder="Новая сфера"
+                className="flex-1 p-2 rounded bg-gray-700 text-white"
+              />
+              <button
+                onClick={async () => {
+                  if (newSector.trim()) {
+                    const updatedSectors = [...sectors, newSector.trim()];
+                    setSectors(updatedSectors);
+                    await saveData(items, updatedSectors);
+                    setNewSector('');
+                  }
+                }}
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <button
+            onClick={() => handleDeleteSector(selectedSector)}
+            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+          >
+            Удалить сферу
+          </button>
+
+          <button
+            onClick={handleUpload}
+            disabled={!selectedFile || !caption}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+          >
+            Добавить
+          </button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4">
         {Array.from(new Set(items.map(item => item.sector))).map(sector => {
