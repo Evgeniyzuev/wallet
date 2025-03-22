@@ -313,10 +313,34 @@ export default function Core() {
 
         {/* Reinvestment slider */}
         <div className="mb-1">
-          <label className="flex items-center justify-between mb-0">
-            APY 26% 
-            <span>{t.reinvest}: {user?.reinvestSetup || 100}%</span>
-          </label>
+          <div className="flex items-center justify-between mb-0">
+            <span className="whitespace-nowrap mr-2">APY 26%</span>
+            
+            <div className="flex items-center justify-center flex-1 mx-2">
+              <span className="whitespace-nowrap">{t.reinvest}</span>
+              <input 
+                type="number" 
+                value={reinvestmentSetupInput}
+                ref={inputRef}
+                className="w-12 h-6 p-1 border border-black text-black rounded mx-2 text-center"
+                onChange={(e) => {
+                  const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
+                  setReinvestmentSetupInput(value);
+                }} 
+              />
+              <span>%</span>
+              <span className="text-xs ml-2 whitespace-nowrap">({t.minLevel}: {Math.max(0, minValue)}%)</span>
+            </div>
+            
+            {((user?.reinvestSetup || 100) >= minValue) && 
+              <button 
+                onClick={handleSaveReinvestSetup}
+                className={`py-0 px-4 rounded font-bold whitespace-nowrap ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
+              >
+                {isSaved ? '✔' : t.save}
+              </button>
+            }
+          </div>
           <div className="w-full h-2 bg-gray-200 rounded-full">
             <div
               className="h-full bg-green-500 rounded-full"
@@ -461,38 +485,6 @@ export default function Core() {
           </button>
         </div>
       )}
-
-      {/* Reinvest setup */}
-      <div className="rounded-lg bg-gray-800 hover:bg-gray-700 transition-all p-2 mb-1">
-        <div className="flex justify-between">
-          <div >
-            {t.reinvest}
-            
-            <input 
-              type="number" 
-              value={reinvestmentSetupInput}
-              ref={inputRef}
-              className="w-10 h-6 p-1 border border-black text-black rounded ml-2"
-              onChange={(e) => {
-                const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
-                setReinvestmentSetupInput(value);
-              }} 
-            /> % <br/>
-            <span className="text-xs">{t.minLevel}: {Math.max(0, minValue)}%</span>
-          </div>
-          {((user?.reinvestSetup || 100) >= minValue) && 
-              <button 
-              onClick={handleSaveReinvestSetup}
-              // disabled={reinvestmentSetupInput >= minValue}
-              className={`py-0 px-4 rounded font-bold ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
-            >
-              {isSaved ? '✔' : t.save}
-            </button>
-            }
-
-        </div>
-
-      </div>
 
       <DailyRewardPopup
         isOpen={showRewardPopup}
