@@ -28,7 +28,7 @@ const translations = {
     enterAmount: "Введите сумму",
     reinvest: "Реинвест",
     save: "Сохранить",
-    minLevel: "мин(-5% * ур)"
+    minLevel: "мин"
   },
   en: {
     walletDaily: "Wallet",
@@ -48,7 +48,7 @@ const translations = {
     enterAmount: "Enter amount",
     reinvest: "Reinvest",
     save: "Save",
-    minLevel: "min(-5% * lvl)"
+    minLevel: "min"
   }
 };
 
@@ -328,7 +328,6 @@ export default function Core() {
                   setReinvestmentSetupInput(value);
                 }} 
               />
-              <span>%</span>
               <span className="text-xs ml-2 whitespace-nowrap">({t.minLevel}: {Math.max(0, minValue)}%)</span>
             </div>
             
