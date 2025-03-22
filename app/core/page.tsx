@@ -27,7 +27,6 @@ const translations = {
     wallet: "Кошелёк",
     enterAmount: "Введите сумму",
     reinvest: "Реинвест",
-    save: "Сохранить",
     minLevel: "мин"
   },
   en: {
@@ -47,7 +46,6 @@ const translations = {
     wallet: "Wallet",
     enterAmount: "Enter amount",
     reinvest: "Reinvest",
-    save: "Save",
     minLevel: "min"
   }
 };
@@ -313,33 +311,39 @@ export default function Core() {
 
         {/* Reinvestment slider */}
         <div className="mb-1">
-          <div className="flex items-center justify-between mb-0">
-            <span className="whitespace-nowrap mr-2">APY 26%</span>
+          <div className="flex items-center space-x-1 mb-1">
+            {/* <div className="flex-none">
+              <span>APY 26%</span>
+            </div> */}
             
-            <div className="flex items-center justify-center flex-1 mx-2">
-              <span className="whitespace-nowrap">{t.reinvest}</span>
+            <div className="flex-1 flex items-center justify-center space-x-1 overflow-hidden">
+              <span className="flex-none">{t.reinvest}</span>
               <input 
                 type="number" 
                 value={reinvestmentSetupInput}
                 ref={inputRef}
-                className="w-12 h-6 p-1 border border-black text-black rounded mx-2 text-center"
+                className="w-12 h-6 p-0 border border-black text-black rounded text-center flex-none"
                 onChange={(e) => {
                   const value = Math.min(100, Math.max(0, parseInt(e.target.value)));
                   setReinvestmentSetupInput(value);
                 }} 
               />
-              <span className="text-xs ml-2 whitespace-nowrap">({t.minLevel}: {Math.max(0, minValue)}%)</span>
+              <span className="flex-none">%</span>
+              <span className="flex-none truncate">({t.minLevel}: {Math.max(0, minValue)}%)</span>
             </div>
             
-            {((user?.reinvestSetup || 100) >= minValue) && 
-              <button 
-                onClick={handleSaveReinvestSetup}
-                className={`py-0 px-4 rounded font-bold whitespace-nowrap ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
-              >
-                {isSaved ? '✔' : t.save}
-              </button>
-            }
+            <div className="flex-none">
+              {((user?.reinvestSetup || 100) >= minValue) && 
+                <button 
+                  onClick={handleSaveReinvestSetup}
+                  className={`py-0 px-3 rounded font-bold ${isSaved ? 'bg-green-500' : 'bg-blue-500 hover:bg-blue-700'} text-white`}
+                >
+                  {isSaved ? '✔' : 'save'}
+                </button>
+              }
+            </div>
           </div>
+          
           <div className="w-full h-2 bg-gray-200 rounded-full">
             <div
               className="h-full bg-green-500 rounded-full"
