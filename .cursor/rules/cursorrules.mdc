@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+App summary:
+A multifunctional platform with an AI assistant helps users in life to do tasks and fulfill their desires.
+
+These are your rules, you must read these before every implementation your make and make sure you adhere to them:
+- When writing classes, make sure to always use tailwind classes and colors. Make sure to always check that you use the content colors for foreground. Look at the existing components and use similar classes.
+- For icons, use the react-icons library. (change if needed)
+- Always use best practices and write clean, simple and readable code. Split up in multiple files and components if needed. Aim for readability and maintainability.
+- Do not remove any existing code and functionalities unless asked. Only do as asked.
+- Do not use the ternary operator unless it's very readable
+- I use next.js app router (change if needed), so make sure to use "use client" where needed.
+- Design mobile first, and make sure to use the tailwind breakpoints.
+- Use the next/image component for images.
+- Aim for simplicity and readability. A simpler design is better. Do not add unnecessary complexity or additional divs / components.
+- Do not add unnecessary comments
+- Reason and think step by step
+- Use semantic HTML tags where possible
+- Keep Good SEO in mind
+- Don't use CDN links for libraries. Use local files
+
+Before generating any code, read ALL these rules again carefully and make sure you adhere to them.
